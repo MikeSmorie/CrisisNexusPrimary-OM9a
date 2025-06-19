@@ -12,6 +12,12 @@ const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
   password: z.string().min(1, "Password is required"),
   email: z.string().email().optional(),
+});
+
+const registerSchema = z.object({
+  username: z.string().min(1, "Username is required"),
+  password: z.string().min(1, "Password is required"),
+  email: z.string().email().optional(),
   skipEmailVerification: z.boolean().optional(),
 });
 
@@ -154,7 +160,7 @@ export function setupAuth(app: Express) {
 
   app.post("/api/register", async (req, res) => {
     try {
-      const result = loginSchema.safeParse(req.body);
+      const result = registerSchema.safeParse(req.body);
       if (!result.success) {
         return res.status(400).json({
           message: "Invalid input", 
