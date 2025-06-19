@@ -168,8 +168,12 @@ export function setupAuth(app: Express) {
         });
       }
 
-      const { username, password, email } = result.data;
-      const skipEmailVerification = result.data.skipEmailVerification || false;
+      const { username, password, email, skipEmailVerification } = result.data;
+      console.log(`[DEBUG] Registration data:`, { username, email, skipEmailVerification });
+
+      // In development mode, always skip verification if not explicitly set to false
+      const shouldSkipVerification = skipEmailVerification === true || process.env.NODE_ENV === 'development';
+      console.log(`[DEBUG] Should skip verification:`, shouldSkipVerification);
 
       // Check if username or email already exists
       const existingUser = await db
@@ -218,13 +222,13 @@ export function setupAuth(app: Express) {
           status: "active", 
           tokens: 1000,
           createdAt: now,
-          isVerified: skipEmailVerification ? true : false,
-          verificationToken: skipEmailVerification ? null : verificationToken,
+          isVerified: shouldSkipVerification ? true : false,
+          verificationToken: shouldSkipVerification ? null : verificationToken,
           tokenVersion: 0
         })
         .returning();
 
-      if (skipEmailVerification) {
+      if (shouldSkipVerification) {
         // Auto-login if email verification is skipped
         req.logIn(newUser, (err) => {
           if (err) {
