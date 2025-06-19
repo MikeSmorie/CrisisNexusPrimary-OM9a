@@ -16,7 +16,7 @@ const loginSchema = z.object({
 
 const registerSchema = z.object({
   username: z.string().min(1, "Username is required"),
-  password: z.string().min(1, "Password is required"),
+  password: z.string().min(1, "Password is required"),  
   email: z.string().email().optional(),
   skipEmailVerification: z.boolean().optional(),
 });
@@ -168,7 +168,8 @@ export function setupAuth(app: Express) {
         });
       }
 
-      const { username, password, email, skipEmailVerification } = result.data;
+      const { username, password, email } = result.data;
+      const skipEmailVerification = result.data.skipEmailVerification || false;
 
       // Check if username or email already exists
       const existingUser = await db
@@ -217,13 +218,13 @@ export function setupAuth(app: Express) {
           status: "active", 
           tokens: 1000,
           createdAt: now,
-          isVerified: skipEmailVerification || process.env.NODE_ENV === 'development' ? true : false,
-          verificationToken: skipEmailVerification || process.env.NODE_ENV === 'development' ? null : verificationToken,
+          isVerified: skipEmailVerification ? true : false,
+          verificationToken: skipEmailVerification ? null : verificationToken,
           tokenVersion: 0
         })
         .returning();
 
-      if (skipEmailVerification || process.env.NODE_ENV === 'development') {
+      if (skipEmailVerification) {
         // Auto-login if email verification is skipped
         req.logIn(newUser, (err) => {
           if (err) {
