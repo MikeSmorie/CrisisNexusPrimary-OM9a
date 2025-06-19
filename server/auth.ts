@@ -12,6 +12,7 @@ const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
   password: z.string().min(1, "Password is required"),
   email: z.string().email().optional(),
+  skipEmailVerification: z.boolean().optional(),
 });
 
 const MemoryStore = createMemoryStore(session);
@@ -57,8 +58,8 @@ export function setupAuth(app: Express) {
           return done(null, false, { message: "Incorrect username." });
         }
 
-        // Check if user email is verified
-        if (!user.isVerified) {
+        // Check if user email is verified (skip in development mode)
+        if (!user.isVerified && process.env.NODE_ENV !== 'development') {
           return done(null, false, { message: "Please verify your email address before logging in." });
         }
 
@@ -161,7 +162,7 @@ export function setupAuth(app: Express) {
         });
       }
 
-      const { username, password, email } = result.data;
+      const { username, password, email, skipEmailVerification } = result.data;
 
       // Check if username or email already exists
       const existingUser = await db
@@ -210,26 +211,45 @@ export function setupAuth(app: Express) {
           status: "active", 
           tokens: 1000,
           createdAt: now,
-          isVerified: false,
-          verificationToken: verificationToken,
+          isVerified: skipEmailVerification || process.env.NODE_ENV === 'development' ? true : false,
+          verificationToken: skipEmailVerification || process.env.NODE_ENV === 'development' ? null : verificationToken,
           tokenVersion: 0
         })
         .returning();
 
-      // TODO: Send verification email
-      console.log(`Email verification token for ${email}: ${verificationToken}`);
-      console.log(`Verification link: ${req.get('origin') || 'http://localhost:5000'}/verify-email?token=${verificationToken}`);
+      if (skipEmailVerification || process.env.NODE_ENV === 'development') {
+        // Auto-login if email verification is skipped
+        req.logIn(newUser, (err) => {
+          if (err) {
+            console.error("Auto-login error:", err);
+            return res.status(500).json({ message: "Registration successful but login failed" });
+          }
+          return res.status(201).json({
+            message: "Registration and login successful",
+            user: {
+              id: newUser.id,
+              username: newUser.username,
+              email: newUser.email,
+              role: newUser.role,
+            },
+          });
+        });
+      } else {
+        // TODO: Send verification email
+        console.log(`Email verification token for ${email}: ${verificationToken}`);
+        console.log(`Verification link: ${req.get('origin') || 'http://localhost:5000'}/verify-email?token=${verificationToken}`);
 
-      res.status(201).json({ 
-        message: "User registered successfully. Please check your email to verify your account.",
-        requiresVerification: true,
-        email: newUser.email,
-        // In development, include the token for testing
-        ...(process.env.NODE_ENV === 'development' && { 
-          verificationToken,
-          verificationLink: `${req.get('origin') || 'http://localhost:5000'}/verify-email?token=${verificationToken}`
-        })
-      });
+        res.status(201).json({ 
+          message: "User registered successfully. Please check your email to verify your account.",
+          requiresVerification: true,
+          email: newUser.email,
+          // In development, include the token for testing
+          ...(process.env.NODE_ENV === 'development' && { 
+            verificationToken,
+            verificationLink: `${req.get('origin') || 'http://localhost:5000'}/verify-email?token=${verificationToken}`
+          })
+        });
+      }
     } catch (error) {
       console.error("Registration error:", error);
       res.status(500).json({ message: "Internal server error" });
