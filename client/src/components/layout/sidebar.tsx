@@ -131,7 +131,7 @@ export function Sidebar() {
       <div className="p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Omega-8</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Omega-9</h2>
             <p className="text-sm text-gray-600 dark:text-gray-400">Clean Core</p>
           </div>
           {isSupergod && (
@@ -305,7 +305,7 @@ export function Sidebar() {
       {/* Version Footer */}
       <div className="mt-auto p-4 border-t border-gray-200 dark:border-gray-800">
         <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
-          Omega-8-Clean-Core v1.0.0
+          Omega-9-Clean-Core v1.0.0
         </div>
       </div>
     </div>

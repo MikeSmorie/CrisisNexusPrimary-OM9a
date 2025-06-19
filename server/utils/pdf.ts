@@ -21,7 +21,7 @@ export interface UserRecord {
 
 export async function generateAuditPdf(data: AuditLogEntry[]): Promise<Buffer> {
   // Generate audit log content as structured text report
-  let content = `OMEGA-8 AUDIT LOGS EXPORT\n`;
+  let content = `OMEGA-9 AUDIT LOGS EXPORT\n`;
   content += `Generated: ${new Date().toISOString()}\n`;
   content += `Total Records: ${data.length}\n\n`;
   content += `${'='.repeat(120)}\n`;
@@ -47,7 +47,7 @@ export async function generateAuditPdf(data: AuditLogEntry[]): Promise<Buffer> {
 
 export async function generateUserPdf(user: UserRecord): Promise<Buffer> {
   // Generate user profile content as structured text report
-  let content = `OMEGA-8 USER PROFILE EXPORT\n`;
+  let content = `OMEGA-9 USER PROFILE EXPORT\n`;
   content += `Generated: ${new Date().toISOString()}\n\n`;
   content += `${'='.repeat(60)}\n`;
   content += `USER INFORMATION\n`;
