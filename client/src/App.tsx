@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import NotFound from "@/pages/not-found";
 import AuthPage from "@/pages/auth-page";
+import SecureAuthPage from "@/pages/secure-auth-page";
 import AdminRegisterPage from "@/pages/admin-register";
 import SupergodRegisterPage from "@/pages/supergod-register";
 import SupergodDashboard from "@/pages/supergod-dashboard";
@@ -51,7 +52,7 @@ function ProtectedAdminRoute({ component: Component }: { component: React.Compon
   }
 
   if (!user || (user.role !== "admin" && user.role !== "supergod")) {
-    return <AuthPage />;
+    return <SecureAuthPage />;
   }
   
   // Log role information
@@ -75,7 +76,7 @@ function ProtectedSupergodRoute({ component: Component }: { component: React.Com
   }
 
   if (!user || user.role !== "supergod") {
-    return <NotFound />;
+    return <SecureAuthPage />;
   }
   
   console.log("[DEBUG] Super-God exclusive route accessed");
@@ -102,7 +103,8 @@ function Router() {
         <Route path="/forgot-password" component={ForgotPasswordPage} />
         <Route path="/reset-password" component={ResetPasswordPage} />
         <Route path="/verify-email" component={VerifyEmailPage} />
-        <Route path="*" component={AuthPage} />
+        <Route path="/auth-secure" component={SecureAuthPage} />
+        <Route path="*" component={SecureAuthPage} />
       </Switch>
     );
   }
