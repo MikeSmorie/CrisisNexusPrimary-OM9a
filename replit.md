@@ -134,4 +134,5 @@ Changelog:
 
 ```
 Preferred communication style: Simple, everyday language.
+UI Design: Clean, minimal, professional appearance without excessive warnings or cluttered styling.
 ```

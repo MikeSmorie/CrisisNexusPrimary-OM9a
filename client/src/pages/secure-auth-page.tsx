@@ -182,26 +182,6 @@ export default function SecureAuthPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {/* Environment Info for Anti-Counterfeit Check */}
-          {bypassEnabled && (
-            <Alert className="mb-4 border-orange-200 bg-orange-50">
-              <AlertTriangle className="h-4 w-4" />
-              <AlertDescription>
-                <strong>Development Environment Detected</strong><br />
-                Email verification bypass available for testing purposes.
-              </AlertDescription>
-            </Alert>
-          )}
-
-          {/* Active Bypass Warning */}
-          {bypassActive && (
-            <Alert className="mb-4 border-yellow-200 bg-yellow-50">
-              <AlertTriangle className="h-4 w-4 text-yellow-600" />
-              <AlertDescription className="text-yellow-800">
-                ⚠️ Email verification bypassed — TESTING MODE ONLY
-              </AlertDescription>
-            </Alert>
-          )}
 
           {/* MANDATORY: Login/Register Toggle Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
@@ -266,31 +246,22 @@ export default function SecureAuthPage() {
                     )}
                   />
 
-                  {/* Email Verification Bypass Checkbox (Testing Mode Only) */}
+                  {/* Email Verification Bypass Checkbox */}
                   {bypassEnabled && (
                     <FormField
                       control={loginForm.control}
                       name="skipEmailVerification"
                       render={({ field }) => (
-                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 border-yellow-300 bg-yellow-50">
+                        <FormItem className="flex flex-row items-center space-x-2 space-y-0">
                           <FormControl>
                             <Checkbox
                               checked={field.value}
-                              onCheckedChange={(checked) => {
-                                field.onChange(checked);
-                                setBypassActive(!!checked);
-                              }}
-                              className="border-yellow-400 data-[state=checked]:bg-yellow-500"
+                              onCheckedChange={field.onChange}
                             />
                           </FormControl>
-                          <div className="space-y-1 leading-none">
-                            <FormLabel className="text-sm font-medium text-yellow-700">
-                              Skip email verification (Testing mode)
-                            </FormLabel>
-                            <p className="text-xs text-yellow-600">
-                              ⚠️ Bypass email verification for immediate testing access
-                            </p>
-                          </div>
+                          <FormLabel className="text-sm font-medium">
+                            Skip email verification (Testing mode)
+                          </FormLabel>
                         </FormItem>
                       )}
                     />
@@ -384,31 +355,22 @@ export default function SecureAuthPage() {
                     )}
                   />
 
-                  {/* Email Verification Bypass Checkbox for Registration */}
+                  {/* Email Verification Bypass Checkbox */}
                   {bypassEnabled && (
                     <FormField
                       control={registerForm.control}
                       name="skipEmailVerification"
                       render={({ field }) => (
-                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 border-yellow-300 bg-yellow-50">
+                        <FormItem className="flex flex-row items-center space-x-2 space-y-0">
                           <FormControl>
                             <Checkbox
                               checked={field.value}
-                              onCheckedChange={(checked) => {
-                                field.onChange(checked);
-                                setBypassActive(!!checked);
-                              }}
-                              className="border-yellow-400 data-[state=checked]:bg-yellow-500"
+                              onCheckedChange={field.onChange}
                             />
                           </FormControl>
-                          <div className="space-y-1 leading-none">
-                            <FormLabel className="text-sm font-medium text-yellow-700">
-                              Skip email verification (Testing mode)
-                            </FormLabel>
-                            <p className="text-xs text-yellow-600">
-                              ⚠️ Bypass email verification for immediate testing access
-                            </p>
-                          </div>
+                          <FormLabel className="text-sm font-medium">
+                            Skip email verification (Testing mode)
+                          </FormLabel>
                         </FormItem>
                       )}
                     />
