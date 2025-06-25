@@ -12,6 +12,7 @@ const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
   password: z.string().min(1, "Password is required"),
   email: z.string().email().optional(),
+  skipEmailVerification: z.boolean().optional(),
 });
 
 const registerSchema = z.object({
@@ -65,7 +66,8 @@ export function setupAuth(app: Express) {
         }
 
         // Check if user email is verified (with bypass options)
-        if (!user.isVerified && !user.skipEmailVerification && process.env.ALLOW_EMAIL_VERIFICATION_BYPASS !== 'true') {
+        const isDevelopment = process.env.NODE_ENV !== 'production';
+        if (!user.isVerified && !user.skipEmailVerification && !isDevelopment) {
           return done(null, false, { message: "Please verify your email address before logging in." });
         }
 
@@ -115,8 +117,8 @@ export function setupAuth(app: Express) {
         });
       }
 
-      const { username, password } = result.data;
-      console.log(`[DEBUG] Login attempt: { username: '${username}', email: '${req.body.email}' }`);
+      const { username, password, skipEmailVerification } = result.data;
+      console.log(`[DEBUG] Login attempt: { username: '${username}', skipEmailVerification: '${skipEmailVerification}' }`);
 
       const cb = async (err: any, user: Express.User, info: IVerifyOptions) => {
         if (err) {
@@ -126,6 +128,40 @@ export function setupAuth(app: Express) {
         if (!user) {
           // Check if the error is due to unverified email
           if (info.message === "Please verify your email address before logging in.") {
+            // Check if bypass is enabled and requested
+            const isDevelopment = process.env.NODE_ENV !== 'production';
+            if (skipEmailVerification && isDevelopment) {
+              console.log("[DEBUG] Bypassing email verification for development");
+              // Find user and log them in directly
+              try {
+                const [foundUser] = await db
+                  .select()
+                  .from(users)
+                  .where(eq(users.username, username))
+                  .limit(1);
+                
+                if (foundUser) {
+                  req.logIn(foundUser, (err) => {
+                    if (err) {
+                      console.error("Session error:", err);
+                      return res.status(500).json({ message: "Session error" });
+                    }
+                    return res.json({
+                      message: "Login successful (bypassed verification)",
+                      user: {
+                        id: foundUser.id,
+                        username: foundUser.username,
+                        email: foundUser.email,
+                        role: foundUser.role,
+                      },
+                    });
+                  });
+                  return;
+                }
+              } catch (err) {
+                console.error("Bypass login error:", err);
+              }
+            }
             return res.status(401).json({ 
               message: info.message,
               requiresVerification: true
@@ -172,7 +208,8 @@ export function setupAuth(app: Express) {
       console.log(`[DEBUG] Registration data:`, { username, email, skipEmailVerification });
 
       // Skip verification if explicitly requested and bypass is allowed
-      const shouldSkipVerification = skipEmailVerification === true && process.env.ALLOW_EMAIL_VERIFICATION_BYPASS === 'true';
+      const isDevelopment = process.env.NODE_ENV !== 'production';
+      const shouldSkipVerification = skipEmailVerification === true && isDevelopment;
       console.log(`[DEBUG] Should skip verification:`, shouldSkipVerification);
 
       // Check if username or email already exists
