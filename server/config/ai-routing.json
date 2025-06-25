@@ -1,9 +1,10 @@
 {
-  "priority": ["claude", "openai", "mistral"],
+  "priority": ["openai", "mistral", "claude"],
   "fallbacks": {
-    "claude": true,
     "openai": true,
-    "mistral": true
+    "mistral": true,
+    "claude": true
   },
-  "globalFallback": true
+  "globalFallback": true,
+  "lastUpdated": "2025-06-25T09:48:00.000Z"
 }

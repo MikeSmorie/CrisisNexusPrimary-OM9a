@@ -1,0 +1,122 @@
+# Omega-V9 System Architecture
+
+## Overview
+
+Omega-V9 is a comprehensive web security platform that combines AI-powered error logging, threat detection, and system monitoring with a sophisticated subscription management system. The platform features a modular architecture with role-based access control, multi-provider AI integration through the OmegaAIR multiplexer system, and advanced payment processing capabilities.
+
+## System Architecture
+
+### Frontend Architecture
+- **Framework**: React 18 with TypeScript
+- **Routing**: Wouter for client-side navigation
+- **State Management**: TanStack Query (React Query) for server state
+- **UI Components**: shadcn/ui component library with Tailwind CSS
+- **Form Handling**: React Hook Form with Zod validation
+- **Theme System**: Dark/light mode with persistent localStorage
+
+### Backend Architecture
+- **Server**: Express.js with TypeScript
+- **Authentication**: Passport.js with session-based authentication
+- **Database**: PostgreSQL with Drizzle ORM
+- **API Design**: RESTful endpoints with middleware-based security
+- **Session Management**: Memory store with configurable security settings
+
+## Key Components
+
+### Authentication System
+- **Multi-role Support**: User, Admin, and Supergod roles with hierarchical permissions
+- **Session Security**: HttpOnly cookies with CSRF protection
+- **Password Reset**: Secure token-based password reset flow
+- **Email Verification**: Cryptographic token verification with sandbox bypass for development
+- **Multi-device Logout**: Token versioning system for session invalidation
+
+### OmegaAIR Multiplexer System
+- **Dynamic Provider Routing**: Intelligent AI provider selection with fallback handling
+- **Supported Providers**: OpenAI (configured), Claude (stub), Mistral (stub)
+- **Configuration Management**: JSON-based routing configuration with priority ordering
+- **Error Handling**: Comprehensive fallback system with graceful degradation
+- **Module Integration**: Standardized AI request interface for all modules
+
+### Subscription Management
+- **Three-tier System**: Free, Pro, and Enterprise plans with feature-based access control
+- **Payment Integration**: PayPal Server SDK with webhook support
+- **Trial Management**: 14-day trials with automatic expiration
+- **Executive Bypass**: Admin and Supergod roles bypass all subscription restrictions
+
+### Logging and Monitoring
+- **Comprehensive Logging**: System-wide error capture with severity levels
+- **Audit Trail**: User action tracking with metadata storage
+- **Error Boundary**: React error boundary with automatic reporting
+- **Real-time Monitoring**: Admin dashboard with filtering and export capabilities
+
+## Data Flow
+
+### Authentication Flow
+1. User submits credentials via login form
+2. Passport.js validates against database
+3. Session created with secure cookie
+4. Role-based permissions applied to subsequent requests
+5. JWT tokens generated for API access with version control
+
+### AI Request Flow
+1. Module initiates AI request through OmegaAIR router
+2. Router checks provider availability and selects best option
+3. Request sent to selected provider with fallback handling
+4. Response processed and returned to requesting module
+5. Usage logged for monitoring and billing purposes
+
+### Payment Processing Flow
+1. User selects subscription plan
+2. PayPal order created with payment details
+3. User completes payment through PayPal interface
+4. Webhook confirms payment completion
+5. User subscription updated and access granted
+
+## External Dependencies
+
+### Payment Providers
+- **PayPal Server SDK**: Primary payment processing with sandbox/production environments
+- **Webhook System**: Real-time payment status updates
+
+### AI Providers
+- **OpenAI API**: Primary AI provider with GPT models
+- **Claude API**: Secondary provider (stub implementation ready)
+- **Mistral API**: Tertiary provider (stub implementation ready)
+
+### Communication Services
+- **SendGrid**: Email delivery for verification and notifications (configured but not implemented)
+
+### Development Tools
+- **Drizzle ORM**: Type-safe database operations with migration support
+- **Vite**: Frontend build tool with hot reload
+- **TypeScript**: Full-stack type safety
+
+## Deployment Strategy
+
+### Environment Configuration
+- **Multi-environment Support**: Development, staging, and production configurations
+- **Secret Management**: Environment variables for API keys and sensitive data
+- **Database Provisioning**: PostgreSQL with connection pooling
+
+### Build Process
+- **Frontend**: Vite build with optimized bundles
+- **Backend**: ESBuild compilation for Node.js deployment
+- **Database**: Drizzle migrations with schema validation
+
+### Infrastructure
+- **Replit Integration**: Configured for cloud deployment with port forwarding
+- **Session Storage**: Memory store with configurable persistence
+- **Static Assets**: Optimized serving with proper caching headers
+
+## Changelog
+
+```
+Changelog:
+- June 25, 2025. Initial setup
+```
+
+## User Preferences
+
+```
+Preferred communication style: Simple, everyday language.
+```

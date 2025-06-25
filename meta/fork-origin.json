@@ -1,0 +1,11 @@
+{
+  "parentSystem": "Omega-V9",
+  "forkName": "AI-PA-OM9",
+  "forkType": "Executive Co-Pilot",
+  "parentVersion": "9.0.0",
+  "forkTimestamp": "2025-06-25T09:48:00.000Z",
+  "isolationStatus": "complete",
+  "databaseIsolation": true,
+  "brandingClean": true,
+  "configReset": true
+}
