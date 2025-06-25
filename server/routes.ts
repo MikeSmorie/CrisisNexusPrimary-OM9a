@@ -193,15 +193,18 @@ export function registerRoutes(app: Express) {
 
   // Email verification bypass status endpoint
   app.get("/api/auth/bypass-status", (req, res) => {
-    const bypassEnabled = process.env.ALLOW_EMAIL_VERIFICATION_BYPASS === 'true';
-    const environment = process.env.NODE_ENV || 'unknown';
-    const dbName = process.env.PGDATABASE || 'unknown';
+    const bypassRaw = process.env.ALLOW_EMAIL_VERIFICATION_BYPASS;
+    const bypassEnabled = bypassRaw === 'true' || bypassRaw === true;
+    const environment = process.env.NODE_ENV || 'development';
+    const dbName = process.env.PGDATABASE || 'omega9';
+    
+    console.log('[DEBUG] Bypass check:', { bypassRaw, bypassEnabled, environment });
     
     res.json({
       bypassEnabled,
       envInfo: {
         env: environment,
-        dbName: dbName.includes('omega') ? 'Omega9' : dbName
+        dbName: dbName.includes('omega') || dbName.includes('neon') ? 'Omega9' : dbName
       }
     });
   });
