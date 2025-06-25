@@ -41,20 +41,7 @@ const auditModule = {
   restricted: true
 };
 
-const navigationItems = [
-  {
-    name: "Two-Factor Auth",
-    href: "/2fa",
-    icon: KeyRound
-  },
-  {
-    name: "Refer & Earn",
-    href: "/referrals",
-    icon: Gift
-  }
-];
-
-// Admin dropdown items
+// Admin dropdown items (includes all main navigation)
 const adminDropdownItems = [
   {
     name: "Home",
@@ -75,6 +62,16 @@ const adminDropdownItems = [
     name: "Subscriptions",
     href: "/subscription",
     icon: CreditCard
+  },
+  {
+    name: "Two-Factor Auth",
+    href: "/2fa",
+    icon: KeyRound
+  },
+  {
+    name: "Refer & Earn",
+    href: "/referrals",
+    icon: Gift
   }
 ];
 
@@ -131,7 +128,7 @@ export function Sidebar() {
   const [location] = useLocation();
   const { user } = useUser();
   const { isSupergod } = useAdmin();
-  const [adminExpanded, setAdminExpanded] = useState(true);
+  const [adminExpanded, setAdminExpanded] = useState(false);
 
   const isActive = (href: string) => {
     if (href === "/") {
@@ -205,31 +202,6 @@ export function Sidebar() {
               })}
             </div>
           )}
-        </div>
-
-        <Separator className="my-4" />
-
-        {/* Other Navigation Items */}
-        <div className="space-y-1">
-          {navigationItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Button
-                key={item.href}
-                variant={isActive(item.href) ? "secondary" : "ghost"}
-                className={cn(
-                  "w-full justify-start text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800",
-                  isActive(item.href) && "bg-gray-100 dark:bg-gray-800"
-                )}
-                asChild
-              >
-                <a href={item.href}>
-                  <Icon className="mr-2 h-4 w-4" />
-                  {item.name}
-                </a>
-              </Button>
-            );
-          })}
         </div>
 
         <Separator className="my-4" />
