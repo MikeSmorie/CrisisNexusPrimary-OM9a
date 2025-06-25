@@ -78,50 +78,38 @@ export default function SecureAuthPage() {
 
   const handleLogin = async (values: z.infer<typeof loginSchema>) => {
     setIsLoading(true);
+    console.log('[DEBUG] Frontend login values:', values);
     try {
-      // Direct API call to handle bypass logic
+      const payload = {
+        username: values.username,
+        password: values.password,
+        skipEmailVerification: values.skipEmailVerification || false
+      };
+      console.log('[DEBUG] Sending login payload:', payload);
+      
       const response = await fetch('/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          username: values.username,
-          password: values.password,
-          skipEmailVerification: values.skipEmailVerification
-        }),
+        body: JSON.stringify(payload),
         credentials: 'include'
       });
 
       const result = await response.json();
       
       if (response.ok) {
-        if (values.skipEmailVerification && bypassEnabled) {
-          setBypassActive(true);
-          toast({
-            title: "Login successful (Bypass Mode)",
-            description: "⚠️ Email verification bypassed — TESTING MODE ONLY",
-          });
-        } else {
-          toast({
-            title: "Login successful",
-            description: "Welcome back!",
-          });
-        }
+        toast({
+          title: values.skipEmailVerification ? "Login successful (Bypass Mode)" : "Login successful",
+          description: values.skipEmailVerification ? "Email verification bypassed" : "Welcome back!",
+        });
         setLocation("/dashboard");
       } else {
-        if (result.requiresVerification) {
-          toast({
-            title: "Email verification required",
-            description: "Please verify your email address before logging in.",
-          });
-        } else {
-          toast({
-            variant: "destructive",
-            title: "Login failed",
-            description: result.message,
-          });
-        }
+        toast({
+          variant: "destructive",
+          title: "Login failed",
+          description: result.message,
+        });
       }
     } catch (error: any) {
       toast({
@@ -463,6 +451,12 @@ export default function SecureAuthPage() {
                 </Button>
               </Link>
             </div>
+          </div>
+
+          {/* Anti-Counterfeit Environment Display */}
+          <div className="text-xs text-muted-foreground text-left mt-4 pt-2 border-t">
+            ENV: {envInfo.dbName} @ {envInfo.env}
+            {bypassEnabled && " | Bypass: Active"}
           </div>
 
           {/* Security Notice */}
