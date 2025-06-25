@@ -58,10 +58,17 @@ export default function AuthBypassPage() {
       const result = await login({ username: values.username, password: values.password });
       
       if (result.ok) {
-        toast({
-          title: "Login successful",
-          description: `Welcome back!`,
-        });
+        if (bypassActive) {
+          toast({
+            title: "Login successful (Bypass Mode)",
+            description: "⚠️ Email verification bypassed — TESTING MODE ONLY",
+          });
+        } else {
+          toast({
+            title: "Login successful",
+            description: "Welcome back!",
+          });
+        }
         setLocation("/dashboard");
       } else {
         if (result.requiresVerification) {
@@ -104,16 +111,18 @@ export default function AuthBypassPage() {
       const result = await response.json();
 
       if (response.ok) {
-        toast({
-          title: "Registration successful",
-          description: values.skipEmailVerification 
-            ? "Account created and logged in successfully!" 
-            : "Please check your email to verify your account.",
-        });
-        
         if (values.skipEmailVerification) {
-          // User should be logged in, redirect to dashboard
+          setBypassActive(true);
+          toast({
+            title: "Registration successful (Bypass Mode)",
+            description: "⚠️ Email verification bypassed — TESTING MODE ONLY",
+          });
           setLocation("/dashboard");
+        } else {
+          toast({
+            title: "Registration successful",
+            description: "Please check your email to verify your account.",
+          });
         }
       } else {
         toast({
@@ -145,12 +154,23 @@ export default function AuthBypassPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Alert className="mb-4">
+          <Alert className="mb-4 border-orange-200 bg-orange-50">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              This is a development environment. Email verification can be bypassed for testing purposes.
+              <strong>Development Environment Detected</strong><br />
+              This is a sandbox environment with email verification bypass available for testing purposes.
             </AlertDescription>
           </Alert>
+
+          {/* Active Bypass Warning */}
+          {bypassActive && (
+            <Alert className="mb-4 border-yellow-200 bg-yellow-50">
+              <AlertTriangle className="h-4 w-4 text-yellow-600" />
+              <AlertDescription className="text-yellow-800">
+                ⚠️ Email verification bypassed — TESTING MODE ONLY
+              </AlertDescription>
+            </Alert>
+          )}
 
           <Tabs defaultValue="login" className="space-y-4">
             <TabsList className="grid w-full grid-cols-2">
@@ -305,16 +325,19 @@ export default function AuthBypassPage() {
                         <FormControl>
                           <Checkbox
                             checked={field.value}
-                            onCheckedChange={field.onChange}
+                            onCheckedChange={(checked) => {
+                              field.onChange(checked);
+                              setBypassActive(!!checked);
+                            }}
+                            className="border-yellow-400 data-[state=checked]:bg-yellow-500"
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
-                          <FormLabel>
-                            Skip email verification (Sandbox mode)
+                          <FormLabel className="text-sm font-medium text-yellow-700">
+                            Skip email verification (Testing mode)
                           </FormLabel>
-                          <p className="text-sm text-muted-foreground">
-                            Check this to bypass email verification and log in immediately. 
-                            Recommended for sandbox testing.
+                          <p className="text-xs text-yellow-600">
+                            ⚠️ Bypass email verification for immediate testing access
                           </p>
                         </div>
                       </FormItem>
