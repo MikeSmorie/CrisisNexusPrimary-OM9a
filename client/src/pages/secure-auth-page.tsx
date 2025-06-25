@@ -103,7 +103,8 @@ export default function SecureAuthPage() {
           title: values.skipEmailVerification ? "Login successful (Bypass Mode)" : "Login successful",
           description: values.skipEmailVerification ? "Email verification bypassed" : "Welcome back!",
         });
-        setLocation("/dashboard");
+        // Force navigation to dashboard
+        window.location.href = "/";
       } else {
         toast({
           variant: "destructive",
@@ -138,12 +139,11 @@ export default function SecureAuthPage() {
 
       if (response.ok) {
         if (values.skipEmailVerification && bypassEnabled) {
-          setBypassActive(true);
           toast({
             title: "Registration successful (Bypass Mode)",
-            description: "⚠️ Email verification bypassed — TESTING MODE ONLY",
+            description: "Email verification bypassed",
           });
-          setLocation("/dashboard");
+          window.location.href = "/";
         } else {
           toast({
             title: "Registration successful",
