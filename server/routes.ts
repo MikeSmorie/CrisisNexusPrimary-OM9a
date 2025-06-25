@@ -187,8 +187,24 @@ export function registerRoutes(app: Express) {
    * GET /api/auth/verify-email - Verify email with token
    * GET /api/auth/status/:email - Check verification status
    * GET /api/auth/validate-verification-token/:token - Validate verification token
+   * GET /api/auth/bypass-status - Check bypass availability and environment info
    */
   app.use("/api/auth", emailVerificationRouter);
+
+  // Email verification bypass status endpoint
+  app.get("/api/auth/bypass-status", (req, res) => {
+    const bypassEnabled = process.env.ALLOW_EMAIL_VERIFICATION_BYPASS === 'true';
+    const environment = process.env.NODE_ENV || 'unknown';
+    const dbName = process.env.PGDATABASE || 'unknown';
+    
+    res.json({
+      bypassEnabled,
+      envInfo: {
+        env: environment,
+        dbName: dbName.includes('omega') ? 'Omega9' : dbName
+      }
+    });
+  });
 
   /**
    * SESSION MANAGEMENT ROUTES
