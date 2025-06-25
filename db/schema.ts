@@ -50,6 +50,7 @@ export const users = pgTable("users", {
   tokens: integer("tokens").notNull().default(0),
   isVerified: boolean("is_verified").notNull().default(false),
   verificationToken: text("verification_token"),
+  skipEmailVerification: boolean("skip_email_verification").notNull().default(false),
   tokenVersion: integer("token_version").notNull().default(0)
 });
 

@@ -64,8 +64,8 @@ export function setupAuth(app: Express) {
           return done(null, false, { message: "Incorrect username." });
         }
 
-        // Check if user email is verified (skip in development mode)
-        if (!user.isVerified && process.env.NODE_ENV !== 'development') {
+        // Check if user email is verified (with bypass options)
+        if (!user.isVerified && !user.skipEmailVerification && process.env.ALLOW_EMAIL_VERIFICATION_BYPASS !== 'true') {
           return done(null, false, { message: "Please verify your email address before logging in." });
         }
 
@@ -171,8 +171,8 @@ export function setupAuth(app: Express) {
       const { username, password, email, skipEmailVerification } = result.data;
       console.log(`[DEBUG] Registration data:`, { username, email, skipEmailVerification });
 
-      // In development mode, always skip verification if not explicitly set to false
-      const shouldSkipVerification = skipEmailVerification === true || process.env.NODE_ENV === 'development';
+      // Skip verification if explicitly requested and bypass is allowed
+      const shouldSkipVerification = skipEmailVerification === true && process.env.ALLOW_EMAIL_VERIFICATION_BYPASS === 'true';
       console.log(`[DEBUG] Should skip verification:`, shouldSkipVerification);
 
       // Check if username or email already exists
@@ -224,6 +224,7 @@ export function setupAuth(app: Express) {
           createdAt: now,
           isVerified: shouldSkipVerification ? true : false,
           verificationToken: shouldSkipVerification ? null : verificationToken,
+          skipEmailVerification: skipEmailVerification || false,
           tokenVersion: 0
         })
         .returning();

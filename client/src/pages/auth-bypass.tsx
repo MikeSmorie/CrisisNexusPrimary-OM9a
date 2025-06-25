@@ -29,6 +29,7 @@ const registerSchema = z.object({
 export default function AuthBypassPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [bypassActive, setBypassActive] = useState(false);
   const { toast } = useToast();
   const { login, register } = useUser();
   const [, setLocation] = useLocation();
