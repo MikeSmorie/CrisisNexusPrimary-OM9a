@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useLocation } from "wouter";
 import { useUser } from "@/hooks/use-user";
 import { useAdmin } from "@/contexts/admin-context";
@@ -18,7 +19,10 @@ import {
   FileText,
   Gift,
   BarChart3,
-  Brain
+  Brain,
+  ChevronRight,
+  ChevronDown,
+  HeadphonesIcon
 } from "lucide-react";
 
 const moduleItems = Array.from({ length: 9 }, (_, i) => ({
@@ -39,29 +43,38 @@ const auditModule = {
 
 const navigationItems = [
   {
-    name: "Dashboard",
-    href: "/",
-    icon: Home
-  },
-  {
-    name: "Profile",
-    href: "/profile",
-    icon: User
-  },
-  {
-    name: "Subscription",
-    href: "/subscription",
-    icon: CreditCard
+    name: "Two-Factor Auth",
+    href: "/2fa",
+    icon: KeyRound
   },
   {
     name: "Refer & Earn",
     href: "/referrals",
     icon: Gift
+  }
+];
+
+// Admin dropdown items
+const adminDropdownItems = [
+  {
+    name: "Home",
+    href: "/",
+    icon: Home
   },
   {
-    name: "Two-Factor Auth",
-    href: "/2fa",
-    icon: KeyRound
+    name: "Profile", 
+    href: "/profile",
+    icon: User
+  },
+  {
+    name: "AI Support",
+    href: "/support-ai",
+    icon: HeadphonesIcon
+  },
+  {
+    name: "Subscriptions",
+    href: "/subscription",
+    icon: CreditCard
   }
 ];
 
@@ -118,12 +131,17 @@ export function Sidebar() {
   const [location] = useLocation();
   const { user } = useUser();
   const { isSupergod } = useAdmin();
+  const [adminExpanded, setAdminExpanded] = useState(true);
 
   const isActive = (href: string) => {
     if (href === "/") {
       return location === "/";
     }
     return location.startsWith(href);
+  };
+
+  const isAdminSectionActive = () => {
+    return adminDropdownItems.some(item => isActive(item.href));
   };
 
   return (
@@ -144,6 +162,54 @@ export function Sidebar() {
       </div>
       
       <ScrollArea className="flex-1 px-3">
+        {/* Admin Dropdown Section */}
+        <div className="space-y-1">
+          <Button
+            variant={isAdminSectionActive() ? "secondary" : "ghost"}
+            className={cn(
+              "w-full justify-start text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800",
+              isAdminSectionActive() && "bg-gray-100 dark:bg-gray-800"
+            )}
+            onClick={() => setAdminExpanded(!adminExpanded)}
+          >
+            {adminExpanded ? (
+              <ChevronDown className="mr-2 h-4 w-4" />
+            ) : (
+              <ChevronRight className="mr-2 h-4 w-4" />
+            )}
+            <Shield className="mr-2 h-4 w-4" />
+            Admin
+          </Button>
+          
+          {adminExpanded && (
+            <div className="ml-6 space-y-1">
+              {adminDropdownItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Button
+                    key={item.href}
+                    variant={isActive(item.href) ? "secondary" : "ghost"}
+                    size="sm"
+                    className={cn(
+                      "w-full justify-start text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800",
+                      isActive(item.href) && "bg-gray-100 dark:bg-gray-800"
+                    )}
+                    asChild
+                  >
+                    <a href={item.href}>
+                      <Icon className="mr-2 h-3 w-3" />
+                      {item.name}
+                    </a>
+                  </Button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        <Separator className="my-4" />
+
+        {/* Other Navigation Items */}
         <div className="space-y-1">
           {navigationItems.map((item) => {
             const Icon = item.icon;
