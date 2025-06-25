@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -8,26 +8,32 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Eye, EyeOff, Loader2, Shield } from "lucide-react";
+import { Eye, EyeOff, Loader2, Shield, AlertTriangle } from "lucide-react";
 import { Link, useLocation } from "wouter";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
   password: z.string().min(6, "Password must be at least 6 characters"),
+  skipEmailVerification: z.boolean().optional(),
 });
 
 const registerSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
+  skipEmailVerification: z.boolean().optional(),
 });
 
 export default function SecureAuthPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
+  const [bypassActive, setBypassActive] = useState(false);
+  const [bypassEnabled, setBypassEnabled] = useState(false);
+  const [envInfo, setEnvInfo] = useState({ env: "unknown", dbName: "unknown" });
   const { toast } = useToast();
   const { login, register } = useUser();
   const [, setLocation] = useLocation();
@@ -37,6 +43,7 @@ export default function SecureAuthPage() {
     defaultValues: {
       username: "",
       password: "",
+      skipEmailVerification: false,
     },
   });
 
@@ -46,30 +53,75 @@ export default function SecureAuthPage() {
       username: "",
       email: "",
       password: "",
+      skipEmailVerification: false,
     },
   });
+
+  // Check bypass environment on component mount
+  useEffect(() => {
+    const checkBypassStatus = async () => {
+      try {
+        const response = await fetch('/api/auth/bypass-status', {
+          credentials: 'include'
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setBypassEnabled(data.bypassEnabled);
+          setEnvInfo(data.envInfo);
+        }
+      } catch (error) {
+        console.error('Failed to check bypass status:', error);
+      }
+    };
+    checkBypassStatus();
+  }, []);
 
   const handleLogin = async (values: z.infer<typeof loginSchema>) => {
     setIsLoading(true);
     try {
-      const result = await login({ 
-        username: values.username, 
-        password: values.password,
-        email: "" // Required by interface but not used for login
+      // Direct API call to handle bypass logic
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: values.username,
+          password: values.password,
+          skipEmailVerification: values.skipEmailVerification
+        }),
+        credentials: 'include'
       });
+
+      const result = await response.json();
       
-      if (result.ok) {
-        toast({
-          title: "Login successful",
-          description: "Welcome back!",
-        });
+      if (response.ok) {
+        if (values.skipEmailVerification && bypassEnabled) {
+          setBypassActive(true);
+          toast({
+            title: "Login successful (Bypass Mode)",
+            description: "⚠️ Email verification bypassed — TESTING MODE ONLY",
+          });
+        } else {
+          toast({
+            title: "Login successful",
+            description: "Welcome back!",
+          });
+        }
         setLocation("/dashboard");
       } else {
-        toast({
-          variant: "destructive",
-          title: "Login failed",
-          description: result.message,
-        });
+        if (result.requiresVerification) {
+          toast({
+            title: "Email verification required",
+            description: "Please verify your email address before logging in.",
+          });
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Login failed",
+            description: result.message,
+          });
+        }
       }
     } catch (error: any) {
       toast({
@@ -85,18 +137,32 @@ export default function SecureAuthPage() {
   const handleRegister = async (values: z.infer<typeof registerSchema>) => {
     setIsLoading(true);
     try {
-      const result = await register({
-        username: values.username,
-        email: values.email,
-        password: values.password,
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+        credentials: 'include'
       });
 
-      if (result.ok) {
-        toast({
-          title: "Registration successful",
-          description: "Please check your email to verify your account.",
-        });
-        setActiveTab("login");
+      const result = await response.json();
+
+      if (response.ok) {
+        if (values.skipEmailVerification && bypassEnabled) {
+          setBypassActive(true);
+          toast({
+            title: "Registration successful (Bypass Mode)",
+            description: "⚠️ Email verification bypassed — TESTING MODE ONLY",
+          });
+          setLocation("/dashboard");
+        } else {
+          toast({
+            title: "Registration successful",
+            description: "Please check your email to verify your account.",
+          });
+          setActiveTab("login");
+        }
       } else {
         toast({
           variant: "destructive",
@@ -128,6 +194,27 @@ export default function SecureAuthPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {/* Environment Info for Anti-Counterfeit Check */}
+          {bypassEnabled && (
+            <Alert className="mb-4 border-orange-200 bg-orange-50">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>
+                <strong>Development Environment Detected</strong><br />
+                Email verification bypass available for testing purposes.
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* Active Bypass Warning */}
+          {bypassActive && (
+            <Alert className="mb-4 border-yellow-200 bg-yellow-50">
+              <AlertTriangle className="h-4 w-4 text-yellow-600" />
+              <AlertDescription className="text-yellow-800">
+                ⚠️ Email verification bypassed — TESTING MODE ONLY
+              </AlertDescription>
+            </Alert>
+          )}
+
           {/* MANDATORY: Login/Register Toggle Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
             <TabsList className="grid w-full grid-cols-2">
@@ -190,6 +277,37 @@ export default function SecureAuthPage() {
                       </FormItem>
                     )}
                   />
+
+                  {/* Email Verification Bypass Checkbox (Testing Mode Only) */}
+                  {bypassEnabled && (
+                    <FormField
+                      control={loginForm.control}
+                      name="skipEmailVerification"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 border-yellow-300 bg-yellow-50">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={(checked) => {
+                                field.onChange(checked);
+                                setBypassActive(!!checked);
+                              }}
+                              className="border-yellow-400 data-[state=checked]:bg-yellow-500"
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel className="text-sm font-medium text-yellow-700">
+                              Skip email verification (Testing mode)
+                            </FormLabel>
+                            <p className="text-xs text-yellow-600">
+                              ⚠️ Bypass email verification for immediate testing access
+                            </p>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                  )}
+
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? (
                       <>
@@ -277,6 +395,37 @@ export default function SecureAuthPage() {
                       </FormItem>
                     )}
                   />
+
+                  {/* Email Verification Bypass Checkbox for Registration */}
+                  {bypassEnabled && (
+                    <FormField
+                      control={registerForm.control}
+                      name="skipEmailVerification"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 border-yellow-300 bg-yellow-50">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={(checked) => {
+                                field.onChange(checked);
+                                setBypassActive(!!checked);
+                              }}
+                              className="border-yellow-400 data-[state=checked]:bg-yellow-500"
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel className="text-sm font-medium text-yellow-700">
+                              Skip email verification (Testing mode)
+                            </FormLabel>
+                            <p className="text-xs text-yellow-600">
+                              ⚠️ Bypass email verification for immediate testing access
+                            </p>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                  )}
+
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? (
                       <>
