@@ -39,9 +39,17 @@ router.post("/:provider/pay", async (req, res) => {
       return res.status(400).json({ error: "Amount and userId are required" });
     }
 
-    // Validate provider exists and is active
+    // Map provider names to correct casing in database
+    const providerNameMap: Record<string, string> = {
+      'paypal': 'PayPal',
+      'solana': 'Solana', 
+      'flutterwave': 'Flutterwave'
+    };
+    
+    const dbProviderName = providerNameMap[provider.toLowerCase()] || provider;
+    
     const providerRecord = await db.query.paymentProviders.findFirst({
-      where: eq(paymentProviders.name, provider.toLowerCase())
+      where: eq(paymentProviders.name, dbProviderName)
     });
 
     if (!providerRecord || !providerRecord.isActive) {
