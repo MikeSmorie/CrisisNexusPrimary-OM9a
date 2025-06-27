@@ -3,6 +3,18 @@ import { db } from "@db";
 import { paymentProviders, transactions } from "@db/schema";
 import { eq } from "drizzle-orm";
 
+// Explicit static imports to resolve deployment issues
+import * as paypalProvider from "../../lib/payments/paypal/index.js";
+import * as solanaProvider from "../../lib/payments/solana/index.js";
+import * as flutterwaveProvider from "../../lib/payments/flutterwave/index.js";
+
+// Payment provider registry - replaces dynamic imports
+const PAYMENT_PROVIDERS = {
+  paypal: paypalProvider,
+  solana: solanaProvider,
+  flutterwave: flutterwaveProvider
+} as const;
+
 const router = express.Router();
 
 // Get all active payment providers
@@ -36,12 +48,11 @@ router.post("/:provider/pay", async (req, res) => {
       return res.status(404).json({ error: "Payment provider not found or inactive" });
     }
 
-    // Dynamic import of payment provider module
-    let paymentModule;
-    try {
-      paymentModule = await import(`../../../lib/payments/${provider.toLowerCase()}/index.js`);
-    } catch (importError) {
-      console.error(`Failed to import provider ${provider}:`, importError);
+    // Get payment provider module from registry
+    const paymentModule = PAYMENT_PROVIDERS[provider.toLowerCase() as keyof typeof PAYMENT_PROVIDERS];
+    
+    if (!paymentModule) {
+      console.error(`Payment provider ${provider} not found in registry`);
       return res.status(500).json({ error: "Payment provider module not available" });
     }
 
