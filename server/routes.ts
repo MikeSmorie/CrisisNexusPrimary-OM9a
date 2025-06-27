@@ -193,17 +193,25 @@ export function registerRoutes(app: Express) {
 
   // Email verification bypass status endpoint
   app.get("/api/auth/bypass-status", (req, res) => {
-    // Force enable bypass for development environment
-    const isDevelopment = process.env.NODE_ENV !== 'production';
-    const bypassEnabled = isDevelopment; // Always true in development
-    const environment = process.env.NODE_ENV || 'development';
+    // Multiple bypass conditions for development/testing environments
+    const nodeEnv = process.env.NODE_ENV;
+    const replitHost = process.env.REPLIT_DOMAINS || process.env.REPL_DOMAIN;
+    const isDevelopment = !nodeEnv || nodeEnv !== 'production' || !!replitHost;
+    
+    // Force bypass enabled in sandbox environments
+    const bypassEnabled = isDevelopment || 
+                          process.env.FORCE_EMAIL_BYPASS === 'true' ||
+                          process.env.ALLOW_EMAIL_VERIFICATION_BYPASS === 'true';
+    const environment = nodeEnv || 'development';
     const dbName = process.env.PGDATABASE || 'omega9';
     
     console.log('[DEBUG] Bypass check:', { 
       isDevelopment, 
       bypassEnabled, 
       environment,
-      nodeEnv: process.env.NODE_ENV 
+      nodeEnv,
+      replitHost: !!replitHost,
+      forceBypass: process.env.FORCE_EMAIL_BYPASS 
     });
     
     res.json({
