@@ -27,7 +27,8 @@ export function MainLayout({ children }: MainLayoutProps) {
                          location.startsWith("/ai-monitor") ||
                          location.startsWith("/mobile") ||
                          location.startsWith("/deployment") ||
-                         location.startsWith("/emergency-settings");
+                         location.startsWith("/emergency-settings") ||
+                         location.startsWith("/forensic");
 
   if (isDisasterRoute) {
     return (

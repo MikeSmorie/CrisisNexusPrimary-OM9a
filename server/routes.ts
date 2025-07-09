@@ -117,6 +117,13 @@ export function registerRoutes(app: Express) {
 
   // Emergency Response Modules
   app.use("/api/disaster/modules", requireAuth, disasterModules);
+  
+  // Import forensic routes dynamically
+  import("./routes/simple-forensic").then((module) => {
+    app.use("/api/forensic", requireAuth, module.default);
+  }).catch((error) => {
+    console.error("Failed to load forensic routes:", error);
+  });
 
   /**
    * AI ASSISTANT ROUTES
