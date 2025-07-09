@@ -33,6 +33,7 @@ import { registerAnalyticsRoutes } from "./routes/analytics";
 import disasterApiRouter from "./routes/disaster-api";
 import disasterAIRoutes from "./routes/disaster-ai";
 import disasterModules from "./routes/disaster-modules";
+import aiIncidentRouter from "./routes/ai-incident";
 import { db } from "../db";
 import { disasterUsers } from "../db/disaster-schema";
 import { eq, and, or, desc, asc, sql } from "drizzle-orm";
