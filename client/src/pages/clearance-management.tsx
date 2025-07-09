@@ -45,21 +45,21 @@ export default function ClearanceManagement() {
 
       {/* Classification System Overview */}
       <Card className="bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800">
-        <CardHeader>
+        <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-red-800 dark:text-red-200">
-            <Shield className="h-5 w-5" />
-            Military-Grade Access Control
+            <Shield className="h-5 w-5 flex-shrink-0" />
+            <span className="truncate">Military-Grade Access Control</span>
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-sm line-clamp-2">
             Five-tier clearance system with role-based access matrix
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-5 gap-4">
+        <CardContent className="p-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             {clearanceLevels.map((level) => (
-              <div key={level.level} className="text-center">
-                <div className={`text-lg font-bold ${level.color}`}>{level.count}</div>
-                <div className="text-xs font-medium">{level.level}</div>
+              <div key={level.level} className="text-center p-3 bg-white dark:bg-gray-800 rounded-lg">
+                <div className={`text-lg font-bold ${level.color} mb-1`}>{level.count}</div>
+                <div className="text-xs font-medium leading-tight">{level.level}</div>
               </div>
             ))}
           </div>
@@ -78,16 +78,16 @@ export default function ClearanceManagement() {
               Compartmentalized access by operational zones
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4">
             <div className="space-y-3">
               {compartments.map((comp) => (
                 <div key={comp.name} className="flex justify-between items-center p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
-                  <div>
-                    <div className="font-medium">{comp.name}</div>
-                    <div className="text-sm text-gray-500">{comp.access}</div>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-medium truncate">{comp.name}</div>
+                    <div className="text-sm text-gray-500 truncate">{comp.access}</div>
                   </div>
-                  <Badge variant="outline" className="text-blue-600">
-                    {comp.users} Users
+                  <Badge variant="outline" className="text-blue-600 ml-3 flex-shrink-0">
+                    {comp.users}
                   </Badge>
                 </div>
               ))}
@@ -105,23 +105,23 @@ export default function ClearanceManagement() {
               Temporary clearance elevation with authorization codes
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4">
             <div className="space-y-3">
               <div className="flex justify-between items-center">
-                <span>Active Overrides</span>
-                <Badge variant="outline" className="text-amber-600">0</Badge>
+                <span className="text-sm truncate">Active Overrides</span>
+                <Badge variant="outline" className="text-amber-600 ml-2 flex-shrink-0">0</Badge>
               </div>
               <div className="flex justify-between items-center">
-                <span>Authorization Codes</span>
-                <Badge variant="outline" className="text-green-600">Valid</Badge>
+                <span className="text-sm truncate">Authorization Codes</span>
+                <Badge variant="outline" className="text-green-600 ml-2 flex-shrink-0">Valid</Badge>
               </div>
               <div className="flex justify-between items-center">
-                <span>Time Limits</span>
-                <Badge variant="outline" className="text-blue-600">4 Hour Max</Badge>
+                <span className="text-sm truncate">Time Limits</span>
+                <Badge variant="outline" className="text-blue-600 ml-2 flex-shrink-0">4h Max</Badge>
               </div>
               <Button variant="destructive" size="sm" className="w-full mt-3">
-                <AlertTriangle className="h-4 w-4 mr-2" />
-                Request Emergency Override
+                <AlertTriangle className="h-4 w-4 mr-2 flex-shrink-0" />
+                <span className="truncate">Request Emergency Override</span>
               </Button>
             </div>
           </CardContent>

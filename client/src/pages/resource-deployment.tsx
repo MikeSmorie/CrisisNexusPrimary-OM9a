@@ -20,13 +20,13 @@ export default function ResourceDeployment() {
   const deployedResources = resources?.filter(r => r.status === 'deployed') || [];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-full">
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <Users className="h-6 w-6 text-green-600" />
-          <h1 className="text-3xl font-bold tracking-tight">Resource Deployment</h1>
+        <div className="flex items-center space-x-2 min-w-0 flex-1">
+          <Users className="h-6 w-6 text-green-600 flex-shrink-0" />
+          <h1 className="text-3xl font-bold tracking-tight truncate">Resource Deployment</h1>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-shrink-0 ml-4">
           <Badge variant="outline" className="text-green-600">
             {availableResources.length} Available
           </Badge>
@@ -39,30 +39,31 @@ export default function ResourceDeployment() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Available Resources */}
         <Card className="border-green-200 dark:border-green-800">
-          <CardHeader>
-            <CardTitle className="text-green-800 dark:text-green-200">
-              Available Resources
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-green-800 dark:text-green-200">
+              <Activity className="h-5 w-5 flex-shrink-0" />
+              <span className="truncate">Available Resources</span>
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-sm line-clamp-2">
               Ready for immediate deployment
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4">
             <div className="space-y-3">
               {availableResources.map((resource: any) => (
                 <div key={resource.id} className="flex justify-between items-center p-3 bg-green-50 dark:bg-green-950 rounded-lg">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
                     {resource.resourceType === 'vehicle' ? (
-                      <Truck className="h-5 w-5 text-green-600" />
+                      <Truck className="h-5 w-5 text-green-600 flex-shrink-0" />
                     ) : (
-                      <Users className="h-5 w-5 text-green-600" />
+                      <Users className="h-5 w-5 text-green-600 flex-shrink-0" />
                     )}
-                    <div>
-                      <div className="font-medium">{resource.name}</div>
-                      <div className="text-sm text-gray-500">{resource.resourceType}</div>
+                    <div className="min-w-0 flex-1">
+                      <div className="font-medium truncate">{resource.name}</div>
+                      <div className="text-sm text-gray-500 truncate">{resource.resourceType}</div>
                     </div>
                   </div>
-                  <Button size="sm" variant="outline">
+                  <Button size="sm" variant="outline" className="flex-shrink-0 ml-3">
                     Deploy
                   </Button>
                 </div>

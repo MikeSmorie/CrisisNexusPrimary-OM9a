@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { FontSizeControls } from "@/components/font-size-controls";
 import { CustomThemeToggle } from "@/components/custom-theme-toggle";
+import { CompactViewToggle } from "@/components/ui/compact-view-toggle";
 import { GPTSupportAgent } from "@/components/GPTSupportAgent";
 import { 
   ArrowLeft, 
@@ -147,6 +148,7 @@ export function Header() {
             </Button>
           )}
 
+          <CompactViewToggle />
           <FontSizeControls />
           <CustomThemeToggle />
 

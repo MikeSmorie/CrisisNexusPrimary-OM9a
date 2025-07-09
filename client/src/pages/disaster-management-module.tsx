@@ -31,23 +31,25 @@ export default function DisasterManagementModule() {
   return (
     <div className="space-y-6">
       {/* Header Section */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex items-center space-x-4 min-w-0 flex-1">
+          <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="flex-shrink-0">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
+            <span className="hidden sm:inline">Back to Dashboard</span>
+            <span className="sm:hidden">Back</span>
           </Button>
-          <div className="flex items-center space-x-2">
-            <Shield className="h-6 w-6 text-red-600" />
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
-              Disaster Management - Module 9
+          <div className="flex items-center space-x-2 min-w-0 flex-1">
+            <Shield className="h-6 w-6 text-red-600 flex-shrink-0" />
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white truncate">
+              Emergency Operations
             </h1>
           </div>
         </div>
         
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 flex-shrink-0">
           <Badge variant="destructive" className="animate-pulse">
-            Emergency Response System
+            <span className="hidden sm:inline">Emergency Response System</span>
+            <span className="sm:hidden">Emergency</span>
           </Badge>
           <div className={`w-2 h-2 rounded-full ${stats?.systemStatus === 'operational' ? 'bg-green-400' : 'bg-red-400'}`}></div>
         </div>
@@ -55,29 +57,29 @@ export default function DisasterManagementModule() {
 
       {/* System Status Overview */}
       <Card className="bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800">
-        <CardHeader>
+        <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-red-800 dark:text-red-200">
-            <Activity className="h-5 w-5" />
-            Emergency Operations Center - Real-time Status
+            <Activity className="h-5 w-5 flex-shrink-0" />
+            <span className="truncate">Emergency Operations Center - Real-time Status</span>
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-4 gap-4">
-            <div className="text-center">
+        <CardContent className="p-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="text-center p-3 bg-white dark:bg-gray-800 rounded-lg">
               <div className="text-2xl font-bold text-red-600">{stats?.activeIncidents || 2}</div>
-              <div className="text-sm text-red-700 dark:text-red-300">Active Incidents</div>
+              <div className="text-xs text-red-700 dark:text-red-300 leading-tight">Active Incidents</div>
             </div>
-            <div className="text-center">
+            <div className="text-center p-3 bg-white dark:bg-gray-800 rounded-lg">
               <div className="text-2xl font-bold text-amber-600">{stats?.criticalAlerts || 1}</div>
-              <div className="text-sm text-amber-700 dark:text-amber-300">Critical Alerts</div>
+              <div className="text-xs text-amber-700 dark:text-amber-300 leading-tight">Critical Alerts</div>
             </div>
-            <div className="text-center">
+            <div className="text-center p-3 bg-white dark:bg-gray-800 rounded-lg">
               <div className="text-2xl font-bold text-green-600">{stats?.availableResources || 15}</div>
-              <div className="text-sm text-green-700 dark:text-green-300">Available Resources</div>
+              <div className="text-xs text-green-700 dark:text-green-300 leading-tight">Available Resources</div>
             </div>
-            <div className="text-center">
+            <div className="text-center p-3 bg-white dark:bg-gray-800 rounded-lg">
               <div className="text-2xl font-bold text-blue-600">{stats?.personnelDeployed || 8}</div>
-              <div className="text-sm text-blue-700 dark:text-blue-300">Personnel Deployed</div>
+              <div className="text-xs text-blue-700 dark:text-blue-300 leading-tight">Personnel Deployed</div>
             </div>
           </div>
         </CardContent>

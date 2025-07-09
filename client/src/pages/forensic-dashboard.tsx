@@ -32,26 +32,26 @@ export default function ForensicDashboard() {
       <Card className="bg-purple-50 dark:bg-purple-950 border-purple-200 dark:border-purple-800">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-purple-800 dark:text-purple-200">
-            <Hash className="h-5 w-5" />
-            Smart Contract Integration
+            <Hash className="h-5 w-5 flex-shrink-0" />
+            <span className="truncate">Smart Contract Integration</span>
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="line-clamp-2">
             Immutable emergency response logging with fraud prevention
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="text-center">
-              <Badge variant="outline" className="text-green-600">Phase 1</Badge>
-              <div className="text-sm mt-1">Off-chain with Testnet Backup</div>
+        <CardContent className="p-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="text-center p-3 bg-white dark:bg-gray-800 rounded-lg">
+              <Badge variant="outline" className="text-green-600 mb-2">Phase 1</Badge>
+              <div className="text-xs leading-tight">Off-chain with Testnet Backup</div>
             </div>
-            <div className="text-center">
-              <Badge variant="outline" className="text-amber-600">Phase 2</Badge>
-              <div className="text-sm mt-1">IPFS Content Storage</div>
+            <div className="text-center p-3 bg-white dark:bg-gray-800 rounded-lg">
+              <Badge variant="outline" className="text-amber-600 mb-2">Phase 2</Badge>
+              <div className="text-xs leading-tight">IPFS Content Storage</div>
             </div>
-            <div className="text-center">
-              <Badge variant="outline" className="text-blue-600">Phase 3</Badge>
-              <div className="text-sm mt-1">Government Chain Integration</div>
+            <div className="text-center p-3 bg-white dark:bg-gray-800 rounded-lg">
+              <Badge variant="outline" className="text-blue-600 mb-2">Phase 3</Badge>
+              <div className="text-xs leading-tight">Government Chain Integration</div>
             </div>
           </div>
         </CardContent>
@@ -60,56 +60,56 @@ export default function ForensicDashboard() {
       {/* Forensic Logging */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="border-blue-200 dark:border-blue-800">
-          <CardHeader>
+          <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-blue-800 dark:text-blue-200">
-              <Database className="h-5 w-5" />
-              Encrypted Logs
+              <Database className="h-5 w-5 flex-shrink-0" />
+              <span className="truncate">Encrypted Logs</span>
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-sm line-clamp-2">
               Tamper-proof emergency response records
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4">
             <div className="space-y-3">
               <div className="flex justify-between items-center">
-                <span>Total Log Entries</span>
-                <Badge variant="outline">{auditLogs?.length || 0}</Badge>
+                <span className="text-sm truncate">Total Log Entries</span>
+                <Badge variant="outline" className="ml-2 flex-shrink-0">{auditLogs?.length || 0}</Badge>
               </div>
               <div className="flex justify-between items-center">
-                <span>Encryption Status</span>
-                <Badge variant="outline" className="text-green-600">AES-256 Active</Badge>
+                <span className="text-sm truncate">Encryption Status</span>
+                <Badge variant="outline" className="text-green-600 ml-2 flex-shrink-0">AES-256</Badge>
               </div>
               <div className="flex justify-between items-center">
-                <span>Integrity Checks</span>
-                <Badge variant="outline" className="text-green-600">All Verified</Badge>
+                <span className="text-sm truncate">Integrity Checks</span>
+                <Badge variant="outline" className="text-green-600 ml-2 flex-shrink-0">Verified</Badge>
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card className="border-green-200 dark:border-green-800">
-          <CardHeader>
+          <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-green-800 dark:text-green-200">
-              <Shield className="h-5 w-5" />
-              Access Control
+              <Shield className="h-5 w-5 flex-shrink-0" />
+              <span className="truncate">Access Control</span>
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-sm line-clamp-2">
               Role-based forensic data transparency
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4">
             <div className="space-y-3">
               <div className="flex justify-between items-center">
-                <span>Commander Access</span>
-                <Badge variant="outline" className="text-blue-600">Regional Data</Badge>
+                <span className="text-sm truncate">Commander Access</span>
+                <Badge variant="outline" className="text-blue-600 ml-2 flex-shrink-0">Regional</Badge>
               </div>
               <div className="flex justify-between items-center">
-                <span>Admin Access</span>
-                <Badge variant="outline" className="text-purple-600">Full Access</Badge>
+                <span className="text-sm truncate">Admin Access</span>
+                <Badge variant="outline" className="text-purple-600 ml-2 flex-shrink-0">Full</Badge>
               </div>
               <div className="flex justify-between items-center">
-                <span>AI Monitor</span>
-                <Badge variant="outline" className="text-amber-600">Redacted Bias</Badge>
+                <span className="text-sm truncate">AI Monitor</span>
+                <Badge variant="outline" className="text-amber-600 ml-2 flex-shrink-0">Redacted</Badge>
               </div>
             </div>
           </CardContent>
