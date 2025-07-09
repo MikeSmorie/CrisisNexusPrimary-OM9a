@@ -1,5 +1,4 @@
 @import './styles/ui-consistency.css';
-@import './styles/content-boundaries.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

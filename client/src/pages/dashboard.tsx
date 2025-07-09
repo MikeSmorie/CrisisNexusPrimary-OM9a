@@ -79,32 +79,30 @@ export default function Dashboard() {
   if (!user) return null;
 
   return (
-    <div className="content-inner">
+    <div className="space-y-6">
       {/* Welcome Section */}
-      <div className="module-section">
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <div className="min-w-0 flex-1">
-            <h1 className="text-3xl font-bold tracking-tight text-contained text-gray-900 dark:text-white">
-              Welcome back, {user.username}
-            </h1>
-            <p className="text-contained text-gray-600 dark:text-gray-400">
-              Access your modules and manage your account
-            </p>
-          </div>
-          <div className="flex items-center space-x-3 flex-shrink-0">
-            <Button 
-              onClick={handleExportProfile}
-              variant="outline"
-              className="button-text-safe flex items-center gap-2"
-            >
-              <Download className="w-4 h-4 flex-shrink-0" />
-              <span className="hidden sm:inline">Download Profile</span>
-            </Button>
-            <Badge variant="outline" className="badge-contained">
-              {getRoleIcon(user.role)}
-              <span className="text-truncate-safe">{user.role.charAt(0).toUpperCase() + user.role.slice(1)}</span>
-            </Badge>
-          </div>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
+            Welcome back, {user.username}
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            Access your modules and manage your account
+          </p>
+        </div>
+        <div className="flex items-center space-x-3">
+          <Button 
+            onClick={handleExportProfile}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <Download className="w-4 h-4" />
+            Download My Profile (PDF)
+          </Button>
+          <Badge variant="outline" className="flex items-center gap-2">
+            {getRoleIcon(user.role)}
+            {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+          </Badge>
         </div>
       </div>
 
@@ -114,101 +112,107 @@ export default function Dashboard() {
       <ExecutivePrivileges />
 
       {/* Account Overview */}
-      <div className="dashboard-grid">
-        <div className="dashboard-card">
-          <div className="dashboard-card-content">
-            <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <h3 className="text-sm font-medium text-truncate-safe">Account Status</h3>
-              <User className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-            </div>
-            <div className="text-2xl font-bold text-contained">Active</div>
-            <p className="text-xs text-muted-foreground text-contained">
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Account Status</CardTitle>
+            <User className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">Active</div>
+            <p className="text-xs text-muted-foreground">
               Account in good standing
             </p>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
-        <div className="dashboard-card">
-          <div className="dashboard-card-content">
-            <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <h3 className="text-sm font-medium text-truncate-safe">Department</h3>
-              <CreditCard className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-            </div>
-            <div className="text-2xl font-bold text-contained">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Department</CardTitle>
+            <CreditCard className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
               {user.department || 'Emergency Management'}
             </div>
-            <p className="text-xs text-muted-foreground text-contained">
+            <p className="text-xs text-muted-foreground">
               Current assignment
             </p>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
-        <div className="dashboard-card">
-          <div className="dashboard-card-content">
-            <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <h3 className="text-sm font-medium text-truncate-safe">Access Level</h3>
-              <div className="flex-shrink-0">{getRoleIcon(user.role)}</div>
-            </div>
-            <div className="text-2xl font-bold text-contained">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Access Level</CardTitle>
+            {getRoleIcon(user.role)}
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
               {user.role === 'supergod' ? 'Full' : user.role === 'admin' ? 'Admin' : 'Standard'}
             </div>
-            <p className="text-xs text-muted-foreground text-contained">
+            <p className="text-xs text-muted-foreground">
               System permissions
             </p>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Quick Actions */}
-      <div className="module-card">
-        <div className="card-content-safe">
-          <h3 className="text-lg font-semibold text-contained mb-2">Quick Actions</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 text-contained mb-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>Quick Actions</CardTitle>
+          <CardDescription>
             Manage your account and access key features
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Button onClick={() => navigate('/profile')} variant="outline" className="button-text-safe">
-              <User className="mr-2 h-4 w-4 flex-shrink-0" />
-              <span>Edit Profile</span>
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-wrap gap-2">
+          <Button onClick={() => navigate('/subscription')} variant="outline">
+            <CreditCard className="mr-2 h-4 w-4" />
+            Manage Subscription
+          </Button>
+          <Button onClick={() => navigate('/profile')} variant="outline">
+            <User className="mr-2 h-4 w-4" />
+            Edit Profile
+          </Button>
+          {(user.role === 'admin' || user.role === 'supergod') && (
+            <Button onClick={() => navigate('/admin')} variant="outline">
+              <Shield className="mr-2 h-4 w-4" />
+              Admin Panel
             </Button>
-            {(user.role === 'admin' || user.role === 'supergod') && (
-              <Button onClick={() => navigate('/admin')} variant="outline" className="button-text-safe">
-                <Shield className="mr-2 h-4 w-4 flex-shrink-0" />
-                <span>Admin Panel</span>
-              </Button>
-            )}
-            {user.role === 'supergod' && (
-              <Button onClick={() => navigate('/supergod')} variant="outline" className="button-text-safe">
-                <Crown className="mr-2 h-4 w-4 flex-shrink-0" />
-                <span>Supergod Panel</span>
-              </Button>
-            )}
-          </div>
-        </div>
-      </div>
+          )}
+          {user.role === 'supergod' && (
+            <Button onClick={() => navigate('/supergod')} variant="outline">
+              <Crown className="mr-2 h-4 w-4" />
+              Supergod Panel
+            </Button>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Modules Grid */}
-      <div className="module-section">
-        <h2 className="text-2xl font-bold tracking-tight mb-6 text-contained text-gray-900 dark:text-white">Available Modules</h2>
-        <div className="grid-cards">
+      <div>
+        <h2 className="text-2xl font-bold tracking-tight mb-4 text-gray-900 dark:text-white">Available Modules</h2>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {moduleItems.map((module) => {
             const Icon = module.icon;
             return (
-              <div key={module.id} className="module-card hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate(module.href)}>
-                <div className="card-content-compact">
-                  <div className="flex items-center justify-between mb-3">
-                    <Icon className="h-5 w-5 text-gray-600 dark:text-gray-400 flex-shrink-0" />
-                    <Badge variant="secondary" className="badge-contained">Ready</Badge>
+              <Card key={module.id} className="hover:shadow-md transition-shadow cursor-pointer bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700" onClick={() => navigate(module.href)}>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <Icon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                    <Badge variant="secondary">Ready</Badge>
                   </div>
-                  <h3 className="text-lg font-semibold text-contained text-gray-900 dark:text-white mb-2">{module.name}</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 text-multiline-safe mb-4">
+                  <CardTitle className="text-lg text-gray-900 dark:text-white">{module.name}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-sm text-gray-600 dark:text-gray-400">
                     {module.description}
-                  </p>
-                  <Button className="w-full button-text-safe" variant="outline" size="sm">
+                  </CardDescription>
+                  <Button className="mt-3 w-full" variant="outline" size="sm">
                     Configure
                   </Button>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             );
           })}
         </div>

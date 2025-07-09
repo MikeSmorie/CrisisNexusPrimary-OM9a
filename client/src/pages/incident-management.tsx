@@ -17,65 +17,64 @@ export default function IncidentManagement() {
   });
 
   return (
-    <div className="content-inner">
-      <div className="module-section">
-        <div className="flex items-center justify-between mb-6">
-          <div className="icon-text-safe flex-1">
-            <AlertTriangle className="h-6 w-6 text-red-600 flex-shrink-0" />
-            <h1 className="text-3xl font-bold tracking-tight text-contained">Incident Management</h1>
-          </div>
-          <Badge variant="destructive" className="badge-contained animate-pulse ml-4">
-            {incidents?.filter(i => i.status === 'active').length || 0} Active
-          </Badge>
+    <div className="space-y-6 max-w-full">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2 min-w-0 flex-1">
+          <AlertTriangle className="h-6 w-6 text-red-600 flex-shrink-0" />
+          <h1 className="text-3xl font-bold tracking-tight truncate">Incident Management</h1>
         </div>
+        <Badge variant="destructive" className="animate-pulse flex-shrink-0 ml-4">
+          {incidents?.filter(i => i.status === 'active').length || 0} Active
+        </Badge>
       </div>
 
-      <div className="grid-cards">
+      <div className="grid grid-cols-1 gap-4">
         {incidents?.map((incident: any) => (
-          <div key={incident.id} className="incident-card border-red-200 dark:border-red-800">
-            <div className="incident-content">
-              <div className="flex justify-between items-start gap-4 mb-4">
+          <Card key={incident.id} className="border-red-200 dark:border-red-800">
+            <CardHeader className="pb-3">
+              <div className="flex justify-between items-start gap-4">
                 <div className="min-w-0 flex-1">
-                  <h3 className="text-lg font-semibold text-red-800 dark:text-red-200 text-truncate-safe">
+                  <CardTitle className="text-red-800 dark:text-red-200 truncate">
                     {incident.incidentCode}
-                  </h3>
-                  <p className="text-multiline-safe text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  </CardTitle>
+                  <CardDescription className="line-clamp-2 text-sm">
                     {incident.description}
-                  </p>
+                  </CardDescription>
                 </div>
                 <Badge 
                   variant={incident.severity === 'critical' ? 'destructive' : 'outline'}
-                  className="badge-contained"
+                  className="flex-shrink-0"
                 >
                   {incident.severity?.toUpperCase()}
                 </Badge>
               </div>
-              
-              <div className="incident-details">
-                <div className="incident-detail-item">
+            </CardHeader>
+            <CardContent className="p-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-blue-600 flex-shrink-0" />
-                  <span className="incident-detail-text">{incident.location}</span>
+                  <span className="truncate">{incident.location}</span>
                 </div>
-                <div className="incident-detail-item">
+                <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-amber-600 flex-shrink-0" />
-                  <span className="incident-detail-text">{new Date(incident.createdAt).toLocaleString()}</span>
+                  <span className="truncate">{new Date(incident.createdAt).toLocaleString()}</span>
                 </div>
-                <div className="incident-detail-item">
+                <div className="flex items-center gap-2">
                   <Users className="h-4 w-4 text-green-600 flex-shrink-0" />
-                  <span className="incident-detail-text">
+                  <span className="truncate">
                     {incident.resourcesNeeded ? 
                       JSON.parse(incident.resourcesNeeded).personnelCount || 0 : 0} Personnel Needed
                   </span>
                 </div>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         )) || (
-          <div className="module-card">
-            <div className="card-content-safe text-center text-gray-500">
+          <Card>
+            <CardContent className="p-6 text-center text-gray-500">
               No incidents currently active
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         )}
       </div>
     </div>
