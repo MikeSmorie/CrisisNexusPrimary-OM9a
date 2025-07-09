@@ -79,7 +79,7 @@ export function DisasterNavigation() {
   });
 
   return (
-    <nav className="w-64 bg-red-900 text-white min-h-screen shadow-xl">
+    <nav className="w-64 bg-red-900 text-white min-h-screen shadow-xl flex flex-col">
       {/* Header */}
       <div className="p-6 border-b border-red-800">
         <div className="flex items-center space-x-3">
@@ -167,7 +167,7 @@ export function DisasterNavigation() {
       </div>
 
       {/* Emergency Contact */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-red-800">
+      <div className="mt-auto p-4 border-t border-red-800">
         <div className="bg-red-800 rounded-lg p-3">
           <div className="text-xs text-red-300 mb-1">Emergency Hotline</div>
           <div className="font-bold">📞 911</div>
