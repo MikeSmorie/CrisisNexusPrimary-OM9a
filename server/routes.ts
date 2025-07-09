@@ -119,6 +119,9 @@ export function registerRoutes(app: Express) {
   // Emergency Response Modules
   app.use("/api/disaster/modules", requireAuth, disasterModules);
   
+  // AI Incident Assessment
+  app.use("/api/ai/incident", requireAuth, aiIncidentRouter);
+  
   // Import forensic routes dynamically
   import("./routes/simple-forensic").then((module) => {
     app.use("/api/forensic", requireAuth, module.default);

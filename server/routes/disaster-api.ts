@@ -2,6 +2,7 @@ import { Router } from "express";
 import { db } from "../../db";
 import { disasterUsers, disasterIncidents, disasterResources, disasterAlerts, disasterActivityLogs, disasterCommunications } from "../../db/disaster-schema";
 import { eq, desc, and } from "drizzle-orm";
+import { createIncident, checkEscalationTriggers } from "../lib/escalationEngine";
 
 const router = Router();
 
@@ -55,36 +56,65 @@ router.get("/resources", async (req, res) => {
   }
 });
 
-// Create new incident
+// Create new incident with AI assessment
 router.post("/incidents", async (req, res) => {
   try {
-    const { incidentCode, type, severity, location, description, reportedBy } = req.body;
+    const { incidentType, type, severity, location, description, reportedBy } = req.body;
     
-    const incident = await db.insert(disasterIncidents).values({
-      incidentCode,
-      type,
-      severity,
-      status: "active",
-      location,
-      description,
-      reportedBy,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    }).returning();
+    if (!description || !location || !(incidentType || type)) {
+      return res.status(400).json({ error: "Missing required fields: description, location, and incidentType/type" });
+    }
 
-    // Log the activity
-    await db.insert(disasterActivityLogs).values({
-      userId: reportedBy,
-      incidentId: incident[0].id,
-      action: "incident_created",
-      details: `Created incident ${incidentCode}: ${type} at ${location}`,
-      timestamp: new Date()
+    // Use AI-powered incident creation with escalation engine
+    const result = await createIncident({
+      incidentType: incidentType || type,
+      description,
+      location,
+      reportedBy: reportedBy || req.user?.username || "System",
+      userId: req.user?.id,
+      severity
     });
 
-    res.json(incident[0]);
+    res.json({
+      success: true,
+      incident: result.incident,
+      aiAssessment: {
+        threatLevel: result.aiAssessment.threat_level,
+        escalationRequired: result.aiAssessment.escalation_required,
+        recommendations: result.aiAssessment.ai_recommendation,
+        urgencyLevel: result.aiAssessment.urgency_level,
+        estimatedResponseTime: result.aiAssessment.estimated_response_time
+      },
+      escalated: result.escalated,
+      message: `Incident created with AI assessment: ${result.aiAssessment.threat_level} threat level${result.escalated ? ' and escalated' : ''}`
+    });
   } catch (error) {
     console.error("Error creating incident:", error);
-    res.status(500).json({ error: "Failed to create incident" });
+    res.status(500).json({ 
+      error: "Failed to create incident", 
+      details: error.message 
+    });
+  }
+});
+
+// Manual escalation check endpoint
+router.post("/incidents/:id/check-escalation", async (req, res) => {
+  try {
+    const incidentId = parseInt(req.params.id);
+    const triggers = await checkEscalationTriggers(incidentId);
+    
+    res.json({
+      success: true,
+      escalationTriggered: triggers.length > 0,
+      triggers,
+      message: triggers.length > 0 ? `Escalation triggered: ${triggers.join(', ')}` : 'No escalation required'
+    });
+  } catch (error) {
+    console.error("Error checking escalation:", error);
+    res.status(500).json({ 
+      error: "Failed to check escalation", 
+      details: error.message 
+    });
   }
 });
 
