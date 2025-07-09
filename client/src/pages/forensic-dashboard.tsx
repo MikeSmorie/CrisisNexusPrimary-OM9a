@@ -71,7 +71,7 @@ export default function ForensicDashboard() {
   
   const [selectedLog, setSelectedLog] = useState<ForensicLog | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [eventTypeFilter, setEventTypeFilter] = useState<string>("");
+  const [eventTypeFilter, setEventTypeFilter] = useState<string>("all");
   const [dateRange, setDateRange] = useState<{ start: string; end: string }>({
     start: "",
     end: ""
@@ -93,7 +93,7 @@ export default function ForensicDashboard() {
     queryKey: ['/api/forensic/logs', { eventTypeFilter, dateRange }],
     queryFn: async () => {
       const params = new URLSearchParams();
-      if (eventTypeFilter) params.append('eventType', eventTypeFilter);
+      if (eventTypeFilter && eventTypeFilter !== "all") params.append('eventType', eventTypeFilter);
       if (dateRange.start) params.append('startDate', dateRange.start);
       if (dateRange.end) params.append('endDate', dateRange.end);
       params.append('limit', '100');
@@ -177,9 +177,11 @@ export default function ForensicDashboard() {
   };
 
   const filteredLogs = logsData?.logs?.filter((log: ForensicLog) => {
-    return searchTerm === "" || 
+    const matchesSearch = searchTerm === "" || 
            log.eventId.toLowerCase().includes(searchTerm.toLowerCase()) ||
            log.eventType.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType = eventTypeFilter === "all" || log.eventType === eventTypeFilter;
+    return matchesSearch && matchesType;
   }) || [];
 
   return (
@@ -311,7 +313,7 @@ export default function ForensicDashboard() {
                       <SelectValue placeholder="All types" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All types</SelectItem>
+                      <SelectItem value="all">All types</SelectItem>
                       <SelectItem value="incident_created">Incident Created</SelectItem>
                       <SelectItem value="decision_approved">Decision Approved</SelectItem>
                       <SelectItem value="resource_allocated">Resource Allocated</SelectItem>
