@@ -6,6 +6,16 @@
   overflow-wrap: break-word;
 }
 
+/* Prevent all content from exceeding container bounds */
+.card {
+  overflow: hidden;
+}
+
+.card * {
+  max-width: 100%;
+  overflow: hidden;
+}
+
 /* Container constraints */
 .space-y-6 {
   max-width: 100%;
@@ -43,6 +53,50 @@
 /* Badge spacing fixes */
 .badge-spacing {
   @apply ml-2 flex-shrink-0;
+}
+
+/* Badge size constraints */
+.badge {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Force all card content to stay within bounds */
+[data-radix-scroll-area-viewport] {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Ensure all flex items respect container bounds */
+.flex > * {
+  min-width: 0;
+}
+
+/* Grid item containment */
+.grid > * {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* Text content containment */
+.text-xs, .text-sm, .text-base, .text-lg, .text-xl {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Specific card content fixes */
+.card-content > * {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.card-content .grid > * {
+  max-width: 100%;
+  overflow: hidden;
 }
 
 /* Icon standardization */

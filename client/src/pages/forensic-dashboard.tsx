@@ -40,18 +40,18 @@ export default function ForensicDashboard() {
           </CardDescription>
         </CardHeader>
         <CardContent className="p-4">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="text-center p-3 bg-white dark:bg-gray-800 rounded-lg">
-              <Badge variant="outline" className="text-green-600 mb-2">Phase 1</Badge>
-              <div className="text-xs leading-tight">Off-chain with Testnet Backup</div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="text-center p-2 bg-white dark:bg-gray-800 rounded-lg min-h-[80px] flex flex-col justify-center">
+              <Badge variant="outline" className="text-green-600 mb-1 mx-auto">Phase 1</Badge>
+              <div className="text-xs leading-tight px-1">Off-chain with Testnet Backup</div>
             </div>
-            <div className="text-center p-3 bg-white dark:bg-gray-800 rounded-lg">
-              <Badge variant="outline" className="text-amber-600 mb-2">Phase 2</Badge>
-              <div className="text-xs leading-tight">IPFS Content Storage</div>
+            <div className="text-center p-2 bg-white dark:bg-gray-800 rounded-lg min-h-[80px] flex flex-col justify-center">
+              <Badge variant="outline" className="text-amber-600 mb-1 mx-auto">Phase 2</Badge>
+              <div className="text-xs leading-tight px-1">IPFS Content Storage</div>
             </div>
-            <div className="text-center p-3 bg-white dark:bg-gray-800 rounded-lg">
-              <Badge variant="outline" className="text-blue-600 mb-2">Phase 3</Badge>
-              <div className="text-xs leading-tight">Government Chain Integration</div>
+            <div className="text-center p-2 bg-white dark:bg-gray-800 rounded-lg min-h-[80px] flex flex-col justify-center">
+              <Badge variant="outline" className="text-blue-600 mb-1 mx-auto">Phase 3</Badge>
+              <div className="text-xs leading-tight px-1">Government Chain Integration</div>
             </div>
           </div>
         </CardContent>
@@ -72,16 +72,16 @@ export default function ForensicDashboard() {
           <CardContent className="p-4">
             <div className="space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-sm truncate">Total Log Entries</span>
-                <Badge variant="outline" className="ml-2 flex-shrink-0">{auditLogs?.length || 0}</Badge>
+                <span className="text-sm flex-1 pr-2">Total Log Entries</span>
+                <Badge variant="outline" className="flex-shrink-0 text-xs">{auditLogs?.length || 0}</Badge>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm truncate">Encryption Status</span>
-                <Badge variant="outline" className="text-green-600 ml-2 flex-shrink-0">AES-256</Badge>
+                <span className="text-sm flex-1 pr-2">Encryption Status</span>
+                <Badge variant="outline" className="text-green-600 flex-shrink-0 text-xs">AES-256</Badge>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm truncate">Integrity Checks</span>
-                <Badge variant="outline" className="text-green-600 ml-2 flex-shrink-0">Verified</Badge>
+                <span className="text-sm flex-1 pr-2">Integrity Checks</span>
+                <Badge variant="outline" className="text-green-600 flex-shrink-0 text-xs">Verified</Badge>
               </div>
             </div>
           </CardContent>
@@ -100,16 +100,16 @@ export default function ForensicDashboard() {
           <CardContent className="p-4">
             <div className="space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-sm truncate">Commander Access</span>
-                <Badge variant="outline" className="text-blue-600 ml-2 flex-shrink-0">Regional</Badge>
+                <span className="text-sm flex-1 pr-2">Commander Access</span>
+                <Badge variant="outline" className="text-blue-600 flex-shrink-0 text-xs">Regional</Badge>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm truncate">Admin Access</span>
-                <Badge variant="outline" className="text-purple-600 ml-2 flex-shrink-0">Full</Badge>
+                <span className="text-sm flex-1 pr-2">Admin Access</span>
+                <Badge variant="outline" className="text-purple-600 flex-shrink-0 text-xs">Full</Badge>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm truncate">AI Monitor</span>
-                <Badge variant="outline" className="text-amber-600 ml-2 flex-shrink-0">Redacted</Badge>
+                <span className="text-sm flex-1 pr-2">AI Monitor</span>
+                <Badge variant="outline" className="text-amber-600 flex-shrink-0 text-xs">Redacted</Badge>
               </div>
             </div>
           </CardContent>
@@ -118,26 +118,26 @@ export default function ForensicDashboard() {
 
       {/* Recent Audit Entries */}
       <Card>
-        <CardHeader>
+        <CardHeader className="pb-3">
           <CardTitle>Recent Forensic Entries</CardTitle>
-          <CardDescription>
+          <CardDescription className="text-sm line-clamp-2">
             Latest emergency response audit trail entries
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4">
           <div className="space-y-3">
             {auditLogs?.slice(0, 5).map((log: any) => (
               <div key={log.id} className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <Lock className="h-4 w-4 text-purple-600" />
-                  <div>
-                    <div className="font-medium">{log.action}</div>
-                    <div className="text-sm text-gray-500">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <Lock className="h-4 w-4 text-purple-600 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <div className="font-medium truncate">{log.action}</div>
+                    <div className="text-sm text-gray-500 truncate">
                       User: {log.userId} | {new Date(log.timestamp).toLocaleString()}
                     </div>
                   </div>
                 </div>
-                <Badge variant="outline" className="text-purple-600">
+                <Badge variant="outline" className="text-purple-600 flex-shrink-0 ml-3 text-xs">
                   Verified
                 </Badge>
               </div>
@@ -152,28 +152,28 @@ export default function ForensicDashboard() {
 
       {/* Post-Crisis Analysis */}
       <Card className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
-        <CardHeader>
-          <CardTitle className="text-blue-800 dark:text-blue-200">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-blue-800 dark:text-blue-200 truncate">
             Post-Crisis Reconstruction Tools
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-4">
-            <Button variant="outline" className="justify-start">
-              <FileCheck className="h-4 w-4 mr-2" />
-              Timeline Report
+        <CardContent className="p-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Button variant="outline" className="justify-start text-sm">
+              <FileCheck className="h-4 w-4 mr-2 flex-shrink-0" />
+              <span className="truncate">Timeline Report</span>
             </Button>
-            <Button variant="outline" className="justify-start">
-              <Database className="h-4 w-4 mr-2" />
-              Decision Audit
+            <Button variant="outline" className="justify-start text-sm">
+              <Database className="h-4 w-4 mr-2 flex-shrink-0" />
+              <span className="truncate">Decision Audit</span>
             </Button>
-            <Button variant="outline" className="justify-start">
-              <Hash className="h-4 w-4 mr-2" />
-              Blockchain Verification
+            <Button variant="outline" className="justify-start text-sm">
+              <Hash className="h-4 w-4 mr-2 flex-shrink-0" />
+              <span className="truncate">Blockchain Verification</span>
             </Button>
-            <Button variant="outline" className="justify-start">
-              <Shield className="h-4 w-4 mr-2" />
-              Full Forensic Analysis
+            <Button variant="outline" className="justify-start text-sm">
+              <Shield className="h-4 w-4 mr-2 flex-shrink-0" />
+              <span className="truncate">Full Forensic Analysis</span>
             </Button>
           </div>
         </CardContent>
