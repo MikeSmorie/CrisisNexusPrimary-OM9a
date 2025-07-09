@@ -57,10 +57,23 @@ export default function SecureAuthPage() {
     },
   });
 
-  // Set default bypass status for emergency systems
+  // Check bypass environment on component mount
   useEffect(() => {
-    setBypassEnabled(true);
-    setEnvInfo({ env: "emergency", dbName: "disaster_management" });
+    const checkBypassStatus = async () => {
+      try {
+        const response = await fetch('/api/auth/bypass-status', {
+          credentials: 'include'
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setBypassEnabled(data.bypassEnabled);
+          setEnvInfo(data.envInfo);
+        }
+      } catch (error) {
+        console.error('Failed to check bypass status:', error);
+      }
+    };
+    checkBypassStatus();
   }, []);
 
   const handleLogin = async (values: z.infer<typeof loginSchema>) => {

@@ -1,8 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { InsertDisasterUser, SelectDisasterUser } from "@db/disaster-schema";
-
-type InsertUser = InsertDisasterUser;
-type SelectUser = SelectDisasterUser;
+import type { InsertUser, SelectUser } from "@db/schema";
 
 type RequestResult = {
   ok: true;
