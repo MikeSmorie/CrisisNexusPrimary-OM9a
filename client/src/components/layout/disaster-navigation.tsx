@@ -1,8 +1,15 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
-import { Shield, AlertTriangle, Radio, Users, MapPin, Settings, BarChart3, MessageSquare, Clock, Home, FileCheck, Lock } from "lucide-react";
+import { Shield, AlertTriangle, Radio, Users, MapPin, Settings, BarChart3, MessageSquare, Clock, Home, FileCheck, Lock, LogOut, HelpCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
+import { useUser } from "@/hooks/use-user";
+import { useToast } from "@/hooks/use-toast";
+import { CustomThemeToggle } from "@/components/custom-theme-toggle";
+import { FontSizeControls } from "@/components/font-size-controls";
+import { GPTSupportAgent } from "@/components/GPTSupportAgent";
+import { useState } from "react";
 
 interface NavItem {
   title: string;
@@ -79,7 +86,10 @@ const navigationItems: NavItem[] = [
 ];
 
 export function DisasterNavigation() {
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
+  const { user, logout } = useUser();
+  const { toast } = useToast();
+  const [isSupportAgentOpen, setIsSupportAgentOpen] = useState(false);
 
   // Get real-time counts for badges
   const { data: stats } = useQuery({
@@ -91,6 +101,26 @@ export function DisasterNavigation() {
     },
     refetchInterval: 30000 // Refresh every 30 seconds
   });
+
+  const handleLogout = async () => {
+    try {
+      const result = await logout();
+      if (!result.ok) {
+        throw new Error(result.message);
+      }
+      toast({
+        title: "Logged out successfully",
+        description: "See you next time!",
+      });
+      navigate("/");
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
+    }
+  };
 
   return (
     <nav className="w-64 bg-red-900 text-white min-h-screen shadow-xl flex flex-col">
@@ -180,14 +210,56 @@ export function DisasterNavigation() {
         </div>
       </div>
 
-      {/* Emergency Contact */}
-      <div className="mt-auto p-4 border-t border-red-800">
+      {/* User Controls */}
+      <div className="mt-auto p-4 border-t border-red-800 space-y-3">
+        {/* User Info */}
+        <div className="bg-red-800 rounded-lg p-3">
+          <div className="text-xs text-red-300 mb-1">Logged in as:</div>
+          <div className="font-bold text-white">{user?.username}</div>
+          <div className="text-xs text-red-300 mt-1">Role: {user?.role || 'user'}</div>
+        </div>
+
+        {/* Theme and Font Controls */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <CustomThemeToggle />
+            <FontSizeControls />
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsSupportAgentOpen(true)}
+              className="text-red-300 hover:text-white hover:bg-red-700 p-1"
+            >
+              <HelpCircle className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleLogout}
+              className="text-red-300 hover:text-white hover:bg-red-700 p-1"
+            >
+              <LogOut className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Emergency Contact */}
         <div className="bg-red-800 rounded-lg p-3">
           <div className="text-xs text-red-300 mb-1">Emergency Hotline</div>
           <div className="font-bold">📞 911</div>
           <div className="text-xs text-red-300 mt-1">24/7 Dispatch Center</div>
         </div>
       </div>
+
+      {/* Support Agent */}
+      {isSupportAgentOpen && (
+        <GPTSupportAgent 
+          onClose={() => setIsSupportAgentOpen(false)}
+          onMinimize={() => setIsSupportAgentOpen(false)}
+        />
+      )}
     </nav>
   );
 }
