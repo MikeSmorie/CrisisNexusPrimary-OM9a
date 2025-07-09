@@ -9,6 +9,7 @@ import {
   Package,
   Lock
 } from "lucide-react";
+import DisasterManagementModule from "@/pages/disaster-management-module";
 
 interface ModuleViewProps {
   moduleId?: string;
@@ -18,6 +19,11 @@ export default function ModuleView({ moduleId }: ModuleViewProps) {
   const params = useParams();
   const [, navigate] = useLocation();
   const id = moduleId || params.id;
+  
+  // Special handling for disaster management module
+  if (id === "9") {
+    return <DisasterManagementModule />;
+  }
   
   // Module name logic - show "Unnamed Module" if no name is set
   const moduleName = `Module ${id}`;
