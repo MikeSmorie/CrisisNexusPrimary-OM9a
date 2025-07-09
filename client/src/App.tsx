@@ -33,6 +33,9 @@ import ForgotPasswordPage from "@/pages/forgot-password";
 import ResetPasswordPage from "@/pages/reset-password";
 import VerifyEmailPage from "@/pages/verify-email";
 import DisasterDashboard from "@/pages/disaster-dashboard";
+import IncidentManagement from "@/pages/incident-management";
+import EmergencyAlerts from "@/pages/emergency-alerts";
+import ResourceDeployment from "@/pages/resource-deployment";
 
 import { useUser } from "@/hooks/use-user";
 import { useToast } from "@/hooks/use-toast";
@@ -140,6 +143,9 @@ function Router() {
         <Route path="/2fa" component={TwoFactorAuth} />
         <Route path="/legacy-dashboard" component={Dashboard} />
         <Route path="/disaster" component={DisasterDashboard} />
+        <Route path="/incidents" component={IncidentManagement} />
+        <Route path="/alerts" component={EmergencyAlerts} />
+        <Route path="/resources" component={ResourceDeployment} />
         <Route path="/" component={DisasterDashboard} />
         <Route component={NotFound} />
       </Switch>
