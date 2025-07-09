@@ -5,8 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useLocation } from "wouter";
-import { TrialBadge } from "@/components/trial-badge";
-import { TokenBalanceDisplay } from "@/components/token-balance-display";
 import { ExecutivePrivileges } from "@/components/executive-privileges";
 import { 
   Grid3X3, 
@@ -93,7 +91,6 @@ export default function Dashboard() {
           </p>
         </div>
         <div className="flex items-center space-x-3">
-          <TrialBadge />
           <Button 
             onClick={handleExportProfile}
             variant="outline"
@@ -114,9 +111,6 @@ export default function Dashboard() {
       {/* Executive Privileges for Admin/Supergod */}
       <ExecutivePrivileges />
 
-      {/* Token Balance Display for Hybrid Billing */}
-      <TokenBalanceDisplay />
-
       {/* Account Overview */}
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
@@ -134,15 +128,15 @@ export default function Dashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Subscription</CardTitle>
+            <CardTitle className="text-sm font-medium">Department</CardTitle>
             <CreditCard className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {currentPlan?.name || 'Free'}
+              {user.department || 'Emergency Management'}
             </div>
             <p className="text-xs text-muted-foreground">
-              Current plan
+              Current assignment
             </p>
           </CardContent>
         </Card>

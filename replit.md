@@ -134,6 +134,16 @@ DisasterMng-1-OM9 is a comprehensive emergency management and disaster response 
 
 ```
 Changelog:
+- July 9, 2025. Landing Page & Navigation Update for Emergency Operations
+  - Updated default landing page to Module 1 - Incident Management for immediate emergency focus
+  - Removed subscription and token management features not applicable to emergency response
+  - Updated sidebar navigation: "DisasterMng-1-OM9" branding with "Emergency Operations" subtitle
+  - Cleaned admin navigation: removed subscription links, kept essential emergency management tools
+  - Dashboard updated: replaced subscription cards with emergency department assignments
+  - Navigation now prioritizes disaster management modules over general application features
+  - AI-powered incident assessment remains fully operational with threat level analysis
+
+Changelog:
 - July 9, 2025. UI/UX Consistency Audit & Content Containment Fix
   - Fixed critical content overflow issues across all disaster management modules
   - Implemented strict container boundary enforcement to prevent content spillage

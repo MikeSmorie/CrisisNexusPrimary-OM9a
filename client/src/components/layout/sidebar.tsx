@@ -96,7 +96,7 @@ const auditModule = {
 // Admin dropdown items (includes all main navigation)
 const adminDropdownItems = [
   {
-    name: "Home",
+    name: "Incident Management",
     href: "/",
     icon: Home
   },
@@ -111,19 +111,9 @@ const adminDropdownItems = [
     icon: HeadphonesIcon
   },
   {
-    name: "Subscriptions",
-    href: "/subscription",
-    icon: CreditCard
-  },
-  {
     name: "Two-Factor Auth",
     href: "/2fa",
     icon: KeyRound
-  },
-  {
-    name: "Refer & Earn",
-    href: "/referrals",
-    icon: Gift
   }
 ];
 
@@ -142,11 +132,6 @@ const adminItems = [
     name: "Logs",
     href: "/admin/logs",
     icon: Settings
-  },
-  {
-    name: "Subscriptions",
-    href: "/admin/subscriptions",
-    icon: CreditCard
   }
 ];
 
@@ -198,8 +183,8 @@ export function Sidebar() {
       <div className="p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Omega-9</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Clean Core</p>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">DisasterMng-1-OM9</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Emergency Operations</p>
           </div>
           {isSupergod && (
             <Badge variant="destructive" className="text-xs px-2 py-1">
