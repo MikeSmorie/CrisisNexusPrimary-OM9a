@@ -10,6 +10,12 @@ import {
   Lock
 } from "lucide-react";
 import DisasterManagementModule from "@/pages/disaster-management-module";
+import IncidentManagement from "@/pages/incident-management";
+import EmergencyAlerts from "@/pages/emergency-alerts";
+import ResourceDeployment from "@/pages/resource-deployment";
+import CommunicationCenter from "@/pages/communication-center";
+import ForensicDashboard from "@/pages/forensic-dashboard";
+import ClearanceManagement from "@/pages/clearance-management";
 
 interface ModuleViewProps {
   moduleId?: string;
@@ -20,9 +26,25 @@ export default function ModuleView({ moduleId }: ModuleViewProps) {
   const [, navigate] = useLocation();
   const id = moduleId || params.id;
   
-  // Special handling for disaster management module
-  if (id === "9") {
-    return <DisasterManagementModule />;
+  // Disaster Management System - Distributed Modules
+  switch (id) {
+    case "1":
+      return <IncidentManagement />;
+    case "2":
+      return <EmergencyAlerts />;
+    case "3":
+      return <ResourceDeployment />;
+    case "4":
+      return <CommunicationCenter />;
+    case "5":
+      return <ForensicDashboard />;
+    case "6":
+      return <ClearanceManagement />;
+    case "9":
+      return <DisasterManagementModule />;
+    default:
+      // Continue with original empty module logic
+      break;
   }
   
   // Module name logic - show "Unnamed Module" if no name is set
