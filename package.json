@@ -52,6 +52,7 @@
     "@types/cors": "^2.8.17",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/pdfmake": "^0.2.11",
+    "@types/uuid": "^10.0.0",
     "axios": "^1.8.1",
     "bcryptjs": "^3.0.2",
     "class-variance-authority": "^0.7.0",
@@ -85,10 +86,12 @@
     "stripe": "^17.5.0",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
+    "uuid": "^11.1.0",
     "vaul": "^1.1.0",
     "wouter": "^3.3.5",
     "ws": "^8.18.0",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "zod-validation-error": "^4.0.0-beta.1"
   },
   "devDependencies": {
     "@replit/vite-plugin-runtime-error-modal": "^0.0.3",

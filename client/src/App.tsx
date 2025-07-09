@@ -45,6 +45,7 @@ import DeploymentControl from "@/pages/deployment-control";
 import EmergencySettings from "@/pages/emergency-settings";
 import ForensicDashboard from "@/pages/forensic-dashboard";
 import ClearanceManagement from "@/pages/clearance-management";
+import CommunicationCenter from "@/pages/communication-center";
 
 import { useUser } from "@/hooks/use-user";
 import { useToast } from "@/hooks/use-toast";
@@ -164,6 +165,7 @@ function Router() {
         <Route path="/emergency-settings" component={EmergencySettings} />
         <Route path="/forensic" component={ForensicDashboard} />
         <Route path="/clearance" component={ClearanceManagement} />
+        <Route path="/communications" component={CommunicationCenter} />
         <Route path="/" component={DisasterDashboard} />
         <Route component={NotFound} />
       </Switch>

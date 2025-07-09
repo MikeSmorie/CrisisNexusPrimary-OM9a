@@ -593,3 +593,8 @@ export const selectPasswordResetTokenSchema = createSelectSchema(passwordResetTo
 
 export type InsertPasswordResetToken = typeof passwordResetTokens.$inferInsert;
 export type SelectPasswordResetToken = typeof passwordResetTokens.$inferSelect;
+
+// Import disaster and clearance schemas
+export * from "./disaster-schema";
+export * from "./clearance-schema";
+export * from "./communication-schema";

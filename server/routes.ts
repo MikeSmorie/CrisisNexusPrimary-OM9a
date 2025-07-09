@@ -139,6 +139,13 @@ export function registerRoutes(app: Express) {
     console.error("Failed to load demo admin routes:", error);
   });
 
+  // Import communication routes dynamically
+  import("./routes/communication").then((module) => {
+    app.use("/api/communication", requireAuth, module.default);
+  }).catch((error) => {
+    console.error("Failed to load communication routes:", error);
+  });
+
   /**
    * AI ASSISTANT ROUTES
    * Auth: Required
