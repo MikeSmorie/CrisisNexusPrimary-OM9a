@@ -33,7 +33,6 @@ import { registerAnalyticsRoutes } from "./routes/analytics";
 import disasterApiRouter from "./routes/disaster-api";
 import disasterAIRoutes from "./routes/disaster-ai";
 import disasterModules from "./routes/disaster-modules";
-import communicationRoutes from "./routes/communication";
 import { db } from "../db";
 import { disasterUsers } from "../db/disaster-schema";
 import { eq, and, or, desc, asc, sql } from "drizzle-orm";
@@ -118,9 +117,6 @@ export function registerRoutes(app: Express) {
 
   // Emergency Response Modules
   app.use("/api/disaster/modules", requireAuth, disasterModules);
-
-  // Multi-layer Communication & Failover System
-  app.use("/", requireAuth, communicationRoutes);
   
   // Import forensic routes dynamically
   import("./routes/simple-forensic").then((module) => {
