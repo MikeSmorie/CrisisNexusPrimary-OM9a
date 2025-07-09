@@ -31,6 +31,8 @@ import { getTokenBalance, consumeTokens, giftTokens, modifyTokens, getAllTokenBa
 import referralRouter from "../modules/3.ReferralEngine/api";
 import { registerAnalyticsRoutes } from "./routes/analytics";
 import disasterApiRouter from "./routes/disaster-api";
+import disasterAIRoutes from "./routes/disaster-ai";
+import disasterModules from "./routes/disaster-modules";
 import { db } from "../db";
 import { disasterUsers } from "../db/disaster-schema";
 import { eq, and, or, desc, asc, sql } from "drizzle-orm";
@@ -109,6 +111,12 @@ export function registerRoutes(app: Express) {
    * DisasterMng-1-OM9 specific endpoints
    */
   app.use("/api/disaster", requireAuth, disasterApiRouter);
+  
+  // Emergency AI Processing Hub
+  app.use("/api/disaster/ai", requireAuth, disasterAIRoutes);
+
+  // Emergency Response Modules
+  app.use("/api/disaster/modules", requireAuth, disasterModules);
 
   /**
    * AI ASSISTANT ROUTES

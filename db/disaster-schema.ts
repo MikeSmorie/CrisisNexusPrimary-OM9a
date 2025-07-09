@@ -140,7 +140,35 @@ export const disasterCommunications = pgTable("disaster_communications", {
   priority: text("priority").notNull().default("normal"),
   createdAt: timestamp("created_at").defaultNow(),
   acknowledgedAt: timestamp("acknowledged_at"),
-  channel: text("channel")
+  channel: text("channel"),
+  translatedContent: text("translated_content"),
+  originalLanguage: text("original_language").default("en")
+});
+
+// Additional tables for v0.2 schema completion
+
+export const disasterTranslations = pgTable("disaster_translations", {
+  id: serial("id").primaryKey(),
+  originalText: text("original_text").notNull(),
+  detectedLanguage: text("detected_language"),
+  translatedText: text("translated_text").notNull(),
+  targetLanguage: text("target_language").default("en"),
+  confidenceScore: decimal("confidence_score", { precision: 3, scale: 2 }),
+  aiProvider: text("ai_provider"),
+  createdAt: timestamp("created_at").defaultNow(),
+  incidentId: integer("incident_id").references(() => disasterIncidents.id)
+});
+
+export const disasterFallbackRoutes = pgTable("disaster_fallback_routes", {
+  id: serial("id").primaryKey(),
+  primaryChannel: text("primary_channel").notNull(),
+  backupChannel1: text("backup_channel_1"),
+  backupChannel2: text("backup_channel_2"),
+  triggerConditions: text("trigger_conditions"), // JSON
+  userId: integer("user_id").references(() => disasterUsers.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  lastTested: timestamp("last_tested"),
+  status: text("status").default("active")
 });
 
 // Relations
@@ -234,6 +262,20 @@ export const disasterCommunicationsRelations = relations(disasterCommunications,
   })
 }));
 
+export const disasterTranslationsRelations = relations(disasterTranslations, ({ one }) => ({
+  incident: one(disasterIncidents, {
+    fields: [disasterTranslations.incidentId],
+    references: [disasterIncidents.id]
+  })
+}));
+
+export const disasterFallbackRoutesRelations = relations(disasterFallbackRoutes, ({ one }) => ({
+  user: one(disasterUsers, {
+    fields: [disasterFallbackRoutes.userId],
+    references: [disasterUsers.id]
+  })
+}));
+
 // Schemas for validation
 export const insertDisasterUserSchema = createInsertSchema(disasterUsers, {
   role: disasterUserRoleEnum.default("responder"),
@@ -276,3 +318,14 @@ export type InsertDisasterErrorLog = typeof disasterErrorLogs.$inferInsert;
 export type SelectDisasterErrorLog = typeof disasterErrorLogs.$inferSelect;
 export type InsertDisasterCommunication = typeof disasterCommunications.$inferInsert;
 export type SelectDisasterCommunication = typeof disasterCommunications.$inferSelect;
+
+export const insertDisasterTranslationSchema = createInsertSchema(disasterTranslations);
+export const selectDisasterTranslationSchema = createSelectSchema(disasterTranslations);
+
+export const insertDisasterFallbackRouteSchema = createInsertSchema(disasterFallbackRoutes);
+export const selectDisasterFallbackRouteSchema = createSelectSchema(disasterFallbackRoutes);
+
+export type InsertDisasterTranslation = typeof disasterTranslations.$inferInsert;
+export type SelectDisasterTranslation = typeof disasterTranslations.$inferSelect;
+export type InsertDisasterFallbackRoute = typeof disasterFallbackRoutes.$inferInsert;
+export type SelectDisasterFallbackRoute = typeof disasterFallbackRoutes.$inferSelect;
