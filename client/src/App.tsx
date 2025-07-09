@@ -36,6 +36,11 @@ import DisasterDashboard from "@/pages/disaster-dashboard";
 import IncidentManagement from "@/pages/incident-management";
 import EmergencyAlerts from "@/pages/emergency-alerts";
 import ResourceDeployment from "@/pages/resource-deployment";
+import ResponderDashboard from "@/pages/responder-dashboard";
+import CommanderDashboard from "@/pages/commander-dashboard";
+import AdminOversight from "@/pages/admin-oversight";
+import AIMonitor from "@/pages/ai-monitor";
+import MobileCompact from "@/pages/mobile-compact";
 
 import { useUser } from "@/hooks/use-user";
 import { useToast } from "@/hooks/use-toast";
@@ -146,6 +151,11 @@ function Router() {
         <Route path="/incidents" component={IncidentManagement} />
         <Route path="/alerts" component={EmergencyAlerts} />
         <Route path="/resources" component={ResourceDeployment} />
+        <Route path="/responder" component={ResponderDashboard} />
+        <Route path="/commander" component={CommanderDashboard} />
+        <Route path="/admin-oversight" component={AdminOversight} />
+        <Route path="/ai-monitor" component={AIMonitor} />
+        <Route path="/mobile" component={MobileCompact} />
         <Route path="/" component={DisasterDashboard} />
         <Route component={NotFound} />
       </Switch>
