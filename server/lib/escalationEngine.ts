@@ -35,7 +35,7 @@ export async function createIncident(data: {
       }
     }
     
-    // Step 4: Create incident with AI analysis (using existing schema)
+    // Step 4: Create incident with AI analysis
     const [newIncident] = await db
       .insert(disasterIncidents)
       .values({
@@ -68,7 +68,11 @@ export async function createIncident(data: {
 
     // Step 7: Auto-assign resources if needed  
     if (ai.threat_level === 'critical' || ai.urgency_level === 'emergency') {
-      await autoAssignResources(newIncident, ai.resource_requirements);
+      try {
+        await autoAssignResources(newIncident, ai.resource_requirements);
+      } catch (error) {
+        console.log('Resource auto-assignment skipped:', error.message);
+      }
     }
 
     return {

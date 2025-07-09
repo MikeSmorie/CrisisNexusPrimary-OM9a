@@ -57,11 +57,14 @@ export default function IncidentManagement() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-amber-600 flex-shrink-0" />
-                  <span className="truncate">{new Date(incident.reportedAt).toLocaleString()}</span>
+                  <span className="truncate">{new Date(incident.createdAt).toLocaleString()}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4 text-green-600 flex-shrink-0" />
-                  <span className="truncate">{incident.assignedPersonnel || 0} Personnel</span>
+                  <span className="truncate">
+                    {incident.resourcesNeeded ? 
+                      JSON.parse(incident.resourcesNeeded).personnelCount || 0 : 0} Personnel Needed
+                  </span>
                 </div>
               </div>
             </CardContent>
