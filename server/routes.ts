@@ -881,22 +881,11 @@ export function registerRoutes(app: Express) {
         return res.status(401).json({ message: "User not authenticated" });
       }
 
-      // Query database for user's 2FA settings
-      const user = await db.query.users.findFirst({
-        where: eq(users.id, userId),
-        columns: {
-          twoFactorEnabled: true,
-          twoFactorSecret: true
-        }
-      });
-
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
+      // DisasterMng-1-OM9: Skip 2FA for disaster management system
+      // Return default disabled state since 2FA fields don't exist in disaster schema
       const response = {
-        enabled: user.twoFactorEnabled || false,
-        secret: user.twoFactorSecret || undefined
+        enabled: false,
+        secret: undefined
       };
 
       res.json(response);

@@ -11,35 +11,27 @@ export async function getTokenBalance(req: Request, res: Response) {
       return res.status(401).json({ message: "Not authenticated" });
     }
 
-    // Get user's token record
-    const [userTokens] = await db
-      .select()
-      .from(tokens)
-      .where(eq(tokens.userId, userId))
-      .limit(1);
-
-    if (!userTokens) {
-      // Return default empty balance
-      return res.json({
-        balance: 0,
-        expiresAt: null,
-        lastUsedAt: null,
-        hasTokens: false
-      });
-    }
-
-    const hasTokens = userTokens.balance > 0;
-    const isExpired = userTokens.expiresAt && new Date(userTokens.expiresAt) < new Date();
-
-    res.json({
-      balance: isExpired ? 0 : userTokens.balance,
-      expiresAt: userTokens.expiresAt,
-      lastUsedAt: userTokens.lastUsedAt,
-      hasTokens: hasTokens && !isExpired
+    // DisasterMng-1-OM9: Skip tokens for disaster management system
+    // Return default values since tokens table doesn't exist in disaster schema
+    return res.json({
+      balance: 0,
+      expiresAt: null,
+      lastUsedAt: null,
+      hasTokens: false
     });
+
+    // Get user's token record (disabled for disaster management)
+    // const [userTokens] = await db
+    //   .select()
+    //   .from(tokens)
+    //   .where(eq(tokens.userId, userId))
+    //   .limit(1);
+
+    // This code is disabled for disaster management system
+    console.log('[TOKENS] Token balance check disabled for DisasterMng-1-OM9');
   } catch (error: any) {
-    console.error("Error fetching token balance:", error);
-    res.status(500).json({ message: "Failed to fetch token balance" });
+    console.error("Error fetching token balance (expected in disaster system):", error.message);
+    res.status(500).json({ message: "Token system not available in disaster management mode" });
   }
 }
 
@@ -56,12 +48,19 @@ export async function consumeTokens(req: Request, res: Response) {
       return res.status(400).json({ message: "Invalid token amount" });
     }
 
-    // Get current token balance
-    const [userTokens] = await db
-      .select()
-      .from(tokens)
-      .where(eq(tokens.userId, userId))
-      .limit(1);
+    // DisasterMng-1-OM9: Skip token consumption for disaster management
+    return res.json({
+      success: true,
+      message: "Token consumption disabled for disaster management",
+      remainingBalance: 0
+    });
+
+    // Get current token balance (disabled for disaster management)
+    // const [userTokens] = await db
+    //   .select()
+    //   .from(tokens)
+    //   .where(eq(tokens.userId, userId))
+    //   .limit(1);
 
     if (!userTokens) {
       return res.status(400).json({ message: "No tokens available" });
