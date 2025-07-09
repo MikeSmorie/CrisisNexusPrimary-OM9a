@@ -108,10 +108,40 @@ DisasterMng-1-OM9 is a comprehensive emergency management and disaster response 
 - **Session Storage**: Memory store with configurable persistence
 - **Static Assets**: Optimized serving with proper caching headers
 
+## Module Dependencies
+
+### Implemented Modules (7 of 10)
+1. **Incident Management** (Module 1) - Core incident tracking and reporting
+2. **Emergency Alerts** (Module 2) - Alert broadcasting system  
+3. **Resource Deployment** (Module 3) - Personnel and equipment tracking
+4. **Communication Center** (Module 4) - 5-tier failover communication system
+5. **Forensic Dashboard** (Module 5) - Immutable audit logging with blockchain
+6. **Clearance Management** (Module 6) - Military-grade access control
+7. **Emergency Operations** (Module 9) - Emergency Operations Center overview
+
+### Module Interdependencies
+- **Incident Management** → triggers Emergency Alerts for new incidents
+- **Communication Center** → depends on Incident Management for emergency communications
+- **Forensic Dashboard** → logs all activities across ALL modules for audit trail
+- **Clearance Management** → controls access permissions across ALL modules
+- **Resource Deployment** → coordinates with Incident Management for personnel assignment
+
+### Hidden Modules
+- Modules 7 and 8 are hidden from navigation (not implemented)
+- Module 10 reserved for special Omega-10 Audit functions
+
 ## Changelog
 
 ```
 Changelog:
+- July 9, 2025. Module Navigation and Dependencies Update
+  - Sidebar navigation updated: Now shows only implemented disaster management modules
+  - Module dependencies mapped: Incident Management triggers alerts, Communication Center depends on incidents
+  - Hidden unused modules: Modules 7 and 8 removed from navigation (not implemented)
+  - Module descriptions added: Each module now shows its purpose in sidebar
+  - Dependency validation: All 7 active modules have proper API endpoints and data flows
+  - Module architecture confirmed: Distributed disaster management system working correctly
+
 - July 9, 2025. DisasterMng-1-OM9 Complete Project Initialization
   - Full database isolation: All previous data purged and replaced with disaster management schema
   - Emergency schema implementation: disaster_ prefixed tables for incidents, resources, alerts, communications

@@ -31,60 +31,56 @@ import {
   Database
 } from "lucide-react";
 
+// Only show implemented disaster management modules
 const moduleItems = [
   {
     id: 1,
     name: "Incident Management",
     href: "/module/1",
-    icon: AlertTriangle
+    icon: AlertTriangle,
+    description: "Active incidents and reporting"
   },
   {
     id: 2,
     name: "Emergency Alerts",
-    href: "/module/2",
-    icon: MessageSquare
+    href: "/module/2", 
+    icon: MessageSquare,
+    description: "Alert broadcasting and management"
   },
   {
     id: 3,
     name: "Resource Deployment", 
     href: "/module/3",
-    icon: Users
+    icon: Users,
+    description: "Personnel and equipment tracking"
   },
   {
     id: 4,
     name: "Communication Center",
     href: "/module/4",
-    icon: Radio
+    icon: Radio,
+    description: "5-tier failover communication system"
   },
   {
     id: 5,
     name: "Forensic Dashboard",
     href: "/module/5",
-    icon: FileText
+    icon: FileText,
+    description: "Immutable audit logging"
   },
   {
     id: 6,
     name: "Clearance Management",
     href: "/module/6",
-    icon: Lock
-  },
-  {
-    id: 7,
-    name: "Module 7",
-    href: "/module/7",
-    icon: Grid3X3
-  },
-  {
-    id: 8,
-    name: "Module 8",
-    href: "/module/8",
-    icon: Grid3X3
+    icon: Lock,
+    description: "Military-grade access control"
   },
   {
     id: 9,
     name: "Emergency Operations",
     href: "/module/9",
-    icon: Shield
+    icon: Shield,
+    description: "Emergency Operations Center overview"
   }
 ];
 
