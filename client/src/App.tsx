@@ -32,6 +32,7 @@ import SupportAI from "@/pages/support-ai";
 import ForgotPasswordPage from "@/pages/forgot-password";
 import ResetPasswordPage from "@/pages/reset-password";
 import VerifyEmailPage from "@/pages/verify-email";
+import DisasterDashboard from "@/pages/disaster-dashboard";
 
 import { useUser } from "@/hooks/use-user";
 import { useToast } from "@/hooks/use-toast";
@@ -137,8 +138,9 @@ function Router() {
         <Route path="/referrals" component={ReferralsPage} />
         <Route path="/locked-module" component={LockedModule} />
         <Route path="/2fa" component={TwoFactorAuth} />
-        <Route path="/profile" component={Dashboard} />
-        <Route path="/" component={Dashboard} />
+        <Route path="/legacy-dashboard" component={Dashboard} />
+        <Route path="/disaster" component={DisasterDashboard} />
+        <Route path="/" component={DisasterDashboard} />
         <Route component={NotFound} />
       </Switch>
     </MainLayout>

@@ -1,8 +1,8 @@
-# AI-PA-OM9 Executive Co-Pilot Architecture
+# DisasterMng-1-OM9 Emergency Response Platform
 
 ## Overview
 
-AI-PA-OM9 is a comprehensive executive assistance platform that combines AI-powered workflow automation, intelligent decision support, and executive co-pilot capabilities. The platform features a modular architecture with role-based access control, multi-provider AI integration through the OmegaAIR multiplexer system, and advanced payment processing capabilities. This is an independent fork of Omega-V9, isolated and configured for executive assistance use cases.
+DisasterMng-1-OM9 is a comprehensive emergency management and disaster response platform that combines AI-powered incident coordination, real-time resource management, and emergency communication capabilities. The platform features a specialized architecture with role-based emergency access control, disaster-specific AI integration through the OmegaAIR multiplexer system, and emergency response coordination tools. This is an independent fork of Omega-V9, completely isolated and configured for emergency management and disaster response use cases.
 
 ## System Architecture
 
@@ -23,19 +23,19 @@ AI-PA-OM9 is a comprehensive executive assistance platform that combines AI-powe
 
 ## Key Components
 
-### Authentication System
-- **Multi-role Support**: User, Admin, and Supergod roles with hierarchical permissions
-- **Session Security**: HttpOnly cookies with CSRF protection
-- **Password Reset**: Secure token-based password reset flow
-- **Email Verification**: Cryptographic token verification with sandbox bypass for development
-- **Multi-device Logout**: Token versioning system for session invalidation
+### Emergency Authentication System
+- **Multi-role Support**: Responder, Commander, Admin, and Coordinator roles with emergency hierarchy
+- **Enhanced Security**: Two-factor authentication enabled by default for all emergency personnel
+- **Emergency Access**: Secure token-based emergency access protocols
+- **Credential Verification**: Emergency credential verification with development bypass for testing
+- **Session Management**: Emergency session management with incident-based access control
 
-### OmegaAIR Multiplexer System
-- **Dynamic Provider Routing**: Intelligent AI provider selection with fallback handling
-- **Supported Providers**: OpenAI (configured), Claude (stub), Mistral (stub)
-- **Configuration Management**: JSON-based routing configuration with priority ordering
-- **Error Handling**: Comprehensive fallback system with graceful degradation
-- **Module Integration**: Standardized AI request interface for all modules
+### Emergency AI Coordination System (OmegaAIR)
+- **Emergency Context Processing**: AI providers isolated with no fallbacks for security
+- **Disaster-Specific Routing**: Emergency response context prefixing for all AI requests
+- **Provider Isolation**: All AI providers require manual configuration - no defaults
+- **Security Protocols**: Safety-first AI routing with emergency response prioritization
+- **Incident Integration**: AI assistance integrated with incident management workflows
 
 ### Subscription Management
 - **Three-tier System**: Free, Pro, and Enterprise plans with feature-based access control
@@ -112,30 +112,17 @@ AI-PA-OM9 is a comprehensive executive assistance platform that combines AI-powe
 
 ```
 Changelog:
-- June 27, 2025. Critical Deployment Issue Resolved - Payment System Fixed
-  - Replaced dynamic wildcard imports with explicit static imports
-  - Created payment provider registry eliminating build-time path resolution errors
-  - Fixed provider name mapping with case-insensitive lookup system
-  - Verified all payment providers (PayPal, Solana, Flutterwave) functional
-  - Payment processing endpoints now deployment-ready with proper import structure
-  - Maintained backward compatibility with existing payment database structure
-
-- June 25, 2025. Email Verification Bypass Implementation Completed
-  - Added bypass checkbox to authentic SecureAuthPage login form
-  - Implemented development environment detection and bypass logic
-  - Created anti-counterfeit verification with environment display
-  - Added yellow warning banners and visual indicators for bypass mode
-  - Backend bypass logic processes skipEmailVerification parameter
-  - Production safety maintained with environment-based controls
-  - Consolidated admin sidebar with expandable dropdown navigation
-
-- June 25, 2025. Fork Purity SOP Completed - AI-PA-OM9 Independent Fork
-  - Database isolation: Complete user/log data purge, fresh seed user
-  - Environment clean: API keys reset to placeholders, aipa_fork=true added
-  - AI routing reset: Priority reordered (OpenAI > Mistral > Claude)
-  - Branding sanitization: README, replit.md updated to AI-PA-OM9
-  - Fork metadata: Created meta/fork-origin.json with lineage tracking
-  - Functional verification: Login, AI requests, admin access confirmed
+- July 9, 2025. DisasterMng-1-OM9 Complete Project Initialization
+  - Full database isolation: All previous data purged and replaced with disaster management schema
+  - Emergency schema implementation: disaster_ prefixed tables for incidents, resources, alerts, communications
+  - Authentication system updated: disaster_users table with emergency roles (responder, commander, admin)
+  - AI system isolation: All AI providers disabled by default, require manual emergency configuration
+  - Disaster-specific UI: Emergency Operations Center dashboard as default interface
+  - Theme update: Emergency response color scheme (red primary, amber warnings)
+  - API endpoints: Complete disaster management REST API with incident tracking
+  - Project identity: DisasterMng-1-OM9 isolated fork with emergency response focus
+  - Security enhancement: Two-factor authentication enabled by default for all personnel
+  - Seed data: Emergency management personnel (admin, chief_fire, medic_1) initialized
 ```
 
 ## User Preferences

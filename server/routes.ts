@@ -30,8 +30,9 @@ import { requireRole, requireSupergod } from "./middleware/rbac";
 import { getTokenBalance, consumeTokens, giftTokens, modifyTokens, getAllTokenBalances } from "./routes/tokens";
 import referralRouter from "../modules/3.ReferralEngine/api";
 import { registerAnalyticsRoutes } from "./routes/analytics";
+import disasterApiRouter from "./routes/disaster-api";
 import { db } from "../db";
-import { users } from "../db/schema";
+import { disasterUsers } from "../db/disaster-schema";
 import { eq, and, or, desc, asc, sql } from "drizzle-orm";
 import { logEvent } from "../lib/logs";
 
@@ -100,6 +101,14 @@ export function registerRoutes(app: Express) {
    * Security: Webhook signature verification
    */
   app.use("/api/webhook", webhookRoutes);
+
+  /**
+   * DISASTER MANAGEMENT ROUTES
+   * Auth: Required for disaster management system
+   * Role: Emergency responders, commanders, admin
+   * DisasterMng-1-OM9 specific endpoints
+   */
+  app.use("/api/disaster", requireAuth, disasterApiRouter);
 
   /**
    * AI ASSISTANT ROUTES

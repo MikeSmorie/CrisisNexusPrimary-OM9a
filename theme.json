@@ -1,6 +1,13 @@
 {
+  "primary": "#dc2626",
   "variant": "professional",
-  "primary": "#007BFF",
-  "appearance": "dark",
-  "radius": 0.5
+  "appearance": "light",
+  "radius": 8,
+  "disaster_theme": {
+    "emergency_red": "#dc2626",
+    "warning_amber": "#f59e0b",
+    "success_green": "#059669",
+    "info_blue": "#0284c7",
+    "critical_orange": "#ea580c"
+  }
 }

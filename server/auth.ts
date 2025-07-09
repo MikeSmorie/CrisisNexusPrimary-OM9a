@@ -3,9 +3,9 @@ import { IVerifyOptions, Strategy as LocalStrategy } from "passport-local";
 import { type Express } from "express";
 import session from "express-session";
 import createMemoryStore from "memorystore";
-import { users, type SelectUser } from "@db/schema";
+import { disasterUsers, type SelectDisasterUser } from "../db/disaster-schema";
 import { z } from "zod";
-import { db } from "@db";
+import { db } from "../db";
 import { eq } from "drizzle-orm";
 
 const loginSchema = z.object({
@@ -26,7 +26,7 @@ const MemoryStore = createMemoryStore(session);
 
 declare global {
   namespace Express {
-    interface User extends SelectUser { }
+    interface User extends SelectDisasterUser { }
   }
 }
 
@@ -57,18 +57,18 @@ export function setupAuth(app: Express) {
       try {
         const [user] = await db
           .select()
-          .from(users)
-          .where(eq(users.username, username))
+          .from(disasterUsers)
+          .where(eq(disasterUsers.username, username))
           .limit(1);
 
         if (!user) {
           return done(null, false, { message: "Incorrect username." });
         }
 
-        // Check if user email is verified (with bypass options)
+        // Check if user email is verified (bypass in development - emergency systems priority)
         const isDevelopment = process.env.NODE_ENV !== 'production';
-        if (!user.isVerified && !user.skipEmailVerification && !isDevelopment) {
-          return done(null, false, { message: "Please verify your email address before logging in." });
+        if (!user.isVerified && !isDevelopment) {
+          return done(null, false, { message: "Please verify your emergency credentials before accessing the system." });
         }
 
         console.log(`[DEBUG] Password comparison: provided='${password}', stored='${user.password}', match=${password === user.password}`);
@@ -78,9 +78,9 @@ export function setupAuth(app: Express) {
         }
 
         await db
-          .update(users)
+          .update(disasterUsers)
           .set({ lastLogin: new Date() })
-          .where(eq(users.id, user.id));
+          .where(eq(disasterUsers.id, user.id));
 
         return done(null, user);
       } catch (err) {
@@ -98,8 +98,8 @@ export function setupAuth(app: Express) {
     try {
       const [user] = await db
         .select()
-        .from(users)
-        .where(eq(users.id, id))
+        .from(disasterUsers)
+        .where(eq(disasterUsers.id, id))
         .limit(1);
       done(null, user);
     } catch (err) {
@@ -126,8 +126,8 @@ export function setupAuth(app: Express) {
           return res.status(500).json({ message: "Internal server error", error: err.message });
         }
         if (!user) {
-          // Check if the error is due to unverified email
-          if (info.message === "Please verify your email address before logging in.") {
+          // Check if the error is due to unverified credentials
+          if (info.message === "Please verify your emergency credentials before accessing the system.") {
             // Check if bypass is enabled and requested
             const isDevelopment = process.env.NODE_ENV !== 'production';
             if (skipEmailVerification && isDevelopment) {
@@ -136,8 +136,8 @@ export function setupAuth(app: Express) {
               try {
                 const [foundUser] = await db
                   .select()
-                  .from(users)
-                  .where(eq(users.username, username))
+                  .from(disasterUsers)
+                  .where(eq(disasterUsers.username, username))
                   .limit(1);
                 
                 if (foundUser) {
@@ -215,25 +215,25 @@ export function setupAuth(app: Express) {
       // Check if username or email already exists
       const existingUser = await db
         .select()
-        .from(users)
-        .where(eq(users.username, username))
+        .from(disasterUsers)
+        .where(eq(disasterUsers.username, username))
         .limit(1);
       
       if (existingUser.length > 0) {
         return res.status(400).json({
-          message: "Username already exists"
+          message: "Emergency responder username already exists"
         });
       }
 
       const existingEmailUser = await db
         .select()
-        .from(users)
-        .where(eq(users.email, email || ""))
+        .from(disasterUsers)
+        .where(eq(disasterUsers.email, email || ""))
         .limit(1);
 
       if (existingEmailUser.length > 0) {
         return res.status(400).json({
-          message: "Email already exists"
+          message: "Emergency contact email already registered"
         });
       }
 
@@ -244,24 +244,23 @@ export function setupAuth(app: Express) {
       const now = new Date();
       
       const [newUser] = await db
-        .insert(users)
+        .insert(disasterUsers)
         .values({
           username,
           email: email || "",
           password: password,
-          role: "user",
+          role: "responder",
           lastLogin: now,
-          trialActive: true,
-          trialStartDate: now,
-          trialExpiresAt: new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000),
-          trialEndsAt: new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000),
-          subscriptionPlan: "free",
+          subscriptionPlan: "emergency",
+          department: "General Response",
+          certificationLevel: "Basic",
+          locationZone: "Unassigned",
+          twoFactorEnabled: true,
           status: "active", 
           tokens: 1000,
           createdAt: now,
           isVerified: shouldSkipVerification ? true : false,
           verificationToken: shouldSkipVerification ? null : verificationToken,
-          skipEmailVerification: skipEmailVerification || false,
           tokenVersion: 0
         })
         .returning();

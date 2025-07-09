@@ -1,10 +1,17 @@
 {
   "priority": ["openai", "mistral", "claude"],
   "fallbacks": {
-    "openai": true,
-    "mistral": true,
-    "claude": true
+    "openai": false,
+    "mistral": false,
+    "claude": false
   },
-  "globalFallback": true,
-  "lastUpdated": "2025-06-25T09:48:00.000Z"
+  "globalFallback": false,
+  "project_id": "DisasterMng-1-OM9",
+  "isolation_mode": true,
+  "disaster_context": {
+    "emergency_priority": true,
+    "context_prefix": "Emergency Response Context: ",
+    "safety_protocols": true
+  },
+  "lastUpdated": "2025-07-09T10:57:00.000Z"
 }

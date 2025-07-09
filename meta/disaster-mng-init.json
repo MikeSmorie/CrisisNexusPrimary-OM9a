@@ -1,0 +1,29 @@
+{
+  "project_id": "DisasterMng-1-OM9",
+  "fork_origin": "AI-PA-OM9",
+  "parent_origin": "Omega-V9",
+  "isolation_mode": "full",
+  "version": "v0.1",
+  "initialization_date": "2025-07-09",
+  "database_isolation": {
+    "schema_prefix": "disaster_",
+    "data_purged": true,
+    "seed_data": "disaster_management_specific"
+  },
+  "branding": {
+    "app_name": "DisasterMng",
+    "primary_context": "disaster_management",
+    "ui_theme": "emergency_response"
+  },
+  "security": {
+    "api_keys_reset": true,
+    "external_dependencies_cleared": true,
+    "session_isolation": true
+  },
+  "features": {
+    "disaster_response": true,
+    "emergency_coordination": true,
+    "resource_management": true,
+    "alert_systems": true
+  }
+}
