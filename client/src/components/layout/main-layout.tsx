@@ -11,9 +11,8 @@ interface MainLayoutProps {
 export function MainLayout({ children }: MainLayoutProps) {
   const [location] = useLocation();
 
-  // Use disaster navigation for disaster management routes
-  const isDisasterRoute = location === "/" || 
-                         location.startsWith("/disaster") || 
+  // Use disaster navigation only for specific disaster management routes
+  const isDisasterRoute = location.startsWith("/disaster") || 
                          location.startsWith("/incidents") || 
                          location.startsWith("/alerts") || 
                          location.startsWith("/resources") || 

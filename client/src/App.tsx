@@ -151,7 +151,6 @@ function Router() {
         <Route path="/referrals" component={ReferralsPage} />
         <Route path="/locked-module" component={LockedModule} />
         <Route path="/2fa" component={TwoFactorAuth} />
-        <Route path="/legacy-dashboard" component={Dashboard} />
         <Route path="/disaster" component={DisasterDashboard} />
         <Route path="/incidents" component={IncidentManagement} />
         <Route path="/alerts" component={EmergencyAlerts} />
@@ -166,7 +165,7 @@ function Router() {
         <Route path="/forensic" component={ForensicDashboard} />
         <Route path="/clearance" component={ClearanceManagement} />
         <Route path="/communications" component={CommunicationCenter} />
-        <Route path="/" component={DisasterDashboard} />
+        <Route path="/" component={Dashboard} />
         <Route component={NotFound} />
       </Switch>
     </MainLayout>
