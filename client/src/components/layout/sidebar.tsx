@@ -22,15 +22,71 @@ import {
   Brain,
   ChevronRight,
   ChevronDown,
-  HeadphonesIcon
+  HeadphonesIcon,
+  AlertTriangle,
+  MessageSquare,
+  Users,
+  Radio,
+  Lock,
+  Database
 } from "lucide-react";
 
-const moduleItems = Array.from({ length: 9 }, (_, i) => ({
-  id: i + 1,
-  name: `Module ${i + 1}`,
-  href: `/module/${i + 1}`,
-  icon: Grid3X3
-}));
+const moduleItems = [
+  {
+    id: 1,
+    name: "Incident Management",
+    href: "/module/1",
+    icon: AlertTriangle
+  },
+  {
+    id: 2,
+    name: "Emergency Alerts",
+    href: "/module/2",
+    icon: MessageSquare
+  },
+  {
+    id: 3,
+    name: "Resource Deployment", 
+    href: "/module/3",
+    icon: Users
+  },
+  {
+    id: 4,
+    name: "Communication Center",
+    href: "/module/4",
+    icon: Radio
+  },
+  {
+    id: 5,
+    name: "Forensic Dashboard",
+    href: "/module/5",
+    icon: FileText
+  },
+  {
+    id: 6,
+    name: "Clearance Management",
+    href: "/module/6",
+    icon: Lock
+  },
+  {
+    id: 7,
+    name: "Module 7",
+    href: "/module/7",
+    icon: Grid3X3
+  },
+  {
+    id: 8,
+    name: "Module 8",
+    href: "/module/8",
+    icon: Grid3X3
+  },
+  {
+    id: 9,
+    name: "Emergency Operations",
+    href: "/module/9",
+    icon: Shield
+  }
+];
 
 // Special Omega-10 Audit Module
 const auditModule = {
