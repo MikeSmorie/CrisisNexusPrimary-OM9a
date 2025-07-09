@@ -20,7 +20,14 @@ export function MainLayout({ children }: MainLayoutProps) {
                          location.startsWith("/communications") ||
                          location.startsWith("/map") ||
                          location.startsWith("/activity") ||
-                         location.startsWith("/analytics");
+                         location.startsWith("/analytics") ||
+                         location.startsWith("/responder") ||
+                         location.startsWith("/commander") ||
+                         location.startsWith("/admin-oversight") ||
+                         location.startsWith("/ai-monitor") ||
+                         location.startsWith("/mobile") ||
+                         location.startsWith("/deployment") ||
+                         location.startsWith("/emergency-settings");
 
   if (isDisasterRoute) {
     return (
