@@ -132,6 +132,13 @@ export function registerRoutes(app: Express) {
     console.error("Failed to load clearance routes:", error);
   });
 
+  // Import demo admin routes dynamically
+  import("./routes/demo-admin").then((module) => {
+    app.use("/api/demo-admin", requireAuth, module.default);
+  }).catch((error) => {
+    console.error("Failed to load demo admin routes:", error);
+  });
+
   /**
    * AI ASSISTANT ROUTES
    * Auth: Required

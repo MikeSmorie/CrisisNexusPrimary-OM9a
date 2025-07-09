@@ -55,7 +55,8 @@ export const disasterUsers = pgTable("disaster_users", {
   tokens: integer("tokens").notNull().default(0),
   isVerified: boolean("is_verified").notNull().default(false),
   verificationToken: text("verification_token"),
-  tokenVersion: integer("token_version").notNull().default(0)
+  tokenVersion: integer("token_version").notNull().default(0),
+  isMock: boolean("is_mock").notNull().default(false)
 });
 
 export const disasterIncidents = pgTable("disaster_incidents", {
@@ -75,7 +76,8 @@ export const disasterIncidents = pgTable("disaster_incidents", {
   actualResolution: timestamp("actual_resolution"),
   resourcesNeeded: text("resources_needed"),
   casualtiesCount: integer("casualties_count").default(0),
-  evacuationsCount: integer("evacuations_count").default(0)
+  evacuationsCount: integer("evacuations_count").default(0),
+  isMock: boolean("is_mock").notNull().default(false)
 });
 
 export const disasterResources = pgTable("disaster_resources", {
@@ -89,7 +91,8 @@ export const disasterResources = pgTable("disaster_resources", {
   operatorId: integer("operator_id").references(() => disasterUsers.id),
   capabilities: text("capabilities"),
   createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow()
+  updatedAt: timestamp("updated_at").defaultNow(),
+  isMock: boolean("is_mock").notNull().default(false)
 });
 
 export const disasterAlerts = pgTable("disaster_alerts", {
@@ -103,7 +106,8 @@ export const disasterAlerts = pgTable("disaster_alerts", {
   activeUntil: timestamp("active_until"),
   createdAt: timestamp("created_at").defaultNow(),
   acknowledgedBy: text("acknowledged_by"), // JSON array of user IDs
-  broadcastChannels: text("broadcast_channels")
+  broadcastChannels: text("broadcast_channels"),
+  isMock: boolean("is_mock").notNull().default(false)
 });
 
 export const disasterActivityLogs = pgTable("disaster_activity_logs", {
@@ -142,7 +146,8 @@ export const disasterCommunications = pgTable("disaster_communications", {
   acknowledgedAt: timestamp("acknowledged_at"),
   channel: text("channel"),
   translatedContent: text("translated_content"),
-  originalLanguage: text("original_language").default("en")
+  originalLanguage: text("original_language").default("en"),
+  isMock: boolean("is_mock").notNull().default(false)
 });
 
 // Additional tables for v0.2 schema completion

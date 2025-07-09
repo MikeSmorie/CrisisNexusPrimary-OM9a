@@ -21,10 +21,12 @@ import {
   Volume2,
   Eye,
   Save,
-  RotateCcw
+  RotateCcw,
+  Wrench
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/hooks/use-user";
+import { DemoModeControls } from "@/components/admin/demo-mode-controls";
 
 interface SystemSettings {
   notifications: {
@@ -216,12 +218,15 @@ export default function EmergencySettings() {
 
       {/* Settings Tabs */}
       <Tabs defaultValue="notifications" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
           <TabsTrigger value="display">Display</TabsTrigger>
           <TabsTrigger value="communication">Communication</TabsTrigger>
           <TabsTrigger value="location">Location</TabsTrigger>
           <TabsTrigger value="emergency">Emergency</TabsTrigger>
+          {(user?.role === 'admin' || user?.role === 'supergod') && (
+            <TabsTrigger value="admin">Admin Tools</TabsTrigger>
+          )}
         </TabsList>
 
         {/* Notifications Settings */}
@@ -559,6 +564,23 @@ export default function EmergencySettings() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        {/* Admin Tools Tab */}
+        {(user?.role === 'admin' || user?.role === 'supergod') && (
+          <TabsContent value="admin" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Wrench className="h-5 w-5" />
+                  <span>Admin Tools</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <DemoModeControls />
+              </CardContent>
+            </Card>
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );
