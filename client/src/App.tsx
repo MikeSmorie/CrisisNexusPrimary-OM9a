@@ -41,6 +41,8 @@ import CommanderDashboard from "@/pages/commander-dashboard";
 import AdminOversight from "@/pages/admin-oversight";
 import AIMonitor from "@/pages/ai-monitor";
 import MobileCompact from "@/pages/mobile-compact";
+import DeploymentControl from "@/pages/deployment-control";
+import EmergencySettings from "@/pages/emergency-settings";
 
 import { useUser } from "@/hooks/use-user";
 import { useToast } from "@/hooks/use-toast";
@@ -156,6 +158,8 @@ function Router() {
         <Route path="/admin-oversight" component={AdminOversight} />
         <Route path="/ai-monitor" component={AIMonitor} />
         <Route path="/mobile" component={MobileCompact} />
+        <Route path="/deployment" component={DeploymentControl} />
+        <Route path="/emergency-settings" component={EmergencySettings} />
         <Route path="/" component={DisasterDashboard} />
         <Route component={NotFound} />
       </Switch>

@@ -59,7 +59,7 @@ const navigationItems: NavItem[] = [
   },
   {
     title: "System Settings",
-    href: "/settings",
+    href: "/emergency-settings",
     icon: Settings,
   }
 ];
