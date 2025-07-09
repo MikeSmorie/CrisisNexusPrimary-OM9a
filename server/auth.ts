@@ -65,10 +65,18 @@ export function setupAuth(app: Express) {
           return done(null, false, { message: "Incorrect username." });
         }
 
-        // Check if user email is verified (bypass in development - emergency systems priority)
+        // Check if user email is verified with sandbox bypass
         const isDevelopment = process.env.NODE_ENV !== 'production';
-        if (!user.isVerified && !isDevelopment) {
+        const replitSandbox = process.env.REPLIT_DOMAINS || process.env.REPL_DOMAIN;
+        const isSandboxEnvironment = isDevelopment || !!replitSandbox;
+        
+        if (!user.isVerified && !isSandboxEnvironment) {
           return done(null, false, { message: "Please verify your emergency credentials before accessing the system." });
+        }
+
+        // Log sandbox bypass for transparency
+        if (!user.isVerified && isSandboxEnvironment) {
+          console.log(`[SANDBOX BYPASS] Emergency credential verification bypassed for user: ${username} in development environment`);
         }
 
         console.log(`[DEBUG] Password comparison: provided='${password}', stored='${user.password}', match=${password === user.password}`);

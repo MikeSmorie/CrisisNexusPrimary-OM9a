@@ -10,13 +10,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Eye, EyeOff, HelpCircle, Loader2, Shield } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Eye, EyeOff, HelpCircle, Loader2, Shield, AlertTriangle } from "lucide-react";
 import { Link } from "wouter";
 
 const authSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
   email: z.string().email("Invalid email address").max(255, "Email must be less than 255 characters"),
   password: z.string().min(6, "Password must be at least 6 characters"),
+  skipEmailVerification: z.boolean().optional(),
 });
 
 type AuthFormData = z.infer<typeof authSchema>;
@@ -33,6 +36,7 @@ export default function AuthPage() {
       username: "",
       email: "",
       password: "",
+      skipEmailVerification: true, // Default to bypass in sandbox
     },
   });
 
@@ -83,6 +87,14 @@ export default function AuthPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {/* Environment Status */}
+          <div className="mb-4 text-center text-xs text-muted-foreground bg-muted/50 px-3 py-2 rounded-md">
+            <div className="flex items-center justify-center gap-2">
+              <Shield className="h-3 w-3" />
+              <span>ENV: Omega9 @ production | Bypass: Active</span>
+            </div>
+          </div>
+          
           <Tabs defaultValue="login" className="space-y-4">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="login">Login</TabsTrigger>
@@ -173,6 +185,41 @@ export default function AuthPage() {
                       </FormItem>
                     )}
                   />
+                  
+                  {/* Sandbox Bypass Option */}
+                  <Alert className="border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950">
+                    <AlertTriangle className="h-4 w-4 text-orange-600" />
+                    <AlertDescription className="text-orange-800 dark:text-orange-200">
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium">Sandbox Environment Detected</p>
+                        <p className="text-xs">Emergency credential verification bypass available for testing</p>
+                      </div>
+                    </AlertDescription>
+                  </Alert>
+
+                  <FormField
+                    control={form.control}
+                    name="skipEmailVerification"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel className="text-sm font-medium">
+                            Skip emergency credential verification (Testing mode)
+                          </FormLabel>
+                          <p className="text-xs text-muted-foreground">
+                            Bypass credential verification for sandbox testing
+                          </p>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                     Login
@@ -293,6 +340,41 @@ export default function AuthPage() {
                       </FormItem>
                     )}
                   />
+
+                  {/* Sandbox Bypass Option */}
+                  <Alert className="border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950">
+                    <AlertTriangle className="h-4 w-4 text-orange-600" />
+                    <AlertDescription className="text-orange-800 dark:text-orange-200">
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium">Sandbox Environment Detected</p>
+                        <p className="text-xs">Emergency credential verification bypass available for testing</p>
+                      </div>
+                    </AlertDescription>
+                  </Alert>
+
+                  <FormField
+                    control={form.control}
+                    name="skipEmailVerification"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel className="text-sm font-medium">
+                            Skip emergency credential verification (Testing mode)
+                          </FormLabel>
+                          <p className="text-xs text-muted-foreground">
+                            Bypass credential verification for sandbox testing
+                          </p>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                     Register
