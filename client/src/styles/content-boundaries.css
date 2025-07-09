@@ -1,0 +1,212 @@
+/* App-wide Content Boundary and Gutter System */
+
+/* Base container boundaries with proper gutters */
+.content-container {
+  @apply max-w-full px-6 py-4 overflow-hidden;
+}
+
+.content-inner {
+  @apply max-w-full overflow-hidden;
+}
+
+/* Card content boundaries */
+.card-content-safe {
+  @apply p-6 overflow-hidden;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+.card-content-compact {
+  @apply p-4 overflow-hidden;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Text content boundaries */
+.text-contained {
+  @apply break-words;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  max-width: 100%;
+}
+
+.text-truncate-safe {
+  @apply truncate max-w-full;
+  min-width: 0;
+}
+
+.text-multiline-safe {
+  @apply break-words;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Grid system with proper gutters */
+.grid-safe {
+  @apply grid gap-6;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.grid-cards {
+  @apply grid gap-4;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+/* Badge and label boundaries */
+.badge-contained {
+  @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+  max-width: calc(100% - 1rem);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Button content boundaries */
+.button-text-safe {
+  @apply truncate;
+  max-width: 200px;
+}
+
+/* Icon and text combinations */
+.icon-text-safe {
+  @apply flex items-center gap-2 min-w-0;
+}
+
+.icon-text-safe span {
+  @apply truncate min-w-0;
+}
+
+/* Module page specific boundaries */
+.module-content {
+  @apply container mx-auto px-8 py-6 max-w-7xl;
+}
+
+.module-section {
+  @apply mb-8 overflow-hidden;
+}
+
+.module-card {
+  @apply bg-white dark:bg-gray-900 rounded-xl shadow-sm border p-6 overflow-hidden;
+}
+
+/* Dashboard specific spacing */
+.dashboard-grid {
+  @apply grid gap-6;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+
+.dashboard-card {
+  @apply bg-white dark:bg-gray-900 rounded-lg shadow-sm border overflow-hidden;
+}
+
+.dashboard-card-content {
+  @apply p-6;
+}
+
+/* Incident management specific */
+.incident-card {
+  @apply border rounded-lg p-4 overflow-hidden bg-white dark:bg-gray-900;
+}
+
+.incident-content {
+  @apply space-y-3 overflow-hidden;
+}
+
+.incident-details {
+  @apply grid grid-cols-1 md:grid-cols-3 gap-4 text-sm;
+}
+
+.incident-detail-item {
+  @apply flex items-center gap-2 min-w-0;
+}
+
+.incident-detail-text {
+  @apply truncate min-w-0 flex-1;
+}
+
+/* Form boundaries */
+.form-container {
+  @apply max-w-2xl mx-auto px-6 py-8;
+}
+
+.form-field {
+  @apply mb-6 overflow-hidden;
+}
+
+.form-input {
+  @apply w-full px-4 py-3 border rounded-lg;
+}
+
+/* Navigation boundaries */
+.nav-item {
+  @apply flex items-center gap-3 px-4 py-2 rounded-lg;
+}
+
+.nav-text {
+  @apply truncate min-w-0 flex-1;
+}
+
+/* Table boundaries */
+.table-container {
+  @apply overflow-x-auto rounded-lg border;
+}
+
+.table-cell {
+  @apply px-4 py-3 max-w-xs;
+}
+
+.table-cell-text {
+  @apply break-words;
+  word-wrap: break-word;
+  max-width: 200px;
+}
+
+/* Responsive gutters */
+@media (max-width: 640px) {
+  .content-container {
+    @apply px-4 py-3;
+  }
+  
+  .module-content {
+    @apply px-4 py-4;
+  }
+  
+  .card-content-safe {
+    @apply p-4;
+  }
+  
+  .dashboard-grid {
+    @apply gap-4;
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .incident-details {
+    @apply grid-cols-1 gap-2;
+  }
+  
+  .grid-safe {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Force containment for any overflow issues */
+.force-contain {
+  contain: layout style paint;
+  overflow: hidden;
+}
+
+/* Emergency containment class for critical elements */
+.emergency-contain {
+  max-width: 100% !important;
+  overflow: hidden !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+}

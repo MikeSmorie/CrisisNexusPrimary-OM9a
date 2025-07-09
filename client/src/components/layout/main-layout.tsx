@@ -19,10 +19,12 @@ export function MainLayout({ children }: MainLayoutProps) {
       <Sidebar />
       <div className="flex flex-1 flex-col overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-auto p-6 bg-gray-50 dark:bg-gray-900">
-          <LoginStatusGuard>
-            {children}
-          </LoginStatusGuard>
+        <main className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900">
+          <div className="content-container">
+            <LoginStatusGuard>
+              {children}
+            </LoginStatusGuard>
+          </div>
         </main>
       </div>
     </div>
