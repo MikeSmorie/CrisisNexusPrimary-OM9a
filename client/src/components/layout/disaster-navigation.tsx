@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
-import { Shield, AlertTriangle, Radio, Users, MapPin, Settings, BarChart3, MessageSquare, Clock, Home, FileCheck } from "lucide-react";
+import { Shield, AlertTriangle, Radio, Users, MapPin, Settings, BarChart3, MessageSquare, Clock, Home, FileCheck, Lock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 
@@ -63,6 +63,13 @@ const navigationItems: NavItem[] = [
     icon: FileCheck,
     badge: "secure",
     badgeVariant: "secondary"
+  },
+  {
+    title: "Clearance Management",
+    href: "/clearance",
+    icon: Lock,
+    badge: "classified",
+    badgeVariant: "destructive"
   },
   {
     title: "System Settings",

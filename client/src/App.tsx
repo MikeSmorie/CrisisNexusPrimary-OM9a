@@ -44,6 +44,7 @@ import MobileCompact from "@/pages/mobile-compact";
 import DeploymentControl from "@/pages/deployment-control";
 import EmergencySettings from "@/pages/emergency-settings";
 import ForensicDashboard from "@/pages/forensic-dashboard";
+import ClearanceManagement from "@/pages/clearance-management";
 
 import { useUser } from "@/hooks/use-user";
 import { useToast } from "@/hooks/use-toast";
@@ -162,6 +163,7 @@ function Router() {
         <Route path="/deployment" component={DeploymentControl} />
         <Route path="/emergency-settings" component={EmergencySettings} />
         <Route path="/forensic" component={ForensicDashboard} />
+        <Route path="/clearance" component={ClearanceManagement} />
         <Route path="/" component={DisasterDashboard} />
         <Route component={NotFound} />
       </Switch>

@@ -28,7 +28,8 @@ export function MainLayout({ children }: MainLayoutProps) {
                          location.startsWith("/mobile") ||
                          location.startsWith("/deployment") ||
                          location.startsWith("/emergency-settings") ||
-                         location.startsWith("/forensic");
+                         location.startsWith("/forensic") ||
+                         location.startsWith("/clearance");
 
   if (isDisasterRoute) {
     return (

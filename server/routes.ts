@@ -125,6 +125,13 @@ export function registerRoutes(app: Express) {
     console.error("Failed to load forensic routes:", error);
   });
 
+  // Import clearance routes dynamically
+  import("./routes/clearance").then((module) => {
+    app.use("/api/clearance", requireAuth, module.default);
+  }).catch((error) => {
+    console.error("Failed to load clearance routes:", error);
+  });
+
   /**
    * AI ASSISTANT ROUTES
    * Auth: Required
