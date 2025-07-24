@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { translateFromEnglish } from '../utils/translate';
 
 export function ResponderOutput({ input }: { input: string }) {
+  console.log('[ResponderOutput] Received input:', input);
   const [language, setLanguage] = useState('Zulu');
   const [output, setOutput] = useState('');
   const [dispatched, setDispatched] = useState(false);
@@ -133,7 +134,7 @@ export function ResponderOutput({ input }: { input: string }) {
           onClick={handleOutput}
           disabled={!input}
         >
-          Translate & Preview
+          Translate & Preview {!input && '(Waiting for input...)'}
         </button>
 
         <div className="flex-1 bg-gray-100 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-600 overflow-auto mb-4">
