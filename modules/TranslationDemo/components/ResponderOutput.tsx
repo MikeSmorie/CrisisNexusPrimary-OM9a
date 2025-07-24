@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import { translateFromEnglish } from '../utils/translate';
 
-export function ResponderOutput() {
+export function ResponderOutput({ input }: { input: string }) {
   const [language, setLanguage] = useState('Zulu');
   const [output, setOutput] = useState('');
 
   const handleOutput = async () => {
-    const translated = await translateFromEnglish("Crisis received. Help is on the way.", language);
+    const translated = await translateFromEnglish(
+      `Crisis received. Help is being dispatched. ${input}`,
+      language
+    );
     setOutput(translated);
   };
 
@@ -29,7 +32,7 @@ export function ResponderOutput() {
       >
         Translate Response
       </button>
-      <div className="mt-2 p-2 border rounded bg-gray-50">{output}</div>
+      <div className="mt-2 p-2 border rounded bg-gray-50 text-sm whitespace-pre-wrap">{output}</div>
     </div>
   );
 }

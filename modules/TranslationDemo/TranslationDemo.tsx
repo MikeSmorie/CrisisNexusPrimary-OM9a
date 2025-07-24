@@ -4,20 +4,34 @@ import { AgentTranslator } from './components/AgentTranslator';
 import { ResponderOutput } from './components/ResponderOutput';
 
 export default function TranslationDemo() {
-  const [input, setInput] = useState('');
+  const [callerMessage, setCallerMessage] = useState('');
+  const [englishTranslation, setEnglishTranslation] = useState('');
+  const [edtgCode, setEdtgCode] = useState('');
 
   return (
-    <div className="h-full max-w-full overflow-hidden">
-      <div className="flex h-full">
-        <div className="flex-1 border-r border-gray-200 dark:border-gray-800 p-4 min-w-0">
-          <CallerInput onInput={setInput} />
+    <div className="flex h-full">
+      <div className="w-1/3 border-r p-4">
+        <CallerInput onInput={setCallerMessage} />
+      </div>
+      <div className="w-1/3 border-r p-4">
+        <AgentTranslator
+          input={callerMessage}
+          setEnglish={setEnglishTranslation}
+          setEdtg={setEdtgCode}
+        />
+        <div className="mt-4">
+          <h3 className="font-semibold mb-2">📋 Crisis Triage Checklist</h3>
+          <ul className="text-sm list-disc list-inside text-gray-700 space-y-1">
+            <li>📍 What is the exact location of the crisis?</li>
+            <li>📞 What is your phone number or callback contact?</li>
+            <li>⏰ When did this occur?</li>
+            <li>🩺 Are there any injured persons?</li>
+            <li>🆘 What is your name and role (bystander, responder, victim)?</li>
+          </ul>
         </div>
-        <div className="flex-1 border-r border-gray-200 dark:border-gray-800 p-4 min-w-0">
-          <AgentTranslator input={input} />
-        </div>
-        <div className="flex-1 p-4 min-w-0">
-          <ResponderOutput />
-        </div>
+      </div>
+      <div className="w-1/3 p-4">
+        <ResponderOutput input={englishTranslation} />
       </div>
     </div>
   );
