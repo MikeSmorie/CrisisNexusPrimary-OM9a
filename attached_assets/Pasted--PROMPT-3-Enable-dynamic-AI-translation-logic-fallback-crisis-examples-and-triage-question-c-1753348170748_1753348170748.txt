@@ -1,0 +1,192 @@
+// ✅ PROMPT 3 — Enable dynamic AI translation logic, fallback crisis examples, and triage question checklist
+
+// 1. Update TranslationDemo.tsx to manage shared state across components
+
+'use client';
+
+import { useState } from 'react';
+import { CallerInput } from './components/CallerInput';
+import { AgentTranslator } from './components/AgentTranslator';
+import { ResponderOutput } from './components/ResponderOutput';
+
+export default function TranslationDemo() {
+  const [callerMessage, setCallerMessage] = useState('');
+  const [englishTranslation, setEnglishTranslation] = useState('');
+  const [edtgCode, setEdtgCode] = useState('');
+
+  return (
+    <div className="flex h-full">
+      <div className="w-1/3 border-r p-4">
+        <CallerInput onInput={setCallerMessage} />
+      </div>
+      <div className="w-1/3 border-r p-4">
+        <AgentTranslator
+          input={callerMessage}
+          setEnglish={setEnglishTranslation}
+          setEdtg={setEdtgCode}
+        />
+        <div className="mt-4">
+          <h3 className="font-semibold mb-2">📋 Crisis Triage Checklist</h3>
+          <ul className="text-sm list-disc list-inside text-gray-700 space-y-1">
+            <li>📍 What is the exact location of the crisis?</li>
+            <li>📞 What is your phone number or callback contact?</li>
+            <li>⏰ When did this occur?</li>
+            <li>🩺 Are there any injured persons?</li>
+            <li>🆘 What is your name and role (bystander, responder, victim)?</li>
+          </ul>
+        </div>
+      </div>
+      <div className="w-1/3 p-4">
+        <ResponderOutput input={englishTranslation} />
+      </div>
+    </div>
+  );
+}
+
+// 2. Update CallerInput.tsx to include fallback dropdown
+
+'use client';
+
+import { useState } from 'react';
+
+const presets = [
+  "Someone is drowning at the beach near Muizenberg.",
+  "My girlfriend just fell off a cliff at Lion’s Head.",
+  "Floodwaters are rising fast in my neighborhood.",
+  "Lightning struck a tree that fell on a car with people inside.",
+  "There’s a violent protest and a fire being started near the municipal office.",
+];
+
+export function CallerInput({ onInput }: { onInput: (text: string) => void }) {
+  const [text, setText] = useState('');
+
+  const handleSelectPreset = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setText(e.target.value);
+    onInput(e.target.value);
+  };
+
+  return (
+    <div>
+      <h2 className="text-lg font-semibold mb-2">📞 Caller Input</h2>
+      <textarea
+        placeholder="Type or speak crisis message in any language"
+        className="w-full p-2 border rounded"
+        rows={6}
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+      />
+      <button
+        className="mt-2 px-4 py-2 bg-blue-600 text-white rounded"
+        onClick={() => onInput(text)}
+      >
+        Submit
+      </button>
+
+      <div className="mt-4">
+        <label className="block mb-1 text-sm font-medium">📚 Or choose a demo crisis:</label>
+        <select
+          className="w-full p-2 border rounded"
+          value=""
+          onChange={handleSelectPreset}
+        >
+          <option value="">— Select a scenario —</option>
+          {presets.map((p, idx) => (
+            <option key={idx} value={p}>
+              {p}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
+  );
+}
+
+// 3. Update AgentTranslator.tsx to simulate GPT-like triage + logging
+
+'use client';
+
+import { useEffect, useState } from 'react';
+import { translateToEnglish, getEDTG } from '../utils/translate';
+
+export function AgentTranslator({
+  input,
+  setEnglish,
+  setEdtg,
+}: {
+  input: string;
+  setEnglish: (val: string) => void;
+  setEdtg: (val: string) => void;
+}) {
+  const [log, setLog] = useState('');
+
+  useEffect(() => {
+    if (input) {
+      const run = async () => {
+        const english = await translateToEnglish(input);
+        const edtg = getEDTG();
+        setEnglish(english);
+        setEdtg(edtg);
+
+        const autoResponse = `
+🧠 [AI Agent Log]
+Incoming Crisis: "${english}"
+⏱ EDTG: ${edtg}
+🔎 Classifying event... ✅
+📌 Requesting location, callback, time of incident, injury status, and caller role...
+🛰 Routing to appropriate emergency channel...`;
+        setLog(autoResponse);
+      };
+      run();
+    }
+  }, [input]);
+
+  return (
+    <div>
+      <h2 className="text-lg font-semibold mb-2">🤖 AI Agent</h2>
+      <pre className="bg-gray-100 p-3 rounded whitespace-pre-wrap text-sm">{log}</pre>
+    </div>
+  );
+}
+
+// 4. Update ResponderOutput.tsx to accept input and reflect it in chosen language
+
+'use client';
+
+import { useState } from 'react';
+import { translateFromEnglish } from '../utils/translate';
+
+export function ResponderOutput({ input }: { input: string }) {
+  const [language, setLanguage] = useState('Zulu');
+  const [output, setOutput] = useState('');
+
+  const handleOutput = async () => {
+    const translated = await translateFromEnglish(
+      `Crisis received. Help is being dispatched. ${input}`,
+      language
+    );
+    setOutput(translated);
+  };
+
+  return (
+    <div>
+      <h2 className="text-lg font-semibold mb-2">🧑‍🚒 Responder Output</h2>
+      <label className="block mb-2">Select responder language:</label>
+      <select
+        value={language}
+        onChange={(e) => setLanguage(e.target.value)}
+        className="w-full p-2 border rounded mb-2"
+      >
+        {["Zulu", "Xhosa", "Afrikaans", "Tswana", "Sotho", "Venda", "Tsonga", "Swati", "Ndebele", "Northern Sotho", "English"].map((lang) => (
+          <option key={lang}>{lang}</option>
+        ))}
+      </select>
+      <button
+        className="px-4 py-2 bg-purple-600 text-white rounded"
+        onClick={handleOutput}
+      >
+        Translate Response
+      </button>
+      <div className="mt-2 p-2 border rounded bg-gray-50 text-sm whitespace-pre-wrap">{output}</div>
+    </div>
+  );
+}
