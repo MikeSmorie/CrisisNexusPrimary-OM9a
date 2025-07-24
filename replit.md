@@ -134,6 +134,15 @@ DisasterMng-1-OM9 is a comprehensive emergency management and disaster response 
 
 ```
 Changelog:
+- July 24, 2025. TranslationDemo Enhancement - Voice Input & Text-to-Speech Complete
+  - Added voice/text mode toggle in CallerInput with simulated microphone functionality
+  - Implemented Web Speech API integration for voice recognition (webkitSpeechRecognition)
+  - Enhanced ResponderOutput with text-to-speech capabilities using SpeechSynthesis API
+  - Added South African language code mapping for proper TTS pronunciation
+  - Crisis scenario presets now support both text and voice input modes
+  - Complete multilingual emergency communication workflow with audio I/O capability
+
+Changelog:
 - July 9, 2025. Landing Page & Navigation Update for Emergency Operations
   - Updated default landing page to Module 1 - Incident Management for immediate emergency focus
   - Removed subscription and token management features not applicable to emergency response

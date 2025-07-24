@@ -11,7 +11,34 @@ export function ResponderOutput({ input }: { input: string }) {
       language
     );
     setOutput(translated);
+    speak(translated, language);
   };
+
+  const speak = (text: string, lang: string) => {
+    const synth = window.speechSynthesis;
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = mapLang(lang);
+    synth.speak(utter);
+  };
+
+  const mapLang = (lang: string) => {
+    const mapping: Record<string, string> = {
+      English: 'en-US',
+      Afrikaans: 'af-ZA',
+      Zulu: 'zu-ZA',
+      Xhosa: 'xh-ZA',
+      Sotho: 'st-ZA',
+      Tswana: 'tn-ZA',
+      Venda: 've-ZA',
+      Tsonga: 'ts-ZA',
+      Swati: 'ss-ZA',
+      Ndebele: 'nr-ZA',
+      'Northern Sotho': 'nso-ZA',
+    };
+    return mapping[lang] || 'en-US';
+  };
+
+  const languageOptions = ["Zulu", "Xhosa", "Afrikaans", "Tswana", "Sotho", "Venda", "Tsonga", "Swati", "Ndebele", "Northern Sotho", "English"];
 
   return (
     <div>
@@ -22,7 +49,7 @@ export function ResponderOutput({ input }: { input: string }) {
         onChange={(e) => setLanguage(e.target.value)}
         className="w-full p-2 border rounded mb-2"
       >
-        {["Zulu", "Xhosa", "Afrikaans", "Tswana", "Sotho", "Venda", "Tsonga", "Swati", "Ndebele", "Northern Sotho", "English"].map((lang) => (
+        {languageOptions.map((lang) => (
           <option key={lang}>{lang}</option>
         ))}
       </select>
@@ -30,7 +57,7 @@ export function ResponderOutput({ input }: { input: string }) {
         className="px-4 py-2 bg-purple-600 text-white rounded"
         onClick={handleOutput}
       >
-        Translate Response
+        Translate & Speak
       </button>
       <div className="mt-2 p-2 border rounded bg-gray-50 text-sm whitespace-pre-wrap">{output}</div>
     </div>
