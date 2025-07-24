@@ -5,6 +5,7 @@ export function ResponderOutput({ input }: { input: string }) {
   const [language, setLanguage] = useState('Zulu');
   const [output, setOutput] = useState('');
   const [dispatched, setDispatched] = useState(false);
+  const [enableTTS, setEnableTTS] = useState(true);
 
   const handleOutput = async () => {
     const translated = await translateFromEnglish(
@@ -13,7 +14,9 @@ export function ResponderOutput({ input }: { input: string }) {
     );
     setOutput(translated);
     setDispatched(false);
-    speak(translated, language);
+    if (enableTTS) {
+      speak(translated, language);
+    }
   };
 
   const handleDispatch = () => {
@@ -22,10 +25,53 @@ export function ResponderOutput({ input }: { input: string }) {
   };
 
   const speak = (text: string, lang: string) => {
+    if (!window.speechSynthesis) {
+      console.warn('Speech synthesis not supported');
+      return;
+    }
+    
     const synth = window.speechSynthesis;
+    
+    // Clear any existing speech
+    synth.cancel();
+    
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = mapLang(lang);
-    synth.speak(utter);
+    
+    // Enhance voice quality with optimized settings
+    utter.rate = 0.85; // Slower for emergency clarity
+    utter.pitch = 1.1; // Slightly higher pitch for urgency but not robotic
+    utter.volume = 0.9; // Clear volume
+    
+    // Wait for voices to load, then select the best available voice
+    const selectVoice = () => {
+      const voices = synth.getVoices();
+      if (voices.length === 0) return;
+      
+      const targetLang = mapLang(lang).split('-')[0];
+      
+      // Priority order: Natural > Google > Microsoft > Any matching language
+      const preferredVoice = 
+        voices.find(voice => voice.lang.startsWith(targetLang) && voice.name.toLowerCase().includes('natural')) ||
+        voices.find(voice => voice.lang.startsWith(targetLang) && voice.name.toLowerCase().includes('google')) ||
+        voices.find(voice => voice.lang.startsWith(targetLang) && voice.name.toLowerCase().includes('microsoft')) ||
+        voices.find(voice => voice.lang.startsWith(targetLang) && !voice.name.toLowerCase().includes('eSpeak')) ||
+        voices.find(voice => voice.lang.startsWith(targetLang));
+      
+      if (preferredVoice) {
+        utter.voice = preferredVoice;
+        console.log(`Using voice: ${preferredVoice.name} (${preferredVoice.lang})`);
+      }
+      
+      synth.speak(utter);
+    };
+    
+    // Ensure voices are loaded
+    if (synth.getVoices().length === 0) {
+      synth.addEventListener('voiceschanged', selectVoice, { once: true });
+    } else {
+      selectVoice();
+    }
   };
 
   const mapLang = (lang: string) => {
@@ -65,6 +111,18 @@ export function ResponderOutput({ input }: { input: string }) {
               <option key={lang}>{lang}</option>
             ))}
           </select>
+        </div>
+
+        <div className="mb-4">
+          <label className="flex items-center space-x-2 text-sm text-slate-600 dark:text-slate-400">
+            <input
+              type="checkbox"
+              checked={enableTTS}
+              onChange={(e) => setEnableTTS(e.target.checked)}
+              className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+            />
+            <span>🔊 Enable voice output (text-to-speech)</span>
+          </label>
         </div>
 
         <button
