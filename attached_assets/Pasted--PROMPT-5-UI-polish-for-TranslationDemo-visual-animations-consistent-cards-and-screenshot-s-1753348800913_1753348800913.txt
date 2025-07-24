@@ -1,0 +1,79 @@
+// ✅ PROMPT 5 — UI polish for TranslationDemo: visual animations, consistent cards, and screenshot styling
+
+// 1. Update TranslationDemo.tsx to apply full-height layout + animations
+
+'use client';
+
+import { useState } from 'react';
+import { CallerInput } from './components/CallerInput';
+import { AgentTranslator } from './components/AgentTranslator';
+import { ResponderOutput } from './components/ResponderOutput';
+
+export default function TranslationDemo() {
+  const [callerMessage, setCallerMessage] = useState('');
+  const [englishTranslation, setEnglishTranslation] = useState('');
+  const [edtgCode, setEdtgCode] = useState('');
+
+  return (
+    <div className="flex flex-col md:flex-row h-full gap-2 p-2">
+      <AnimatedCard>
+        <CallerInput onInput={setCallerMessage} />
+      </AnimatedCard>
+
+      <AnimatedCard>
+        <AgentTranslator
+          input={callerMessage}
+          setEnglish={setEnglishTranslation}
+          setEdtg={setEdtgCode}
+        />
+        <div className="mt-4">
+          <h3 className="font-semibold mb-2 text-blue-800">📋 Crisis Triage Checklist</h3>
+          <ul className="text-sm list-disc list-inside text-gray-700 space-y-1">
+            <li>📍 Exact location of the crisis?</li>
+            <li>📞 Callback number?</li>
+            <li>⏰ Time of occurrence?</li>
+            <li>🩺 Injured parties involved?</li>
+            <li>🧍 Caller role (bystander, victim, responder)?</li>
+          </ul>
+        </div>
+      </AnimatedCard>
+
+      <AnimatedCard>
+        <ResponderOutput input={englishTranslation} />
+      </AnimatedCard>
+    </div>
+  );
+}
+
+// 2. Create a new shared AnimatedCard wrapper in /modules/TranslationDemo/components/AnimatedCard.tsx
+
+'use client';
+
+import { motion } from 'framer-motion';
+
+export function AnimatedCard({ children }: { children: React.ReactNode }) {
+  return (
+    <motion.div
+      className="flex-1 p-4 bg-white rounded-2xl shadow-md border border-gray-200 overflow-auto"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+// 3. Add framer-motion dependency to project root (if not yet added)
+// Replit shell:
+// npm install framer-motion
+
+// 4. Polish global styles (if Tailwind config allows)
+// - Use clean background (#f5f7fa)
+// - Increase padding/margin for card sections
+// - Ensure mobile-friendly vertical stacking on small screens
+
+// 5. Screenshot-Friendly Enhancements
+// - All headings: use consistent Tailwind classes → text-lg font-semibold mb-2 text-slate-800
+// - Buttons: consistent color schemes (blue, green, purple, red)
+// - Hide overflow text → use `whitespace-pre-wrap` and `overflow-auto` for long logs

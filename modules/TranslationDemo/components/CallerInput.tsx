@@ -40,19 +40,19 @@ export function CallerInput({ onInput }: { onInput: (text: string) => void }) {
   };
 
   return (
-    <div>
-      <h2 className="text-lg font-semibold mb-2">📞 Caller Input</h2>
+    <div className="h-full flex flex-col">
+      <h2 className="text-lg font-semibold mb-2 text-slate-800">📞 Caller Input</h2>
 
-      <div className="mb-2">
-        <label className="mr-3 text-sm">Mode:</label>
+      <div className="mb-4">
+        <label className="mr-3 text-sm font-medium text-slate-600">Mode:</label>
         <button
-          className={`px-2 py-1 rounded mr-2 ${mode === 'text' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
+          className={`px-3 py-2 rounded-lg mr-2 transition-colors ${mode === 'text' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
           onClick={() => setMode('text')}
         >
           Text
         </button>
         <button
-          className={`px-2 py-1 rounded ${mode === 'voice' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
+          className={`px-3 py-2 rounded-lg transition-colors ${mode === 'voice' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
           onClick={() => setMode('voice')}
         >
           Voice
@@ -60,34 +60,40 @@ export function CallerInput({ onInput }: { onInput: (text: string) => void }) {
       </div>
 
       {mode === 'text' ? (
-        <>
+        <div className="flex-1 flex flex-col">
           <textarea
-            placeholder="Type your message..."
-            className="w-full p-2 border rounded"
-            rows={6}
+            placeholder="Type your emergency message..."
+            className="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
             value={text}
             onChange={(e) => setText(e.target.value)}
           />
           <button
-            className="mt-2 px-4 py-2 bg-blue-600 text-white rounded"
+            className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md"
             onClick={() => onInput(text)}
           >
-            Submit
+            Submit Message
           </button>
-        </>
+        </div>
       ) : (
-        <button
-          className={`mt-2 px-4 py-2 rounded ${recording ? 'bg-red-600 text-white' : 'bg-green-600 text-white'}`}
-          onClick={handleMicInput}
-        >
-          {recording ? 'Listening...' : '🎤 Start Voice Input'}
-        </button>
+        <div className="flex-1 flex flex-col items-center justify-center">
+          <button
+            className={`px-6 py-4 rounded-lg text-white font-medium transition-all shadow-lg ${recording ? 'bg-red-600 hover:bg-red-700 animate-pulse' : 'bg-green-600 hover:bg-green-700'}`}
+            onClick={handleMicInput}
+          >
+            {recording ? 'Listening...' : '🎤 Start Voice Input'}
+          </button>
+          {text && (
+            <div className="mt-4 p-3 bg-gray-50 rounded-lg border text-sm text-gray-700">
+              <strong>Captured:</strong> {text}
+            </div>
+          )}
+        </div>
       )}
 
       <div className="mt-4">
-        <label className="block mb-1 text-sm font-medium">📚 Or choose a demo crisis:</label>
+        <label className="block mb-2 text-sm font-medium text-slate-600">📚 Demo Crisis Scenarios:</label>
         <select
-          className="w-full p-2 border rounded"
+          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           value=""
           onChange={handleSelectPreset}
         >

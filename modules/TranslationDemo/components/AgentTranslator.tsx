@@ -34,9 +34,11 @@ Incoming Crisis: "${english}"
   }, [input]);
 
   return (
-    <div>
-      <h2 className="text-lg font-semibold mb-2">🤖 AI Agent</h2>
-      <pre className="bg-gray-100 p-3 rounded whitespace-pre-wrap text-sm">{log}</pre>
+    <div className="h-full flex flex-col">
+      <h2 className="text-lg font-semibold mb-2 text-slate-800">🤖 AI Agent</h2>
+      <div className="flex-1 bg-gray-50 p-4 rounded-lg border overflow-auto">
+        <pre className="whitespace-pre-wrap text-sm text-gray-800 leading-relaxed">{log || 'Waiting for caller input...'}</pre>
+      </div>
     </div>
   );
 }

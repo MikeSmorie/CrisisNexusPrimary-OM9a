@@ -41,25 +41,35 @@ export function ResponderOutput({ input }: { input: string }) {
   const languageOptions = ["Zulu", "Xhosa", "Afrikaans", "Tswana", "Sotho", "Venda", "Tsonga", "Swati", "Ndebele", "Northern Sotho", "English"];
 
   return (
-    <div>
-      <h2 className="text-lg font-semibold mb-2">🧑‍🚒 Responder Output</h2>
-      <label className="block mb-2">Select responder language:</label>
-      <select
-        value={language}
-        onChange={(e) => setLanguage(e.target.value)}
-        className="w-full p-2 border rounded mb-2"
-      >
-        {languageOptions.map((lang) => (
-          <option key={lang}>{lang}</option>
-        ))}
-      </select>
+    <div className="h-full flex flex-col">
+      <h2 className="text-lg font-semibold mb-2 text-slate-800">🧑‍🚒 Responder Output</h2>
+      
+      <div className="mb-4">
+        <label className="block mb-2 text-sm font-medium text-slate-600">Select responder language:</label>
+        <select
+          value={language}
+          onChange={(e) => setLanguage(e.target.value)}
+          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+        >
+          {languageOptions.map((lang) => (
+            <option key={lang}>{lang}</option>
+          ))}
+        </select>
+      </div>
+
       <button
-        className="px-4 py-2 bg-purple-600 text-white rounded"
+        className="mb-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
         onClick={handleOutput}
+        disabled={!input}
       >
-        Translate & Speak
+        Translate & Speak Response
       </button>
-      <div className="mt-2 p-2 border rounded bg-gray-50 text-sm whitespace-pre-wrap">{output}</div>
+
+      <div className="flex-1 bg-gray-50 p-4 rounded-lg border overflow-auto">
+        <div className="text-sm whitespace-pre-wrap text-gray-800 leading-relaxed">
+          {output || 'Translated response will appear here...'}
+        </div>
+      </div>
     </div>
   );
 }
