@@ -5,7 +5,7 @@ export function ResponderOutput({ input }: { input: string }) {
   const [language, setLanguage] = useState('Zulu');
   const [output, setOutput] = useState('');
   const [dispatched, setDispatched] = useState(false);
-  const [enableTTS, setEnableTTS] = useState(true);
+  const [enableTTS, setEnableTTS] = useState(false); // Disabled by default due to poor browser TTS quality
 
   const handleOutput = async () => {
     const translated = await translateFromEnglish(
@@ -14,9 +14,7 @@ export function ResponderOutput({ input }: { input: string }) {
     );
     setOutput(translated);
     setDispatched(false);
-    if (enableTTS) {
-      speak(translated, language);
-    }
+    // Don't auto-play TTS - let user choose manually
   };
 
   const handleDispatch = () => {
@@ -121,7 +119,7 @@ export function ResponderOutput({ input }: { input: string }) {
               onChange={(e) => setEnableTTS(e.target.checked)}
               className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
             />
-            <span>🔊 Enable voice output (text-to-speech)</span>
+            <span>🔊 Show audio playback option (Note: Browser TTS quality varies)</span>
           </label>
         </div>
 
@@ -137,6 +135,14 @@ export function ResponderOutput({ input }: { input: string }) {
           <div className="text-sm whitespace-pre-wrap text-gray-900 dark:text-gray-100 leading-relaxed">
             {output || 'Translated response will appear here...'}
           </div>
+          {output && enableTTS && (
+            <button
+              onClick={() => speak(output, language)}
+              className="mt-3 px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition-colors"
+            >
+              🔊 Play Audio
+            </button>
+          )}
         </div>
 
         {output && (
