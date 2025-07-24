@@ -1,0 +1,117 @@
+// ✅ PROMPT 2 — Populate TranslationDemo components with simulated multilingual input and translation logic
+
+// 1. Fill in /modules/TranslationDemo/components/CallerInput.tsx
+
+'use client';
+
+import { useState } from 'react';
+
+export function CallerInput({ onInput }: { onInput: (text: string) => void }) {
+  const [text, setText] = useState('');
+
+  return (
+    <div>
+      <h2 className="text-lg font-semibold mb-2">📞 Caller Input</h2>
+      <textarea
+        placeholder="Type or speak crisis message in any language"
+        className="w-full p-2 border rounded"
+        rows={6}
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+      />
+      <button
+        className="mt-2 px-4 py-2 bg-blue-600 text-white rounded"
+        onClick={() => onInput(text)}
+      >
+        Submit
+      </button>
+    </div>
+  );
+}
+
+// 2. Fill in /modules/TranslationDemo/components/AgentTranslator.tsx
+
+'use client';
+
+import { useState } from 'react';
+import { translateToEnglish, getEDTG } from '../utils/translate';
+
+export function AgentTranslator({ input }: { input: string }) {
+  const [log, setLog] = useState('');
+
+  const handleTranslate = async () => {
+    const english = await translateToEnglish(input);
+    const edtg = getEDTG();
+    setLog(`🧠 English Translation: ${english}\n📌 EDTG: ${edtg}`);
+  };
+
+  return (
+    <div>
+      <h2 className="text-lg font-semibold mb-2">🤖 AI Agent</h2>
+      <p className="mb-2 text-sm italic text-gray-600">Logs all input in English + EDTG code</p>
+      <button
+        className="mb-2 px-4 py-2 bg-green-600 text-white rounded"
+        onClick={handleTranslate}
+      >
+        Translate Input
+      </button>
+      <pre className="bg-gray-100 p-2 rounded whitespace-pre-wrap">{log}</pre>
+    </div>
+  );
+}
+
+// 3. Fill in /modules/TranslationDemo/components/ResponderOutput.tsx
+
+'use client';
+
+import { useState } from 'react';
+import { translateFromEnglish } from '../utils/translate';
+
+export function ResponderOutput() {
+  const [language, setLanguage] = useState('Zulu');
+  const [output, setOutput] = useState('');
+
+  const handleOutput = async () => {
+    const translated = await translateFromEnglish("Crisis received. Help is on the way.", language);
+    setOutput(translated);
+  };
+
+  return (
+    <div>
+      <h2 className="text-lg font-semibold mb-2">🧑‍🚒 Responder Output</h2>
+      <label className="block mb-2">Select responder language:</label>
+      <select
+        value={language}
+        onChange={(e) => setLanguage(e.target.value)}
+        className="w-full p-2 border rounded mb-2"
+      >
+        {["Zulu", "Xhosa", "Afrikaans", "Tswana", "Sotho", "Venda", "Tsonga", "Swati", "Ndebele", "Northern Sotho", "English"].map((lang) => (
+          <option key={lang}>{lang}</option>
+        ))}
+      </select>
+      <button
+        className="px-4 py-2 bg-purple-600 text-white rounded"
+        onClick={handleOutput}
+      >
+        Translate Response
+      </button>
+      <div className="mt-2 p-2 border rounded bg-gray-50">{output}</div>
+    </div>
+  );
+}
+
+// 4. Update /modules/TranslationDemo/utils/translate.ts
+
+export async function translateToEnglish(input: string): Promise<string> {
+  // Simulate translation
+  return `[Translated to English]: ${input}`;
+}
+
+export async function translateFromEnglish(input: string, language: string): Promise<string> {
+  return `[${language} Translation]: ${input}`;
+}
+
+export function getEDTG(): string {
+  const now = new Date();
+  return now.toISOString(); // Later upgrade to full EDTG if needed
+}

@@ -28,7 +28,8 @@ import {
   Users,
   Radio,
   Lock,
-  Database
+  Database,
+  Languages
 } from "lucide-react";
 
 // Only show implemented disaster management modules
@@ -81,6 +82,13 @@ const moduleItems = [
     href: "/module/9",
     icon: Shield,
     description: "Emergency Operations Center overview"
+  },
+  {
+    id: 'translation',
+    name: "Translation Demo",
+    href: "/translation-demo",
+    icon: Languages,
+    description: "CrisisNexus multilingual helpline simulation"
   }
 ];
 

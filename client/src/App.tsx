@@ -46,6 +46,7 @@ import EmergencySettings from "@/pages/emergency-settings";
 import ForensicDashboard from "@/pages/forensic-dashboard";
 import ClearanceManagement from "@/pages/clearance-management";
 import CommunicationCenter from "@/pages/communication-center";
+import TranslationDemoPage from "@/pages/translation-demo";
 
 import { useUser } from "@/hooks/use-user";
 import { useToast } from "@/hooks/use-toast";
@@ -151,6 +152,7 @@ function Router() {
         <Route path="/referrals" component={ReferralsPage} />
         <Route path="/locked-module" component={LockedModule} />
         <Route path="/2fa" component={TwoFactorAuth} />
+        <Route path="/translation-demo" component={TranslationDemoPage} />
 
         <Route path="/" component={IncidentManagement} />
         <Route component={NotFound} />
