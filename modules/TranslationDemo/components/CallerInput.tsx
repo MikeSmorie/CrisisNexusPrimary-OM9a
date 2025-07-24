@@ -46,13 +46,13 @@ export function CallerInput({ onInput }: { onInput: (text: string) => void }) {
       <div className="mb-4">
         <label className="mr-3 text-sm font-medium text-slate-600 dark:text-slate-400">Mode:</label>
         <button
-          className={`px-3 py-2 rounded-lg mr-2 transition-colors ${mode === 'text' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
+          className={`px-3 py-2 rounded-lg mr-2 transition-colors ${mode === 'text' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-200 dark:bg-gray-700 text-black dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600'}`}
           onClick={() => setMode('text')}
         >
           Text
         </button>
         <button
-          className={`px-3 py-2 rounded-lg transition-colors ${mode === 'voice' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
+          className={`px-3 py-2 rounded-lg transition-colors ${mode === 'voice' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-200 dark:bg-gray-700 text-black dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600'}`}
           onClick={() => setMode('voice')}
         >
           Voice
@@ -63,7 +63,7 @@ export function CallerInput({ onInput }: { onInput: (text: string) => void }) {
         <div className="flex-1 flex flex-col">
           <textarea
             placeholder="Type your emergency message..."
-            className="flex-1 p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none placeholder-gray-500 dark:placeholder-gray-400"
+            className="flex-1 p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-black dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none placeholder-gray-500 dark:placeholder-gray-400"
             value={text}
             onChange={(e) => setText(e.target.value)}
           />
@@ -83,7 +83,7 @@ export function CallerInput({ onInput }: { onInput: (text: string) => void }) {
             {recording ? 'Listening...' : '🎤 Start Voice Input'}
           </button>
           {text && (
-            <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+            <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 text-sm text-black dark:text-white">
               <strong>Captured:</strong> {text}
             </div>
           )}
@@ -93,7 +93,7 @@ export function CallerInput({ onInput }: { onInput: (text: string) => void }) {
       <div className="mt-4">
         <label className="block mb-2 text-sm font-medium text-slate-600 dark:text-slate-400">📚 Demo Crisis Scenarios:</label>
         <select
-          className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-black dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           value=""
           onChange={handleSelectPreset}
         >
