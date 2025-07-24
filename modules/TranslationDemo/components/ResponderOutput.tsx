@@ -8,11 +8,16 @@ export function ResponderOutput({ input }: { input: string }) {
   const [enableTTS, setEnableTTS] = useState(false); // Disabled by default due to poor browser TTS quality
 
   const handleOutput = async () => {
-    const translated = await translateFromEnglish(
-      `Crisis received. Help is being dispatched. ${input}`,
-      language
-    );
-    setOutput(translated);
+    const message = `Crisis received. Help is being dispatched. ${input}`;
+    
+    // If English is selected, don't translate - just use the English message directly
+    if (language === 'English') {
+      setOutput(message);
+    } else {
+      const translated = await translateFromEnglish(message, language);
+      setOutput(translated);
+    }
+    
     setDispatched(false);
     // Don't auto-play TTS - let user choose manually
   };
