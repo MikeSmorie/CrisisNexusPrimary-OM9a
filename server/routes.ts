@@ -1045,7 +1045,7 @@ export function registerRoutes(app: Express) {
         return res.json({ translated: `[Simulated English]: ${input}` });
       }
       
-      const OpenAI = require('openai');
+      const { default: OpenAI } = await import('openai');
       const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
       
       const completion = await openai.chat.completions.create({
@@ -1058,6 +1058,7 @@ export function registerRoutes(app: Express) {
 
       res.json({ translated: completion.choices[0].message.content });
     } catch (error) {
+      console.error('Translation error:', error);
       res.json({ translated: `[Translation Error]: ${error.message}` });
     }
   });
@@ -1069,7 +1070,7 @@ export function registerRoutes(app: Express) {
         return res.json({ translated: `[${targetLanguage} Simulated]: ${input}` });
       }
       
-      const OpenAI = require('openai');
+      const { default: OpenAI } = await import('openai');
       const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
       
       const completion = await openai.chat.completions.create({
@@ -1085,6 +1086,7 @@ export function registerRoutes(app: Express) {
 
       res.json({ translated: completion.choices[0].message.content });
     } catch (error) {
+      console.error('Translation error:', error);
       res.json({ translated: `[Translation Error]: ${error.message}` });
     }
   });
