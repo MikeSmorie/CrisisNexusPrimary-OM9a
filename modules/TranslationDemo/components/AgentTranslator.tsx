@@ -36,8 +36,8 @@ Incoming Crisis: "${english}"
   return (
     <div className="h-full flex flex-col">
       <h2 className="text-lg font-semibold mb-2 text-slate-800 dark:text-slate-200">🤖 AI Agent</h2>
-      <div className="flex-1 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 overflow-auto">
-        <pre className="whitespace-pre-wrap text-sm text-black dark:text-white leading-relaxed">{log || 'Waiting for caller input...'}</pre>
+      <div className="flex-1 bg-gray-100 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-600 overflow-auto">
+        <pre className="whitespace-pre-wrap text-sm text-gray-900 dark:text-gray-100 leading-relaxed">{log || 'Waiting for caller input...'}</pre>
       </div>
     </div>
   );

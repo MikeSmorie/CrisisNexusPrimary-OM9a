@@ -49,7 +49,7 @@ export function ResponderOutput({ input }: { input: string }) {
         <select
           value={language}
           onChange={(e) => setLanguage(e.target.value)}
-          className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-black dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
         >
           {languageOptions.map((lang) => (
             <option key={lang}>{lang}</option>
@@ -65,8 +65,8 @@ export function ResponderOutput({ input }: { input: string }) {
         Translate & Speak Response
       </button>
 
-      <div className="flex-1 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 overflow-auto">
-        <div className="text-sm whitespace-pre-wrap text-black dark:text-white leading-relaxed">
+      <div className="flex-1 bg-gray-100 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-600 overflow-auto">
+        <div className="text-sm whitespace-pre-wrap text-gray-900 dark:text-gray-100 leading-relaxed">
           {output || 'Translated response will appear here...'}
         </div>
       </div>
