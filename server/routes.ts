@@ -1057,7 +1057,7 @@ export function registerRoutes(app: Express) {
       });
 
       res.json({ translated: completion.choices[0].message.content });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Translation error:', error);
       res.json({ translated: `[Translation Error]: ${error.message}` });
     }
@@ -1085,7 +1085,7 @@ export function registerRoutes(app: Express) {
       });
 
       res.json({ translated: completion.choices[0].message.content });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Translation error:', error);
       res.json({ translated: `[Translation Error]: ${error.message}` });
     }
