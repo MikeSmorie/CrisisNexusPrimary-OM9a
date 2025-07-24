@@ -10,7 +10,7 @@ export default function TranslationDemo() {
   const [edtgCode, setEdtgCode] = useState('');
 
   return (
-    <div className="flex flex-col md:flex-row h-full gap-2 p-2 bg-slate-50">
+    <div className="flex flex-col md:flex-row h-full gap-2 p-2 bg-slate-50 dark:bg-slate-900">
       <AnimatedCard>
         <CallerInput onInput={setCallerMessage} />
       </AnimatedCard>
@@ -22,8 +22,8 @@ export default function TranslationDemo() {
           setEdtg={setEdtgCode}
         />
         <div className="mt-4">
-          <h3 className="text-lg font-semibold mb-2 text-slate-800">📋 Crisis Triage Checklist</h3>
-          <ul className="text-sm list-disc list-inside text-gray-700 space-y-1">
+          <h3 className="text-lg font-semibold mb-2 text-slate-800 dark:text-slate-200">📋 Crisis Triage Checklist</h3>
+          <ul className="text-sm list-disc list-inside text-gray-700 dark:text-gray-300 space-y-1">
             <li>📍 Exact location of the crisis?</li>
             <li>📞 Callback number?</li>
             <li>⏰ Time of occurrence?</li>

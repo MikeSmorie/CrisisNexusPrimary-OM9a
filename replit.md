@@ -253,4 +253,5 @@ Changelog:
 ```
 Preferred communication style: Simple, everyday language.
 UI Design: Clean, minimal, professional appearance without excessive warnings or cluttered styling.
+Dark Mode Accessibility: Ensure strong contrast between font and background colors in both light and dark modes.
 ```

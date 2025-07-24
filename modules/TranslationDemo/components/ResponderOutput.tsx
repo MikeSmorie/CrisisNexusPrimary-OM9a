@@ -42,14 +42,14 @@ export function ResponderOutput({ input }: { input: string }) {
 
   return (
     <div className="h-full flex flex-col">
-      <h2 className="text-lg font-semibold mb-2 text-slate-800">🧑‍🚒 Responder Output</h2>
+      <h2 className="text-lg font-semibold mb-2 text-slate-800 dark:text-slate-200">🧑‍🚒 Responder Output</h2>
       
       <div className="mb-4">
-        <label className="block mb-2 text-sm font-medium text-slate-600">Select responder language:</label>
+        <label className="block mb-2 text-sm font-medium text-slate-600 dark:text-slate-400">Select responder language:</label>
         <select
           value={language}
           onChange={(e) => setLanguage(e.target.value)}
-          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
         >
           {languageOptions.map((lang) => (
             <option key={lang}>{lang}</option>
@@ -65,8 +65,8 @@ export function ResponderOutput({ input }: { input: string }) {
         Translate & Speak Response
       </button>
 
-      <div className="flex-1 bg-gray-50 p-4 rounded-lg border overflow-auto">
-        <div className="text-sm whitespace-pre-wrap text-gray-800 leading-relaxed">
+      <div className="flex-1 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 overflow-auto">
+        <div className="text-sm whitespace-pre-wrap text-gray-800 dark:text-gray-200 leading-relaxed">
           {output || 'Translated response will appear here...'}
         </div>
       </div>
