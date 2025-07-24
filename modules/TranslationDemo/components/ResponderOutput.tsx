@@ -7,9 +7,10 @@ export function ResponderOutput({ input }: { input: string }) {
   const [dispatched, setDispatched] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Automatically process when input changes
+  // Automatically process when input or language changes
   useEffect(() => {
     if (input) {
+      setDispatched(false); // Reset dispatch state when language changes
       handleAutoDispatch();
     }
   }, [input, language]);
