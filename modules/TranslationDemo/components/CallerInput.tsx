@@ -40,8 +40,12 @@ export function CallerInput({ onInput }: { onInput: (text: string) => void }) {
   };
 
   return (
-    <div className="h-full flex flex-col">
-      <h2 className="text-lg font-semibold mb-2 text-slate-800 dark:text-slate-200">📞 Caller Input</h2>
+    <div className="h-full flex flex-col border-2 border-blue-400 rounded-2xl">
+      <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 backdrop-blur-md shadow-sm p-4 rounded-t-2xl border-b border-blue-200 dark:border-blue-700">
+        <h2 className="text-lg font-bold text-blue-800 dark:text-blue-200">📞 Victim Caller</h2>
+      </div>
+      
+      <div className="flex-1 flex flex-col p-4">
 
       <div className="mb-4">
         <label className="mr-3 text-sm font-medium text-slate-600 dark:text-slate-400">Mode:</label>
@@ -104,6 +108,7 @@ export function CallerInput({ onInput }: { onInput: (text: string) => void }) {
             </option>
           ))}
         </select>
+        </div>
       </div>
     </div>
   );

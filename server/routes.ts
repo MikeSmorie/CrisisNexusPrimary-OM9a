@@ -1037,6 +1037,58 @@ export function registerRoutes(app: Express) {
    */
   registerAnalyticsRoutes(app); // These routes have their own middleware checks
 
+  // Translation API routes for real GPT translation
+  app.post("/api/translate-to-english", async (req, res) => {
+    try {
+      const { input } = req.body;
+      if (!process.env.OPENAI_API_KEY) {
+        return res.json({ translated: `[Simulated English]: ${input}` });
+      }
+      
+      const OpenAI = require('openai');
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      
+      const completion = await openai.chat.completions.create({
+        model: 'gpt-4o', // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: [
+          { role: 'system', content: 'Translate any language to English clearly and concisely for emergency response. Focus on extracting key emergency information.' },
+          { role: 'user', content: input },
+        ],
+      });
+
+      res.json({ translated: completion.choices[0].message.content });
+    } catch (error) {
+      res.json({ translated: `[Translation Error]: ${error.message}` });
+    }
+  });
+
+  app.post("/api/translate-from-english", async (req, res) => {
+    try {
+      const { input, targetLanguage } = req.body;
+      if (!process.env.OPENAI_API_KEY) {
+        return res.json({ translated: `[${targetLanguage} Simulated]: ${input}` });
+      }
+      
+      const OpenAI = require('openai');
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      
+      const completion = await openai.chat.completions.create({
+        model: 'gpt-4o', // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: [
+          {
+            role: 'system',
+            content: `Translate the following emergency message into ${targetLanguage} in a calm, clear tone suitable for emergency responders. Do not include any English.`,
+          },
+          { role: 'user', content: input },
+        ],
+      });
+
+      res.json({ translated: completion.choices[0].message.content });
+    } catch (error) {
+      res.json({ translated: `[Translation Error]: ${error.message}` });
+    }
+  });
+
   // Error handler must be last
   app.use(errorHandler);
 
