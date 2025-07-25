@@ -55,6 +55,7 @@ export function setupAuth(app: Express) {
   passport.use(
     new LocalStrategy(async (username, password, done) => {
       try {
+        console.log(`[DEBUG] Login attempt: { username: '${username}', skipEmailVerification: '${process.env.NODE_ENV}' }`);
         const [user] = await db
           .select()
           .from(disasterUsers)
@@ -62,15 +63,19 @@ export function setupAuth(app: Express) {
           .limit(1);
 
         if (!user) {
+          console.log(`[DEBUG] User not found: ${username}`);
           return done(null, false, { message: "Incorrect username." });
         }
 
+        console.log(`[DEBUG] Password comparison: provided='${password}', stored='${user.password}', match=${password === user.password}`);
+        
         // Check if user email is verified with sandbox bypass
         const isDevelopment = process.env.NODE_ENV !== 'production';
         const replitSandbox = process.env.REPLIT_DOMAINS || process.env.REPL_DOMAIN;
         const isSandboxEnvironment = isDevelopment || !!replitSandbox;
         
         if (!user.isVerified && !isSandboxEnvironment) {
+          console.log(`[DEBUG] User not verified: ${username}, isDev: ${isDevelopment}, sandbox: ${!!replitSandbox}`);
           return done(null, false, { message: "Please verify your emergency credentials before accessing the system." });
         }
 
