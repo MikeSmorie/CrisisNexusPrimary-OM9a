@@ -32,6 +32,12 @@ export function CallerInput({ onInput }: { onInput: (text: string) => void }) {
       recognition.onresult = (event: any) => {
         const transcript = event.results[event.results.length - 1][0].transcript;
         setText(transcript);
+        // Auto-submit voice input immediately when speech ends
+        if (event.results[event.results.length - 1].isFinal) {
+          setTimeout(() => {
+            onInput(transcript);
+          }, 500); // Small delay for better UX
+        }
       };
       
       recognition.onerror = (event: any) => {
@@ -41,6 +47,10 @@ export function CallerInput({ onInput }: { onInput: (text: string) => void }) {
       
       recognition.onend = () => {
         setRecording(false);
+        // Ensure voice input is submitted when recording ends
+        if (text) {
+          onInput(text);
+        }
       };
       
       setRecording(true);
@@ -124,8 +134,8 @@ export function CallerInput({ onInput }: { onInput: (text: string) => void }) {
             </div>
           )}
           {text && (
-            <div className="mt-4 p-3 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 text-sm text-gray-900 dark:text-gray-100 max-w-md">
-              <strong>Captured:</strong> {text}
+            <div className="mt-4 p-3 bg-green-100 dark:bg-green-900 rounded-lg border border-green-300 dark:border-green-600 text-sm text-gray-900 dark:text-gray-100">
+              <strong>✅ Captured & Auto-Submitted:</strong> {text}
             </div>
           )}
         </div>
