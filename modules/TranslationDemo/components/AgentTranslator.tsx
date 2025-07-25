@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { translateToEnglish, getEDTG } from '../utils/translate';
 import { classifyIntent, generateAcknowledgement } from '../../../lib/classifyIntent';
+import { handleIntent } from '../../../lib/intentRouter';
 
 export function AgentTranslator({
   input,
@@ -19,9 +20,12 @@ export function AgentTranslator({
         const english = await translateToEnglish(input);
         const edtg = getEDTG();
         const result = classifyIntent(english);
-        const routeToResponder = result.type === 'emergency' && result.confidence >= 0.9;
         
-        // Only route high-confidence emergency content to ResponderOutput
+        // Use intent router for emergency confirmation logic
+        const intentResponse = handleIntent(result.type.toUpperCase(), result.confidence, english);
+        const routeToResponder = intentResponse.routeToResponder || false;
+        
+        // Only route confirmed emergency content to ResponderOutput
         if (routeToResponder) {
           setEnglish(english);
           setEdtg(edtg);
@@ -38,7 +42,9 @@ export function AgentTranslator({
         };
 
         let responseText = '';
-        if (routeToResponder) {
+        if (intentResponse.intent === 'CONFIRM_EMERGENCY') {
+          responseText = `⚠️ Confirmation Required: "${intentResponse.message}"\n⛔ Awaiting confirmation before routing to responder.`;
+        } else if (routeToResponder) {
           responseText = '📌 Requesting location, callback, time of incident, injury status, and caller role...\n📡 Routing to appropriate emergency channel...';
         } else {
           const acknowledgement = generateAcknowledgement(result.type, result.confidence);
@@ -51,7 +57,7 @@ Raw Input: "${input}"
 Translated: "${english}"
 ⏱ EDTG: ${edtg}
 Intent: 🧠 ${result.type.toUpperCase()} (${Math.round(result.confidence * 100)}%)
-Decision: ${routeToResponder ? '📡 Routed to Responder' : '⛔ Held for Clarification'}
+Decision: ${routeToResponder ? '📡 Routed to Responder' : intentResponse.intent === 'CONFIRM_EMERGENCY' ? '⚠️ Awaiting Confirmation' : '⛔ Held for Clarification'}
 ${responseText}`;
         setLog(autoResponse);
       };

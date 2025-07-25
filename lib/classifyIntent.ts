@@ -4,9 +4,19 @@ export function classifyIntent(text: string): {
 } {
   const t = text.toLowerCase();
   
-  // High-confidence emergency patterns
-  if (/fire|flood|fell|injured|stabbed|accident|trapped|collapsed|emergency|help|drowning|violence|attack|crash|stuck|medical|ambulance|police|hospital|bleeding|hurt/.test(t)) {
+  // Ultra-high confidence emergency patterns (98%+)
+  if (/fire|bleeding|attack|ambulance|emergency|crime|now/.test(t) && /help|please|urgent|serious/.test(t)) {
+    return { type: "emergency", confidence: 0.98 };
+  }
+  
+  // High-confidence emergency patterns (95%)
+  if (/fire|flood|fell|injured|stabbed|accident|trapped|collapsed|emergency|help|drowning|violence|attack|crash|stuck|medical|ambulance|police|hospital|bleeding|hurt|crime/.test(t)) {
     return { type: "emergency", confidence: 0.95 };
+  }
+  
+  // Medium-confidence emergency patterns (85%) - requires confirmation
+  if (/help|urgent|serious|problem|hurt|pain|danger/.test(t)) {
+    return { type: "emergency", confidence: 0.85 };
   }
   
   // High-confidence greeting patterns
