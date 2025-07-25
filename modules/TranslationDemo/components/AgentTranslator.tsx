@@ -39,8 +39,10 @@ Incoming Crisis: "${english}"
         <h2 className="text-lg font-bold text-indigo-800 dark:text-indigo-200">🤖 AI Translator</h2>
       </div>
       
-      <div className="flex-1 bg-gray-100 dark:bg-gray-800 p-4 m-4 rounded-lg border border-gray-200 dark:border-gray-600 overflow-auto">
-        <pre className="whitespace-pre-wrap text-sm text-gray-900 dark:text-gray-100 leading-relaxed">{log || 'Waiting for caller input...'}</pre>
+      <div className="bg-slate-900 rounded-xl p-4 overflow-auto max-h-[calc(100vh-200px)] m-4">
+        <pre className="whitespace-pre-wrap text-white text-sm font-mono">
+          {log || 'Waiting for caller input...'}
+        </pre>
       </div>
     </div>
   );

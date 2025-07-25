@@ -78,10 +78,10 @@ export function ResponderOutput({ input }: { input: string }) {
           </div>
         )}
 
-        <div className="flex-1 bg-gray-100 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-600 overflow-auto mb-4">
-          <div className="text-sm whitespace-pre-wrap text-gray-900 dark:text-gray-100 leading-relaxed">
+        <div className="bg-slate-900 rounded-xl p-4 overflow-auto max-h-[calc(100vh-200px)] mb-4">
+          <pre className="whitespace-pre-wrap text-white text-sm font-mono">
             {output || 'Awaiting emergency dispatch...'}
-          </div>
+          </pre>
         </div>
 
         {dispatched && (
