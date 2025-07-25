@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { translateToEnglish, getEDTG } from '../utils/translate';
+import { classifyIntent, generateAcknowledgement } from '../../../lib/classifyIntent';
 
 export function AgentTranslator({
   input,
@@ -11,34 +12,6 @@ export function AgentTranslator({
   setEdtg: (val: string) => void;
 }) {
   const [log, setLog] = useState('');
-  
-  // Intent classifier function
-  const classifyIntent = (text: string): 'emergency' | 'greeting' | 'unclear' => {
-    const lowerText = text.toLowerCase();
-    
-    // Non-emergency greetings/tests
-    const greetingPatterns = [
-      'hello', 'hi', 'hey', 'can you hear me', 'is this working', 
-      'test', 'testing', '123', 'check', 'mic check'
-    ];
-    
-    // Emergency keywords
-    const emergencyPatterns = [
-      'fire', 'accident', 'injury', 'hurt', 'bleeding', 'emergency', 'help',
-      'drowning', 'fell', 'cliff', 'flood', 'violence', 'attack', 'crash',
-      'stuck', 'trapped', 'medical', 'ambulance', 'police', 'hospital'
-    ];
-    
-    if (greetingPatterns.some(pattern => lowerText.includes(pattern))) {
-      return 'greeting';
-    }
-    
-    if (emergencyPatterns.some(pattern => lowerText.includes(pattern))) {
-      return 'emergency';
-    }
-    
-    return 'unclear';
-  };
 
   useEffect(() => {
     if (input) {
@@ -46,9 +19,10 @@ export function AgentTranslator({
         const english = await translateToEnglish(input);
         const edtg = getEDTG();
         const intent = classifyIntent(english);
+        const routeToResponder = intent === 'emergency';
         
         // Only route emergency content to ResponderOutput
-        if (intent === 'emergency') {
+        if (routeToResponder) {
           setEnglish(english);
           setEdtg(edtg);
         } else {
@@ -59,8 +33,17 @@ export function AgentTranslator({
         const intentEmoji = {
           'emergency': '🚨',
           'greeting': '👋',
-          'unclear': '❓'
+          'noise': '🔇',
+          'unknown': '❓'
         };
+
+        let responseText = '';
+        if (routeToResponder) {
+          responseText = '📌 Requesting location, callback, time of incident, injury status, and caller role...\n🛰 Routing to appropriate emergency channel...';
+        } else {
+          const acknowledgement = generateAcknowledgement(intent);
+          responseText = `💬 Caller Acknowledgement: "${acknowledgement}"\n🚫 Not routing to responder - awaiting emergency content.`;
+        }
 
         const autoResponse = `
 🧠 [AI Agent Log]
@@ -68,12 +51,8 @@ Raw Input: "${input}"
 Translated: "${english}"
 ⏱ EDTG: ${edtg}
 🔍 Interpreted Intent: ${intentEmoji[intent]} ${intent.toUpperCase()}
-${intent === 'emergency' ? 
-  '📌 Requesting location, callback, time of incident, injury status, and caller role...\n🛰 Routing to appropriate emergency channel...' : 
-  intent === 'greeting' ? 
-  '✋ Non-emergency greeting detected. Awaiting actual emergency report.' :
-  '❓ Intent unclear. Please provide more specific emergency information.'
-}`;
+Route to Responder: ${routeToResponder ? '✅ YES' : '❌ NO'}
+${responseText}`;
         setLog(autoResponse);
       };
       run();
