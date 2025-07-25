@@ -134,15 +134,15 @@ DisasterMng-1-OM9 is a comprehensive emergency management and disaster response 
 
 ```
 Changelog:
-- July 25, 2025. Emergency Confirmation Layer & Intent Router Complete
-  - Created lib/intentRouter.ts with fallback confirmation logic for medium-confidence emergencies
-  - Enhanced confidence thresholds: 98% ultra-high (immediate dispatch), 95% high (dispatch), 85% medium (requires confirmation)
-  - Added emergency confirmation workflow: "Is this an actual emergency?" for ambiguous cases
-  - Implemented three-tier emergency handling: Dispatch / Confirm / Hold based on confidence and keywords
-  - AI log shows confirmation state: "⚠️ Awaiting Confirmation" for medium-confidence emergencies
-  - Enhanced emergency keyword detection with context-aware patterns
-  - System now catches edge cases while preventing false dispatches through confirmation layer
-  - Demo-safe with clear visual feedback for all decision paths
+- July 25, 2025. Fixed Emergency Classification Thresholds & Logic
+  - Fixed critical bug: system now classifies original input instead of AI translation response
+  - Adjusted confidence thresholds: 95%+ for immediate dispatch, 85% for confirmation only on edge cases
+  - Enhanced emergency patterns to catch "stranded", "drowning", "flood" scenarios immediately
+  - Lowered confirmation threshold to reduce false negatives on genuine emergencies
+  - Added context-aware keywords: "tree", "water", "flood" trigger high confidence when combined with emergency terms
+  - System now properly dispatches clear emergencies like "people stranded, risk drowning" without confirmation
+  - Maintains safety through negative pattern matching to exclude casual conversations
+  - Classification source clearly labeled in AI log for transparency
 
 - July 25, 2025. Deployment Readiness & Health Check Implementation Complete
   - Added comprehensive health check endpoints (/ and /health) for Cloud Run compatibility

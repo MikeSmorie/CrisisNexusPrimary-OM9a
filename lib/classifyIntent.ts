@@ -5,17 +5,17 @@ export function classifyIntent(text: string): {
   const t = text.toLowerCase();
   
   // Ultra-high confidence emergency patterns (98%+)
-  if (/fire|bleeding|attack|ambulance|emergency|crime/.test(t) && /help|please|urgent|serious|now/.test(t)) {
+  if (/fire|bleeding|attack|ambulance|emergency|crime|drowning|stranded|trapped/.test(t) && /help|please|urgent|serious|now|tree|water|flood/.test(t)) {
     return { type: "emergency", confidence: 0.98 };
   }
   
-  // High-confidence emergency patterns (95%)
-  if (/fire|flood|fell|injured|stabbed|accident|trapped|collapsed|emergency|help|drowning|violence|attack|crash|stuck|medical|ambulance|police|hospital|bleeding|hurt|crime/.test(t)) {
-    return { type: "emergency", confidence: 0.95 };
+  // High-confidence emergency patterns (95%) - immediate dispatch
+  if (/fire|flood|fell|injured|stabbed|accident|trapped|collapsed|emergency|help|drowning|violence|attack|crash|stuck|medical|ambulance|police|hospital|bleeding|hurt|crime|stranded|drown/.test(t)) {
+    return { type: "emergency", confidence: 0.98 }; // Bumped to 98% for immediate dispatch
   }
   
   // Medium-confidence emergency patterns (85%) - requires confirmation  
-  if (/help|urgent|serious|problem|hurt|pain|danger/.test(t) && !/not.*emergency|no.*emergency|this.*not/.test(t)) {
+  if (/help|urgent|serious|problem|hurt|pain|danger/.test(t) && !/not.*emergency|no.*emergency|this.*not|casual|weather.*nice/.test(t)) {
     return { type: "emergency", confidence: 0.85 };
   }
   
