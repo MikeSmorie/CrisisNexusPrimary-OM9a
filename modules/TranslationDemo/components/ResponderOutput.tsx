@@ -84,7 +84,7 @@ export function ResponderOutput({ input }: { input: string }) {
 
         <div className="bg-slate-900 rounded-lg p-4 overflow-auto max-h-[calc(100vh-200px)] mb-4">
           <pre className="whitespace-pre-wrap text-white text-sm font-mono">
-            {output || (input ? '🚫 Non-emergency content blocked from dispatch' : 'Awaiting emergency dispatch...')}
+            {output || (input ? '⛔ Content held for clarification - requires clearer emergency information' : 'Awaiting emergency dispatch...')}
           </pre>
         </div>
 

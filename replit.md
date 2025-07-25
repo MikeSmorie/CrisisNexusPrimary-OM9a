@@ -134,15 +134,15 @@ DisasterMng-1-OM9 is a comprehensive emergency management and disaster response 
 
 ```
 Changelog:
-- July 25, 2025. Enhanced Intent Classification & Professional Demo System Complete
-  - Created dedicated `lib/classifyIntent.ts` with lightweight intent classifier using regex patterns
-  - Implemented 4-tier classification: emergency, greeting, noise, unknown with specific acknowledgements
-  - Added professional caller acknowledgement system with context-appropriate responses
-  - Enhanced AI log shows "Route to Responder: ✅ YES / ❌ NO" for clear demo visibility
-  - Non-emergency content (greetings, noise, unclear) blocked from responder dispatch with clear indicators
-  - Added language selector for voice input with South African language support (Auto, English, Afrikaans, Zulu, Xhosa, Sotho)
-  - Fixed content clipping with square, scrollable boxes using proper overflow handling
-  - System now demo-safe: greetings echo back to caller only, emergencies route to full pipeline
+- July 25, 2025. Smart Voice Vetting & Confidence-Based Filtering Complete
+  - Enhanced intent classifier with confidence scoring system (0.4-0.95 range)
+  - Implemented dual-threshold filtering: emergency type AND 90%+ confidence required for responder routing
+  - Added intelligent acknowledgement system based on confidence levels
+  - AI log now shows "Intent: 🧠 EMERGENCY (95%)" and "Decision: 📡 Routed / ⛔ Held for Clarification"
+  - Low-confidence or non-emergency content held with contextual feedback messages
+  - Strengthened emergency detection patterns while maintaining greeting/noise classification
+  - System prevents junk content from reaching responders through smart confidence thresholds
+  - Demo-ready with clear visual indicators showing AI decision-making process
 
 - July 25, 2025. Deployment Readiness & Health Check Implementation Complete
   - Added comprehensive health check endpoints (/ and /health) for Cloud Run compatibility

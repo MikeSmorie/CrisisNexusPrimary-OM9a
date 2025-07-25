@@ -18,10 +18,10 @@ export function AgentTranslator({
       const run = async () => {
         const english = await translateToEnglish(input);
         const edtg = getEDTG();
-        const intent = classifyIntent(english);
-        const routeToResponder = intent === 'emergency';
+        const result = classifyIntent(english);
+        const routeToResponder = result.type === 'emergency' && result.confidence >= 0.9;
         
-        // Only route emergency content to ResponderOutput
+        // Only route high-confidence emergency content to ResponderOutput
         if (routeToResponder) {
           setEnglish(english);
           setEdtg(edtg);
@@ -39,10 +39,10 @@ export function AgentTranslator({
 
         let responseText = '';
         if (routeToResponder) {
-          responseText = '📌 Requesting location, callback, time of incident, injury status, and caller role...\n🛰 Routing to appropriate emergency channel...';
+          responseText = '📌 Requesting location, callback, time of incident, injury status, and caller role...\n📡 Routing to appropriate emergency channel...';
         } else {
-          const acknowledgement = generateAcknowledgement(intent);
-          responseText = `💬 Caller Acknowledgement: "${acknowledgement}"\n🚫 Not routing to responder - awaiting emergency content.`;
+          const acknowledgement = generateAcknowledgement(result.type, result.confidence);
+          responseText = `💬 Caller Acknowledgement: "${acknowledgement}"\n⛔ Held for Clarification - AI needs clearer emergency information before routing.`;
         }
 
         const autoResponse = `
@@ -50,8 +50,8 @@ export function AgentTranslator({
 Raw Input: "${input}"
 Translated: "${english}"
 ⏱ EDTG: ${edtg}
-🔍 Interpreted Intent: ${intentEmoji[intent]} ${intent.toUpperCase()}
-Route to Responder: ${routeToResponder ? '✅ YES' : '❌ NO'}
+Intent: 🧠 ${result.type.toUpperCase()} (${Math.round(result.confidence * 100)}%)
+Decision: ${routeToResponder ? '📡 Routed to Responder' : '⛔ Held for Clarification'}
 ${responseText}`;
         setLog(autoResponse);
       };
