@@ -12,6 +12,7 @@ export function CallerInput({ onInput }: { onInput: (text: string) => void }) {
   const [text, setText] = useState('');
   const [mode, setMode] = useState<'text' | 'voice'>('text');
   const [recording, setRecording] = useState(false);
+  const [voiceLanguage, setVoiceLanguage] = useState('auto');
   const recognitionRef = useRef<any>(null);
 
   const handleSelectPreset = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -24,7 +25,16 @@ export function CallerInput({ onInput }: { onInput: (text: string) => void }) {
       const recognition = new (window as any).webkitSpeechRecognition();
       recognitionRef.current = recognition;
       
-      recognition.lang = 'en-US';
+      // Set language based on user selection
+      const langMap: Record<string, string> = {
+        'auto': 'en-US',
+        'English': 'en-US',
+        'Afrikaans': 'af-ZA',
+        'Zulu': 'zu-ZA',
+        'Xhosa': 'xh-ZA',
+        'Sotho': 'st-ZA'
+      };
+      recognition.lang = langMap[voiceLanguage] || 'en-US';
       recognition.interimResults = false;
       recognition.maxAlternatives = 1;
       recognition.continuous = true; // Keep listening until stopped
@@ -113,6 +123,23 @@ export function CallerInput({ onInput }: { onInput: (text: string) => void }) {
         </div>
       ) : (
         <div className="flex-1 flex flex-col items-center justify-center">
+          {/* Language selector for voice input */}
+          <div className="mb-4 w-full max-w-xs">
+            <label className="block mb-2 text-sm font-medium text-slate-600 dark:text-slate-400">Voice Language:</label>
+            <select
+              value={voiceLanguage}
+              onChange={(e) => setVoiceLanguage(e.target.value)}
+              className="w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+            >
+              <option value="auto">Auto Detect</option>
+              <option value="English">English</option>
+              <option value="Afrikaans">Afrikaans</option>
+              <option value="Zulu">Zulu</option>
+              <option value="Xhosa">Xhosa</option>
+              <option value="Sotho">Sotho</option>
+            </select>
+          </div>
+          
           {!recording ? (
             <button
               className="px-6 py-4 rounded-lg bg-green-600 hover:bg-green-700 text-white font-medium transition-all shadow-lg"

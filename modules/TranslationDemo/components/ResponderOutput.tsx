@@ -7,11 +7,15 @@ export function ResponderOutput({ input }: { input: string }) {
   const [dispatched, setDispatched] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Automatically process when input or language changes
+  // Automatically process when input or language changes (only for emergencies)
   useEffect(() => {
-    if (input) {
+    if (input && input.trim() !== '') {
       setDispatched(false); // Reset dispatch state when language changes
       handleAutoDispatch();
+    } else {
+      // Clear output if no emergency input
+      setOutput('');
+      setDispatched(false);
     }
   }, [input, language]);
 
@@ -78,9 +82,9 @@ export function ResponderOutput({ input }: { input: string }) {
           </div>
         )}
 
-        <div className="bg-slate-900 rounded-xl p-4 overflow-auto max-h-[calc(100vh-200px)] mb-4">
+        <div className="bg-slate-900 rounded-lg p-4 overflow-auto max-h-[calc(100vh-200px)] mb-4">
           <pre className="whitespace-pre-wrap text-white text-sm font-mono">
-            {output || 'Awaiting emergency dispatch...'}
+            {output || (input ? 'No emergency content to dispatch...' : 'Awaiting emergency dispatch...')}
           </pre>
         </div>
 

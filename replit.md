@@ -134,6 +134,15 @@ DisasterMng-1-OM9 is a comprehensive emergency management and disaster response 
 
 ```
 Changelog:
+- July 25, 2025. Voice Input Demo Enhancement & Intent Classification Complete
+  - Added language selector for voice input with South African language support (Auto, English, Afrikaans, Zulu, Xhosa, Sotho)
+  - Implemented intent classification middleware to distinguish emergency vs non-emergency content
+  - Non-emergency greetings ("hello", "testing", "can you hear me") are flagged and NOT routed to ResponderView
+  - Only real emergency content (fire, accident, injury, flood, etc.) triggers emergency dispatch
+  - Enhanced AI log with "🔍 Interpreted Intent" visibility (🚨 Emergency, 👋 Greeting, ❓ Unclear)
+  - Fixed content clipping with square, scrollable boxes using proper overflow handling
+  - Voice recognition now supports multiple South African languages for authentic emergency scenarios
+
 - July 25, 2025. Deployment Readiness & Health Check Implementation Complete
   - Added comprehensive health check endpoints (/ and /health) for Cloud Run compatibility
   - Fixed missing database columns (assigned_commander, priority_level, contact_info, etc.)
