@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 const presets = [
   "Someone is drowning at the beach near Muizenberg.",
@@ -12,30 +12,53 @@ export function CallerInput({ onInput }: { onInput: (text: string) => void }) {
   const [text, setText] = useState('');
   const [mode, setMode] = useState<'text' | 'voice'>('text');
   const [recording, setRecording] = useState(false);
+  const recognitionRef = useRef<any>(null);
 
   const handleSelectPreset = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setText(e.target.value);
     onInput(e.target.value);
   };
 
-  const handleMicInput = async () => {
+  const startRecording = async () => {
     try {
       const recognition = new (window as any).webkitSpeechRecognition();
+      recognitionRef.current = recognition;
+      
       recognition.lang = 'en-US';
       recognition.interimResults = false;
       recognition.maxAlternatives = 1;
+      recognition.continuous = true; // Keep listening until stopped
+      
       recognition.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript;
+        const transcript = event.results[event.results.length - 1][0].transcript;
         setText(transcript);
-        onInput(transcript);
+      };
+      
+      recognition.onerror = (event: any) => {
+        console.error('Speech recognition error:', event.error);
         setRecording(false);
       };
-      recognition.onerror = () => setRecording(false);
+      
+      recognition.onend = () => {
+        setRecording(false);
+      };
+      
       setRecording(true);
       recognition.start();
     } catch (e) {
       alert('Voice input not supported in this browser.');
       setRecording(false);
+    }
+  };
+
+  const stopRecording = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      recognitionRef.current = null;
+    }
+    setRecording(false);
+    if (text) {
+      onInput(text);
     }
   };
 
@@ -80,14 +103,28 @@ export function CallerInput({ onInput }: { onInput: (text: string) => void }) {
         </div>
       ) : (
         <div className="flex-1 flex flex-col items-center justify-center">
-          <button
-            className={`px-6 py-4 rounded-lg text-white font-medium transition-all shadow-lg ${recording ? 'bg-red-600 hover:bg-red-700 animate-pulse' : 'bg-green-600 hover:bg-green-700'}`}
-            onClick={handleMicInput}
-          >
-            {recording ? 'Listening...' : '🎤 Start Voice Input'}
-          </button>
+          {!recording ? (
+            <button
+              className="px-6 py-4 rounded-lg bg-green-600 hover:bg-green-700 text-white font-medium transition-all shadow-lg"
+              onClick={startRecording}
+            >
+              🎤 Start Voice Input
+            </button>
+          ) : (
+            <div className="flex flex-col items-center space-y-4">
+              <div className="px-6 py-4 rounded-lg bg-red-600 text-white font-medium animate-pulse shadow-lg">
+                🔴 Recording... Speak your emergency
+              </div>
+              <button
+                className="px-6 py-3 rounded-lg bg-red-700 hover:bg-red-800 text-white font-medium transition-all shadow-lg"
+                onClick={stopRecording}
+              >
+                ⏹️ Stop & Submit
+              </button>
+            </div>
+          )}
           {text && (
-            <div className="mt-4 p-3 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 text-sm text-gray-900 dark:text-gray-100">
+            <div className="mt-4 p-3 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 text-sm text-gray-900 dark:text-gray-100 max-w-md">
               <strong>Captured:</strong> {text}
             </div>
           )}
