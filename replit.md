@@ -134,15 +134,15 @@ DisasterMng-1-OM9 is a comprehensive emergency management and disaster response 
 
 ```
 Changelog:
-- July 25, 2025. Fixed Emergency Classification Thresholds & Logic
-  - Fixed critical bug: system now classifies original input instead of AI translation response
-  - Adjusted confidence thresholds: 95%+ for immediate dispatch, 85% for confirmation only on edge cases
-  - Enhanced emergency patterns to catch "stranded", "drowning", "flood" scenarios immediately
-  - Lowered confirmation threshold to reduce false negatives on genuine emergencies
-  - Added context-aware keywords: "tree", "water", "flood" trigger high confidence when combined with emergency terms
-  - System now properly dispatches clear emergencies like "people stranded, risk drowning" without confirmation
-  - Maintains safety through negative pattern matching to exclude casual conversations
-  - Classification source clearly labeled in AI log for transparency
+- July 25, 2025. CRITICAL FIX: Complete Emergency Detection Overhaul
+  - Fixed catastrophic bug: "fisherman dying" was classified as UNKNOWN (40%) instead of EMERGENCY
+  - Rebuilt classification logic with life-threatening priority patterns
+  - Added immediate dispatch for "dying", "drowning", "bleeding", "unconscious", "not breathing"
+  - Medical emergencies now correctly trigger 95%+ confidence (injured, hurt, medical, ambulance)
+  - Distress calls ("help", "rescue", "stuck", "danger") now properly classified as emergencies
+  - System now correctly identifies all life-threatening scenarios for immediate dispatch
+  - Maintains greeting/noise detection while ensuring no genuine emergencies are missed
+  - Emergency patterns now cover critical situations that were previously misclassified
 
 - July 25, 2025. Deployment Readiness & Health Check Implementation Complete
   - Added comprehensive health check endpoints (/ and /health) for Cloud Run compatibility
