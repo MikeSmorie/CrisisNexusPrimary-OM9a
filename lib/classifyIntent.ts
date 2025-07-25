@@ -5,7 +5,7 @@ export function classifyIntent(text: string): {
   const t = text.toLowerCase();
   
   // Ultra-high confidence emergency patterns (98%+)
-  if (/fire|bleeding|attack|ambulance|emergency|crime|now/.test(t) && /help|please|urgent|serious/.test(t)) {
+  if (/fire|bleeding|attack|ambulance|emergency|crime/.test(t) && /help|please|urgent|serious|now/.test(t)) {
     return { type: "emergency", confidence: 0.98 };
   }
   
@@ -14,8 +14,8 @@ export function classifyIntent(text: string): {
     return { type: "emergency", confidence: 0.95 };
   }
   
-  // Medium-confidence emergency patterns (85%) - requires confirmation
-  if (/help|urgent|serious|problem|hurt|pain|danger/.test(t)) {
+  // Medium-confidence emergency patterns (85%) - requires confirmation  
+  if (/help|urgent|serious|problem|hurt|pain|danger/.test(t) && !/not.*emergency|no.*emergency|this.*not/.test(t)) {
     return { type: "emergency", confidence: 0.85 };
   }
   

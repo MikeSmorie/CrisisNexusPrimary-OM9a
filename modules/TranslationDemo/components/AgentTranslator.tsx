@@ -19,10 +19,12 @@ export function AgentTranslator({
       const run = async () => {
         const english = await translateToEnglish(input);
         const edtg = getEDTG();
-        const result = classifyIntent(english);
+        
+        // Classify the ORIGINAL input, not the AI translation
+        const result = classifyIntent(input);
         
         // Use intent router for emergency confirmation logic
-        const intentResponse = handleIntent(result.type.toUpperCase(), result.confidence, english);
+        const intentResponse = handleIntent(result.type.toUpperCase(), result.confidence, input);
         const routeToResponder = intentResponse.routeToResponder || false;
         
         // Only route confirmed emergency content to ResponderOutput
@@ -54,6 +56,7 @@ export function AgentTranslator({
         const autoResponse = `
 🧠 [AI Agent Log]
 Raw Input: "${input}"
+Classification Source: Original Input (NOT translated text)
 Translated: "${english}"
 ⏱ EDTG: ${edtg}
 Intent: 🧠 ${result.type.toUpperCase()} (${Math.round(result.confidence * 100)}%)
