@@ -66,21 +66,14 @@ app.use((req, res, next) => {
   next();
 });
 
-// Health check endpoint for deployment
-app.get("/", (req, res) => {
-  res.status(200).json({ 
-    status: "healthy", 
-    service: "CrisisNexus Emergency Management System",
-    timestamp: new Date().toISOString(),
-    version: "1.0.0"
-  });
-});
-
+// Health check endpoint for deployment (NOT on root path)
 app.get("/health", (req, res) => {
   res.status(200).json({ 
     status: "healthy",
+    service: "CrisisNexus Emergency Management System",
     uptime: process.uptime(),
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    version: "1.0.0"
   });
 });
 

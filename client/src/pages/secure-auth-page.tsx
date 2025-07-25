@@ -103,8 +103,14 @@ export default function SecureAuthPage() {
           title: values.skipEmailVerification ? "Login successful (Bypass Mode)" : "Login successful",
           description: values.skipEmailVerification ? "Email verification bypassed" : "Welcome back!",
         });
-        // Force navigation to dashboard
-        window.location.href = "/";
+        
+        // Refresh user context first
+        console.log('[DEBUG] Login successful, refreshing user context...');
+        
+        // Navigate to dashboard after successful login
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 1000);
       } else {
         toast({
           variant: "destructive",
