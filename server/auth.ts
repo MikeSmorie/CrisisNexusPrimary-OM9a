@@ -3,7 +3,7 @@ import { IVerifyOptions, Strategy as LocalStrategy } from "passport-local";
 import { type Express } from "express";
 import session from "express-session";
 import createMemoryStore from "memorystore";
-import { users, type SelectUser } from "../db/schema";
+import { disasterUsers, type SelectDisasterUser } from "../db/disaster-schema";
 import { z } from "zod";
 import { db } from "../db";
 import { eq } from "drizzle-orm";
@@ -26,7 +26,7 @@ const MemoryStore = createMemoryStore(session);
 
 declare global {
   namespace Express {
-    interface User extends SelectUser { }
+    interface User extends SelectDisasterUser { }
   }
 }
 
@@ -55,27 +55,22 @@ export function setupAuth(app: Express) {
   passport.use(
     new LocalStrategy(async (username, password, done) => {
       try {
-        console.log(`[DEBUG] Login attempt: { username: '${username}', skipEmailVerification: '${process.env.NODE_ENV}' }`);
         const [user] = await db
           .select()
-          .from(users)
-          .where(eq(users.username, username))
+          .from(disasterUsers)
+          .where(eq(disasterUsers.username, username))
           .limit(1);
 
         if (!user) {
-          console.log(`[DEBUG] User not found: ${username}`);
           return done(null, false, { message: "Incorrect username." });
         }
 
-        console.log(`[DEBUG] Password comparison: provided='${password}', stored='${user.password}', match=${password === user.password}`);
-        
         // Check if user email is verified with sandbox bypass
         const isDevelopment = process.env.NODE_ENV !== 'production';
         const replitSandbox = process.env.REPLIT_DOMAINS || process.env.REPL_DOMAIN;
         const isSandboxEnvironment = isDevelopment || !!replitSandbox;
         
         if (!user.isVerified && !isSandboxEnvironment) {
-          console.log(`[DEBUG] User not verified: ${username}, isDev: ${isDevelopment}, sandbox: ${!!replitSandbox}`);
           return done(null, false, { message: "Please verify your emergency credentials before accessing the system." });
         }
 
@@ -91,9 +86,9 @@ export function setupAuth(app: Express) {
         }
 
         await db
-          .update(users)
+          .update(disasterUsers)
           .set({ lastLogin: new Date() })
-          .where(eq(users.id, user.id));
+          .where(eq(disasterUsers.id, user.id));
 
         return done(null, user);
       } catch (err) {
@@ -111,8 +106,8 @@ export function setupAuth(app: Express) {
     try {
       const [user] = await db
         .select()
-        .from(users)
-        .where(eq(users.id, id))
+        .from(disasterUsers)
+        .where(eq(disasterUsers.id, id))
         .limit(1);
       done(null, user);
     } catch (err) {
