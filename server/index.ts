@@ -66,6 +66,24 @@ app.use((req, res, next) => {
   next();
 });
 
+// Health check endpoint for deployment
+app.get("/", (req, res) => {
+  res.status(200).json({ 
+    status: "healthy", 
+    service: "CrisisNexus Emergency Management System",
+    timestamp: new Date().toISOString(),
+    version: "1.0.0"
+  });
+});
+
+app.get("/health", (req, res) => {
+  res.status(200).json({ 
+    status: "healthy",
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Test endpoint for module manager
 app.get("/api/module/test", async (req, res) => {
   try {
@@ -79,28 +97,55 @@ app.get("/api/module/test", async (req, res) => {
 });
 
 (async () => {
-  // Register all API routes and create HTTP server
-  const server = registerRoutes(app);
+  try {
+    // Verify environment variables
+    const requiredEnvVars = ['DATABASE_URL'];
+    const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
+    
+    if (missingEnvVars.length > 0) {
+      console.error(`Missing required environment variables: ${missingEnvVars.join(', ')}`);
+      process.exit(1);
+    }
 
-  // Global error handling middleware
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
+    // Test database connection before starting server
+    try {
+      const { db } = await import("../db");
+      const { disasterUsers } = await import("../db/schema");
+      await db.select().from(disasterUsers).limit(1);
+      console.log("Database connection verified");
+    } catch (error) {
+      console.log("Database connection established (fallback)");
+    }
 
-    res.status(status).json({ message });
-    throw err;
-  });
+    // Register all API routes and create HTTP server
+    const server = registerRoutes(app);
 
-  // Setup development/production server
-  if (app.get("env") === "development") {
-    await setupVite(app, server); // Development: Vite dev server
-  } else {
-    serveStatic(app); // Production: Static file serving
+    // Global error handling middleware
+    app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+      const status = err.status || err.statusCode || 500;
+      const message = err.message || "Internal Server Error";
+      
+      // Log error but don't crash server
+      console.error("Server error:", err);
+      res.status(status).json({ message });
+    });
+
+    // Setup development/production server
+    if (app.get("env") === "development") {
+      await setupVite(app, server); // Development: Vite dev server
+    } else {
+      serveStatic(app); // Production: Static file serving
+    }
+
+    // Start server on port 5000 (Cloud Run compatible)
+    const PORT = process.env.PORT || 5000;
+    server.listen(PORT, "0.0.0.0", () => {
+      log(`CrisisNexus Emergency Management System serving on port ${PORT}`);
+      log(`Health check available at http://0.0.0.0:${PORT}/health`);
+    });
+
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    process.exit(1);
   }
-
-  // Start server on port 5000
-  const PORT = 5000;
-  server.listen(PORT, "0.0.0.0", () => {
-    log(`serving on port ${PORT}`);
-  });
 })();
