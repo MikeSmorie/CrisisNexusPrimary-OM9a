@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, text, jsonb, timestamp, boolean, integer, bytea, bigint } from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, text, jsonb, timestamp, boolean, integer, bigint } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -45,7 +45,7 @@ export const disasterForensicLogs = pgTable("disaster_forensic_logs", {
   signature: varchar("signature", { length: 128 }).notNull(),
   
   // Encryption fields
-  encryptedPayload: bytea("encrypted_payload"),
+  encryptedPayload: text("encrypted_payload"),
   keyVersion: integer("key_version").default(1),
   
   // Audit fields

@@ -1,7 +1,7 @@
 import express from "express";
 import { sendAIRequest, isAnyProviderAvailable } from "../../lib/ai/router";
 import { db } from "@db";
-import { activityLogs } from "@db/schema";
+import { disasterActivityLogs } from "@db/schema";
 import { validateJsonInput, validateRequiredProps } from "../utils/validation";
 
 const router = express.Router();

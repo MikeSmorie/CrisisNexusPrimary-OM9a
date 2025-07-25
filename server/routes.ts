@@ -35,7 +35,7 @@ import disasterAIRoutes from "./routes/disaster-ai";
 import disasterModules from "./routes/disaster-modules";
 import aiIncidentRouter from "./routes/ai-incident";
 import { db } from "../db";
-import { users } from "../db/schema";
+import { disasterUsers } from "../db/schema";
 import { eq, and, or, desc, asc, sql } from "drizzle-orm";
 import { logEvent } from "../lib/logs";
 
@@ -848,27 +848,17 @@ export function registerRoutes(app: Express) {
   app.post("/api/admin/tokens/modify", requireAdmin, modifyTokens);
   app.get("/api/admin/tokens/all", requireAdmin, getAllTokenBalances);
 
-  // Get users with subscription info for subscription manager
+  // Get emergency personnel for admin management
   app.get("/api/users/with-subscriptions", requireAdmin, async (req, res) => {
     try {
-      const allUsers = await db.query.users.findMany({
-        with: {
-          subscriptions: {
-            with: {
-              plan: true
-            }
-          }
-        }
-      });
+      const allUsers = await db.query.disasterUsers.findMany();
 
       const usersData = allUsers.map(user => ({
         id: user.id,
         username: user.username,
-        subscription: user.subscriptions?.[0] ? {
-          id: user.subscriptions[0].id,
-          planId: user.subscriptions[0].planId,
-          status: user.subscriptions[0].status
-        } : undefined
+        role: user.role,
+        department: user.department,
+        status: user.status
       }));
 
       res.json(usersData);

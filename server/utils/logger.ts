@@ -1,57 +1,45 @@
+// CrisisNexus Emergency Management System
+// Emergency logging utility
 import { db } from "@db";
-import { errorLogs, type InsertErrorLog } from "@db/schema";
+import { disasterErrorLogs } from "@db/schema";
 
-export type LogLevel = "INFO" | "WARNING" | "ERROR";
+export interface EmergencyLogData {
+  level: string;
+  message: string;
+  source: string;
+  stackTrace?: string;
+}
 
-export async function logError(
-  level: LogLevel,
-  message: string,
-  source: string,
-  stackTrace?: string
-) {
+export async function logEmergencyEvent(data: EmergencyLogData) {
   try {
-    const [log] = await db
-      .insert(errorLogs)
-      .values({
-        level,
-        message,
-        source,
-        stackTrace,
-        timestamp: new Date(),
-      })
-      .returning();
-
-    return log;
+    await db.insert(disasterErrorLogs).values({
+      level: data.level,
+      message: data.message,
+      source: data.source,
+      stackTrace: data.stackTrace,
+    });
   } catch (error) {
-    // Fallback to console if database logging fails
-    console.error("Failed to log error:", error);
-    console.error("Original error:", { level, message, source, stackTrace });
+    console.error("Emergency logging failed:", error);
   }
 }
 
-// Create a custom error instance with source tracking
-export class OmegaError extends Error {
-  constructor(message: string, public source: string) {
-    super(message);
-    this.name = "OmegaError";
-  }
-}
+// Export default logger for backward compatibility
+export const logger = {
+  error: (message: string, source: string = "system") => 
+    logEmergencyEvent({ level: "ERROR", message, source }),
+  warn: (message: string, source: string = "system") => 
+    logEmergencyEvent({ level: "WARNING", message, source }),
+  info: (message: string, source: string = "system") => 
+    logEmergencyEvent({ level: "INFO", message, source })
+};
 
-// Helper function to extract useful information from Error objects
-export function extractErrorInfo(error: unknown): { message: string; stack?: string } {
-  if (error instanceof Error) {
-    return {
-      message: error.message,
-      stack: error.stack,
-    };
-  }
-  return {
-    message: String(error),
-  };
-}
-
-// Utility to log unexpected errors
-export async function logUnexpectedError(error: unknown, source: string) {
-  const { message, stack } = extractErrorInfo(error);
-  return logError("ERROR", message, source, stack);
-}
+// Export legacy function for backward compatibility
+export const logError = (message: string, source: string = "system", error?: any) => {
+  const errorMessage = error ? `${message}: ${error.message}` : message;
+  return logEmergencyEvent({ 
+    level: "ERROR", 
+    message: errorMessage, 
+    source,
+    metadata: error?.stack 
+  });
+};
