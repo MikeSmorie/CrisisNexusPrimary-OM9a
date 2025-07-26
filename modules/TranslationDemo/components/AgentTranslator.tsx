@@ -26,6 +26,7 @@ export function AgentTranslator({
     if (input) {
       const run = async () => {
         const english = await translateToEnglish(input);
+        // CRITICAL: EDTG must be captured ONCE per event and never change
         const edtg = getEDTG();
         
         // Use intelligent dialogue engine for progressive threat assessment
@@ -57,7 +58,7 @@ export function AgentTranslator({
 🧠 [Emergency Dialogue Engine]
 Raw Input: "${input}"
 Translated: "${english}"
-⏱ EDTG: ${edtg}
+⏱ EDTG: ${edtg} [LOCKED]
 🎯 Threat Level: ${dialogueResult.newState.threatLevel}% (Stage: ${dialogueResult.newState.stage})
 📍 Context: ${dialogueResult.newState.context.location || 'Unknown'} | Person at risk: ${dialogueResult.newState.context.personInDanger ? 'Yes' : 'Unknown'}
 Decision: ${dialogueResult.shouldDispatch ? '🚨 EMERGENCY DISPATCHED' : '🔄 Gathering Critical Information'}

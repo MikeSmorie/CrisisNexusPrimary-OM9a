@@ -134,14 +134,17 @@ DisasterMng-1-OM9 is a comprehensive emergency management and disaster response 
 
 ```
 Changelog:
-- July 26, 2025. Intelligent Emergency Dialogue Engine Implementation Complete  
+- July 26, 2025. Emergency Dialogue System & EDTG Timestamp Fix Complete
+  - Fixed CRITICAL EDTG issue: Enhanced Date-Time Group now locks to exact event timestamp instead of running clock
+  - EDTG timestamps are immutable once created - essential for forensic logging and emergency audit trails
   - Created progressive threat assessment system that builds context from multiple caller inputs
   - Implemented intelligent AI responses that guide callers toward critical information
+  - Added operator dialogue display in caller interface with "📞 Operator:" messaging
   - Added escalating dialogue stages: initial → gathering → escalating → dispatched
   - System now proactively asks targeted questions based on threat level assessment
   - Enhanced with scenario-specific logic (rip currents, cramping, distress signals)
   - Automatic dispatch triggers at 70%+ threat confidence with intelligent summary generation
-  - AI now engages callers conversationally instead of requiring complete emergency statements
+  - AI engages callers conversationally instead of requiring complete emergency statements
   - Maintains conversation flow while building comprehensive emergency context for responders
 
 - July 25, 2025. Deployment Readiness & Health Check Implementation Complete
