@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { translateFromEnglish } from '../utils/translate';
 
-export function ResponderOutput({ input }: { input: string }) {
+export function ResponderOutput({ input, edtg }: { input: string; edtg?: string }) {
   const [language, setLanguage] = useState('Zulu');
   const [output, setOutput] = useState('');
   const [dispatched, setDispatched] = useState(false);

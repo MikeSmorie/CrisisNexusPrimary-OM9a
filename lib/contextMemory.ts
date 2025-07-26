@@ -25,6 +25,10 @@ export function scoreEmergencyWords(text: string): { keywords: string[], score: 
     "bleeding": 40,
     "attack": 40,
     "attacked": 40,
+    "stuck": 50,        // CRITICAL: stuck under car = immediate dispatch
+    "trapped": 45,
+    "crushed": 50,
+    "pinned": 45,
     
     // High urgency words (30% each)
     "trouble": 30,
@@ -32,6 +36,11 @@ export function scoreEmergencyWords(text: string): { keywords: string[], score: 
     "emergency": 30,
     "injured": 30,
     "fallen": 30,
+    "car": 35,          // Car incidents are high urgency
+    "vehicle": 30,
+    "jack": 40,         // Car jack failure = very dangerous
+    "fell": 35,
+    "under": 40,        // Under something = trapped
     
     // Medium urgency words (20% each)
     "current": 20,
@@ -42,6 +51,8 @@ export function scoreEmergencyWords(text: string): { keywords: string[], score: 
     "waving": 15,
     "shouting": 15,
     "screaming": 25,
+    "accident": 25,
+    "crash": 30,
     
     // Location/context words (10% each)
     "water": 10,
