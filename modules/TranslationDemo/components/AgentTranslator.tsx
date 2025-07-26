@@ -42,8 +42,8 @@ export function AgentTranslator({
         const updatedContext = updateSessionContext(callerId, input, escalationResult.response);
         
         // Route to responder if dispatch threshold is met
-        if (escalationResult.shouldDispatch) {
-          setEnglish(english);
+        if (escalationResult.shouldDispatch && escalationResult.dispatchSummary) {
+          setEnglish(escalationResult.dispatchSummary); // Send full dispatch summary to responder
           setEdtg(edtg);
         } else {
           setEnglish(''); // Hold for more information

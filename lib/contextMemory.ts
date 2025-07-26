@@ -11,6 +11,19 @@ export interface SessionContext {
     operator: string;
     timestamp: number;
   }>;
+  // Enhanced 911 SOP data collection
+  criticalInfo: {
+    location?: string;
+    exactAddress?: string;
+    incidentType?: string;
+    numberOfVictims?: number;
+    currentCondition?: string;
+    callerRelation?: string; // witness, victim, bystander
+    responderNeeded?: string; // police, fire, ems, lifeguard
+    immediateActions?: string[];
+    hazards?: string[];
+    accessInstructions?: string;
+  };
 }
 
 // Volatile session memory - resets on server restart
@@ -85,7 +98,8 @@ export function getSessionContext(callerId: string): SessionContext {
       mentionedKeywords: new Set(),
       lastUpdate: Date.now(),
       callerId,
-      conversationHistory: []
+      conversationHistory: [],
+      criticalInfo: {}
     };
   }
   return sessionMemory[callerId];
@@ -115,27 +129,53 @@ export function updateSessionContext(
   return context;
 }
 
-// Generate intelligent escalating response based on context
+// Enhanced 911 SOP-compliant response generation
 export function generateEscalatingResponse(context: SessionContext, latestInput: string): {
   response: string;
   shouldDispatch: boolean;
   escalationLevel: 'initial' | 'gathering' | 'escalating' | 'dispatched';
+  dispatchSummary?: string;
 } {
-  const { threatScore, mentionedKeywords } = context;
+  const { threatScore, mentionedKeywords, criticalInfo } = context;
+  const lowerInput = latestInput.toLowerCase();
   
-  // Emergency dispatch threshold (60%+)
+  // Extract critical information from current input
+  updateCriticalInfo(context, latestInput);
+  
+  // Emergency dispatch threshold (60%+) - Full 911 protocol
   if (threatScore >= 60) {
+    const missingCritical = getMissingCriticalInfo(context);
+    
+    if (missingCritical.length > 0) {
+      return {
+        response: `EMERGENCY CONFIRMED. Dispatching now. Critical: I need the exact ${missingCritical.join(' and ')} immediately. Stay on the line.`,
+        shouldDispatch: true,
+        escalationLevel: 'dispatched',
+        dispatchSummary: generateDispatchSummary(context)
+      };
+    }
+    
     return {
-      response: "Emergency confirmed. Stay on the line. Dispatching responders now. Where exactly is the person located?",
+      response: "EMERGENCY UNITS DISPATCHED. Keep the line open. Can you tell me what immediate actions you're taking? Are there any hazards responders should know about?",
       shouldDispatch: true,
-      escalationLevel: 'dispatched'
+      escalationLevel: 'dispatched',
+      dispatchSummary: generateDispatchSummary(context)
     };
   }
   
-  // High urgency - escalating (40-59%)
+  // High urgency - escalating (40-59%) - Follow 911 triage
   if (threatScore >= 40) {
+    const missingInfo = getMissingCriticalInfo(context);
+    if (missingInfo.includes('location')) {
+      return {
+        response: "This is an emergency situation. I need your EXACT LOCATION immediately - what beach, what section, nearest landmark?",
+        shouldDispatch: false,
+        escalationLevel: 'escalating'
+      };
+    }
+    
     return {
-      response: "This appears to be a developing emergency. Are lifeguards present? What's the exact location? Can you see the person now?",
+      response: `Emergency developing. How many people are involved? What is their current condition? Are you safe to stay and provide updates?`,
       shouldDispatch: false,
       escalationLevel: 'escalating'
     };
@@ -144,18 +184,101 @@ export function generateEscalatingResponse(context: SessionContext, latestInput:
   // Medium urgency - gathering information (20-39%)
   if (threatScore >= 20) {
     return {
-      response: "Help me understand the situation better - what's the person's current condition? Are they responsive?",
+      response: "I'm coordinating a response. Tell me exactly what you're seeing right now - are they conscious, moving, responding to you?",
       shouldDispatch: false,
       escalationLevel: 'gathering'
     };
   }
   
-  // Initial contact - standard response
+  // Initial contact - standard 911 opening
   return {
-    response: "I'm here to help. Can you tell me what's happening? Is anyone in immediate danger?",
+    response: "911 Emergency - What is your exact location and what is the emergency?",
     shouldDispatch: false,
     escalationLevel: 'initial'
   };
+}
+
+// Extract and store critical emergency information following 911 protocols
+function updateCriticalInfo(context: SessionContext, input: string): void {
+  const lower = input.toLowerCase();
+  
+  // Location extraction (critical priority #1)
+  if (/camps?\s*bay|clifton|sea\s*point|hout\s*bay|muizenberg|boulders/.test(lower)) {
+    const match = lower.match(/(camps?\s*bay|clifton|sea\s*point|hout\s*bay|muizenberg|boulders)/);
+    if (match) context.criticalInfo.location = match[1];
+  }
+  
+  // Incident type identification
+  if (/shark|bite|bitten/.test(lower)) {
+    context.criticalInfo.incidentType = 'Shark Attack';
+    context.criticalInfo.responderNeeded = 'Emergency Medical Services + Marine Rescue';
+  }
+  if (/drowning|rip\s*current|swept/.test(lower)) {
+    context.criticalInfo.incidentType = 'Water Rescue Emergency';
+    context.criticalInfo.responderNeeded = 'Lifeguard + Marine Rescue';
+  }
+  if (/stuck.*car|trapped.*vehicle|car.*fell/.test(lower)) {
+    context.criticalInfo.incidentType = 'Vehicle Entrapment';
+    context.criticalInfo.responderNeeded = 'Fire Department + Emergency Medical';
+  }
+  
+  // Victim count
+  const victimMatch = lower.match(/(\d+)\s*(person|people|victim)/);
+  if (victimMatch) {
+    context.criticalInfo.numberOfVictims = parseInt(victimMatch[1]);
+  } else if (/someone|person|he|she|victim/.test(lower) && !context.criticalInfo.numberOfVictims) {
+    context.criticalInfo.numberOfVictims = 1;
+  }
+  
+  // Current condition assessment
+  if (/bleeding|blood/.test(lower)) context.criticalInfo.currentCondition = 'Active bleeding';
+  if (/unconscious|not\s*moving/.test(lower)) context.criticalInfo.currentCondition = 'Unconscious/unresponsive';
+  if (/waving|struggling|calling\s*help/.test(lower)) context.criticalInfo.currentCondition = 'Conscious but in distress';
+  
+  // Caller relationship
+  if (/i\s*am|me|my/.test(lower)) context.criticalInfo.callerRelation = 'victim/involved';
+  if (/i\s*see|watching|witnessed/.test(lower)) context.criticalInfo.callerRelation = 'witness';
+  
+  // Hazards and access
+  if (/rough\s*sea|waves|current/.test(lower)) {
+    context.criticalInfo.hazards = context.criticalInfo.hazards || [];
+    context.criticalInfo.hazards.push('Dangerous sea conditions');
+  }
+  if (/rocks|reef|shallow/.test(lower)) {
+    context.criticalInfo.hazards = context.criticalInfo.hazards || [];
+    context.criticalInfo.hazards.push('Rocky/reef hazards');
+  }
+}
+
+// Identify missing critical information for 911 dispatch
+function getMissingCriticalInfo(context: SessionContext): string[] {
+  const missing: string[] = [];
+  
+  if (!context.criticalInfo.location) missing.push('location');
+  if (!context.criticalInfo.incidentType) missing.push('nature of emergency');
+  if (!context.criticalInfo.numberOfVictims) missing.push('number of people involved');
+  if (!context.criticalInfo.currentCondition) missing.push('victim condition');
+  
+  return missing;
+}
+
+// Generate comprehensive dispatch summary following 911 standards
+function generateDispatchSummary(context: SessionContext): string {
+  const info = context.criticalInfo;
+  const keywords = Array.from(context.mentionedKeywords).join(', ');
+  
+  return `EMERGENCY DISPATCH SUMMARY:
+📍 LOCATION: ${info.location || 'Unknown - CRITICAL'}
+🚨 INCIDENT TYPE: ${info.incidentType || 'Emergency situation'}
+👥 VICTIMS: ${info.numberOfVictims || 'Unknown number'}
+🩺 CONDITION: ${info.currentCondition || 'Assessment needed'}
+🚒 RESPONSE UNITS: ${info.responderNeeded || 'Multi-unit response'}
+⚠️ HAZARDS: ${info.hazards?.join(', ') || 'Standard precautions'}
+📞 CALLER: ${info.callerRelation || 'Unknown relation'}
+🔍 KEYWORDS: ${keywords}
+⭐ THREAT LEVEL: ${context.threatScore}% - ${context.threatScore >= 80 ? 'CRITICAL' : context.threatScore >= 60 ? 'HIGH' : 'ELEVATED'}
+
+ONGOING COMMUNICATION: Caller remains on line for updates.`;
 }
 
 // Clean up old sessions (5+ minutes idle)
