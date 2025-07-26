@@ -12,15 +12,15 @@ export default function TranslationDemo() {
 
   return (
     <div className="h-full w-full max-w-none bg-slate-50 dark:bg-slate-900">
-      {/* Flexible layout for resizable windows */}
-      <div className="flex flex-col lg:flex-row gap-4 p-4 h-full w-full">
-        {/* Caller Input - Fully resizable */}
-        <div className="flex-1 min-w-0 min-h-[400px]">
+      {/* Three-column layout with proper sizing */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 p-4 h-full w-full overflow-hidden">
+        {/* Caller Input */}
+        <div className="h-full max-h-full overflow-hidden">
           <CallerInput onInput={setCallerMessage} operatorMessage={operatorMessage} />
         </div>
 
-        {/* Agent Translator - Fully resizable */}
-        <div className="flex-1 min-w-0 min-h-[400px]">
+        {/* Agent Translator */}
+        <div className="h-full max-h-full overflow-hidden">
           <AgentTranslator
             input={callerMessage}
             setEnglish={setEnglishTranslation}
@@ -29,8 +29,8 @@ export default function TranslationDemo() {
           />
         </div>
 
-        {/* Responder Output - Fully resizable */}
-        <div className="flex-1 min-w-0 min-h-[400px]">
+        {/* Responder Output */}
+        <div className="h-full max-h-full overflow-hidden">
           <ResponderOutput input={englishTranslation} edtg={edtgCode} />
         </div>
       </div>
