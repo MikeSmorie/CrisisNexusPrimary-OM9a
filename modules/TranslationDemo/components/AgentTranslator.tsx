@@ -103,7 +103,7 @@ ${responseText}`;
         <h2 className="text-lg font-bold text-indigo-800 dark:text-indigo-200">🤖 AI Translator</h2>
       </div>
       
-      <div className="flex-1 bg-slate-900 p-4 overflow-auto m-4 min-h-[300px]">
+      <div className="flex-1 bg-slate-900 p-4 m-4 overflow-y-auto">
         <pre className="whitespace-pre-wrap text-white text-sm font-mono">
           {log || 'Waiting for caller input...'}
         </pre>

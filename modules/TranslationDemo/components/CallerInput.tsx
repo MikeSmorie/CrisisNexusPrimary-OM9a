@@ -94,26 +94,28 @@ export function CallerInput({ onInput, operatorMessage }: { onInput: (text: stri
         <h2 className="text-lg font-bold text-blue-800 dark:text-blue-200">📞 Victim Caller</h2>
       </div>
       
-      <div className="flex-1 flex flex-col p-4">
+      <div className="flex-1 flex flex-col p-4 min-h-0">
 
-      {/* Operator Dialogue Display */}
-      {operatorMessage && (
-        <div className="mb-4 bg-blue-900/30 border border-blue-500 p-4">
-          <div className="flex items-start gap-3">
-            <span className="text-blue-300 font-bold text-sm whitespace-nowrap">📞 Operator:</span>
-            <span className="text-white text-sm leading-relaxed">{operatorMessage}</span>
+      {/* Operator Dialogue Display - Scrollable */}
+      <div className="mb-4 max-h-32 overflow-y-auto">
+        {operatorMessage && (
+          <div className="bg-blue-900/30 border border-blue-500 p-4">
+            <div className="flex items-start gap-3">
+              <span className="text-blue-300 font-bold text-sm whitespace-nowrap">📞 Operator:</span>
+              <span className="text-white text-sm leading-relaxed">{operatorMessage}</span>
+            </div>
           </div>
-        </div>
-      )}
-      
-      {/* Debug: Show if operatorMessage exists */}
-      {!operatorMessage && (
-        <div className="mb-4 bg-gray-700/50 border border-gray-600 p-3">
-          <div className="text-gray-400 text-xs italic">
-            Waiting for operator response...
+        )}
+        
+        {/* Debug: Show if operatorMessage exists */}
+        {!operatorMessage && (
+          <div className="bg-gray-700/50 border border-gray-600 p-3">
+            <div className="text-gray-400 text-xs italic">
+              Waiting for operator response...
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       <div className="mb-4">
         <label className="mr-3 text-sm font-medium text-slate-600 dark:text-slate-400">Mode:</label>

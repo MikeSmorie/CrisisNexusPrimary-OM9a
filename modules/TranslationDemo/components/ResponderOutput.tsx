@@ -59,8 +59,8 @@ export function ResponderOutput({ input, edtg }: { input: string; edtg?: string 
         <h2 className="text-lg font-bold text-purple-800 dark:text-purple-200">🧑‍🚒 Responder View</h2>
       </div>
       
-      <div className="flex-1 flex flex-col p-4">
-        <div className="mb-4">
+      <div className="flex-1 flex flex-col p-4 min-h-0">
+        <div className="mb-4 flex-shrink-0">
           <label className="block mb-2 text-sm font-medium text-slate-600 dark:text-slate-400">Emergency responder language preference:</label>
           <select
             value={language}
@@ -74,7 +74,7 @@ export function ResponderOutput({ input, edtg }: { input: string; edtg?: string 
         </div>
 
         {isProcessing && (
-          <div className="mb-4 p-3 bg-yellow-100 dark:bg-yellow-900 border border-yellow-300 dark:border-yellow-700 rounded-lg">
+          <div className="mb-4 p-3 bg-yellow-100 dark:bg-yellow-900 border border-yellow-300 dark:border-yellow-700 rounded-lg flex-shrink-0">
             <div className="flex items-center space-x-2">
               <div className="w-4 h-4 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin"></div>
               <span className="text-yellow-800 dark:text-yellow-200 text-sm">Processing emergency dispatch...</span>
@@ -82,14 +82,14 @@ export function ResponderOutput({ input, edtg }: { input: string; edtg?: string 
           </div>
         )}
 
-        <div className="flex-1 bg-slate-900 p-4 overflow-auto mb-4 min-h-[300px]">
+        <div className="flex-1 bg-slate-900 p-4 mb-4 overflow-y-auto">
           <pre className="whitespace-pre-wrap text-white text-sm font-mono">
             {output || (input ? '⛔ Content held for clarification - requires clearer emergency information' : 'Awaiting emergency dispatch...')}
           </pre>
         </div>
 
         {dispatched && (
-          <div className="mt-auto">
+          <div className="flex-shrink-0">
             <div className="w-full py-3 bg-green-700 text-white rounded-lg shadow-md font-semibold text-center">
               ✅ Emergency Dispatched Successfully
             </div>
