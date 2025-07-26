@@ -8,7 +8,7 @@ const presets = [
   "There's a violent protest and a fire being started near the municipal office.",
 ];
 
-export function CallerInput({ onInput }: { onInput: (text: string) => void }) {
+export function CallerInput({ onInput, operatorMessage }: { onInput: (text: string) => void; operatorMessage?: string }) {
   const [text, setText] = useState('');
   const [mode, setMode] = useState<'text' | 'voice'>('text');
   const [recording, setRecording] = useState(false);
@@ -89,6 +89,16 @@ export function CallerInput({ onInput }: { onInput: (text: string) => void }) {
       </div>
       
       <div className="flex-1 flex flex-col p-4">
+
+      {/* Operator Dialogue Display */}
+      {operatorMessage && (
+        <div className="mb-4 bg-blue-900/20 border border-blue-600 rounded-lg p-3">
+          <div className="flex items-start gap-2">
+            <span className="text-blue-400 font-semibold text-sm">📞 Operator:</span>
+            <span className="text-blue-100 text-sm">{operatorMessage}</span>
+          </div>
+        </div>
+      )}
 
       <div className="mb-4">
         <label className="mr-3 text-sm font-medium text-slate-600 dark:text-slate-400">Mode:</label>

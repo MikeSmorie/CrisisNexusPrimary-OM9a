@@ -111,22 +111,37 @@ function extractLocation(input: string): string {
 
 function generateEscalatingQuestion(context: DialogueState['context']): string {
   if (context.location && context.personInDanger) {
-    return "This sounds serious. Is the person still in the water? Can you describe their current condition?";
+    return "This sounds serious. Is the person still in the water? Can you describe their current condition? Emergency services are being prepared for dispatch.";
   }
   if (context.personInDanger) {
-    return "Where exactly is this happening? Can you give me the specific location?";
+    return "Where exactly is this happening? Can you give me the specific location? I need to alert emergency services immediately.";
   }
-  return "Is someone in immediate physical danger right now? Where is this occurring?";
+  return "Is someone in immediate physical danger right now? Where is this occurring? Please be specific - this could be an emergency.";
 }
 
 function generateGatheringQuestion(context: DialogueState['context']): string {
   if (!context.location) {
-    return "Can you tell me the exact location? This will help emergency services respond quickly.";
+    return "Can you tell me the exact location? This will help emergency services respond quickly if needed.";
   }
   if (!context.personInDanger) {
-    return "Is anyone hurt or in danger? What exactly are you seeing?";
+    return "Is anyone hurt or in danger? What exactly are you seeing? I need to determine if this requires emergency response.";
   }
-  return "Help me understand the situation better - what's the person's current condition?";
+  return "Help me understand the situation better - what's the person's current condition? Are they responsive?";
+}
+
+// Add crank call detection
+function detectPotentialCrank(context: DialogueState['context']): boolean {
+  const responses = context.responses.join(' ').toLowerCase();
+  
+  // Check for inconsistent or silly responses
+  if (/joke|kidding|pranking|fake|test/.test(responses)) return true;
+  if (context.responses.length > 3 && !context.location && !context.personInDanger) return true;
+  
+  return false;
+}
+
+export function generateCrankWarning(): string {
+  return "⚠️ WARNING: Making false emergency reports is a serious offense that wastes critical resources and can result in criminal charges. If this is not a genuine emergency, please disconnect now. If this IS an emergency, please provide specific details immediately.";
 }
 
 function generateDispatchSummary(context: DialogueState['context']): string {

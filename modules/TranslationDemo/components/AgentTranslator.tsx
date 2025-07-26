@@ -8,10 +8,12 @@ export function AgentTranslator({
   input,
   setEnglish,
   setEdtg,
+  setOperatorMessage,
 }: {
   input: string;
   setEnglish: (val: string) => void;
   setEdtg: (val: string) => void;
+  setOperatorMessage: (val: string) => void;
 }) {
   const [log, setLog] = useState('');
   const [dialogueState, setDialogueState] = useState<DialogueState>({
@@ -39,12 +41,15 @@ export function AgentTranslator({
           setEdtg('');
         }
 
+        // Set operator message for caller display
+        setOperatorMessage(dialogueResult.response);
+
         // Generate response based on dialogue engine
         let responseText = '';
         if (dialogueResult.shouldDispatch) {
-          responseText = `🚨 EMERGENCY DISPATCH INITIATED\n📡 ${dialogueResult.dispatchSummary}\n💬 AI Response: "${dialogueResult.response}"`;
+          responseText = `🚨 EMERGENCY DISPATCH INITIATED\n📡 ${dialogueResult.dispatchSummary}`;
         } else {
-          responseText = `💬 AI Dialogue: "${dialogueResult.response}"\n📊 Threat Assessment: Building context (${dialogueResult.newState.threatLevel}% confidence)`;
+          responseText = `📊 Threat Assessment: Building context (${dialogueResult.newState.threatLevel}% confidence)\n🔄 Gathering additional information from caller`;
         }
 
         const autoResponse = `

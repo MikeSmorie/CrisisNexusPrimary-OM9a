@@ -34,6 +34,7 @@ import disasterApiRouter from "./routes/disaster-api";
 import disasterAIRoutes from "./routes/disaster-ai";
 import disasterModules from "./routes/disaster-modules";
 import aiIncidentRouter from "./routes/ai-incident";
+import analyzeThreatRouter from "./routes/analyze-threat";
 import { db } from "../db";
 import { disasterUsers } from "../db/schema";
 import { eq, and, or, desc, asc, sql } from "drizzle-orm";

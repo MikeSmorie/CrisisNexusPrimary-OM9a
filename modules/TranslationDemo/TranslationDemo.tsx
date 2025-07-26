@@ -8,6 +8,7 @@ export default function TranslationDemo() {
   const [callerMessage, setCallerMessage] = useState('');
   const [englishTranslation, setEnglishTranslation] = useState('');
   const [edtgCode, setEdtgCode] = useState('');
+  const [operatorMessage, setOperatorMessage] = useState('');
 
   return (
     <div className="h-full w-full max-w-none bg-slate-50 dark:bg-slate-900">
@@ -16,7 +17,7 @@ export default function TranslationDemo() {
         {/* Caller Input - Full width on mobile, 1/3 on desktop */}
         <div className="w-full min-h-[400px] lg:min-h-full">
           <AnimatedCard>
-            <CallerInput onInput={setCallerMessage} />
+            <CallerInput onInput={setCallerMessage} operatorMessage={operatorMessage} />
           </AnimatedCard>
         </div>
 
@@ -27,6 +28,7 @@ export default function TranslationDemo() {
               input={callerMessage}
               setEnglish={setEnglishTranslation}
               setEdtg={setEdtgCode}
+              setOperatorMessage={setOperatorMessage}
             />
             <div className="mt-4">
               <h3 className="text-lg font-semibold mb-2 text-slate-800 dark:text-slate-200">📋 Crisis Triage Checklist</h3>
