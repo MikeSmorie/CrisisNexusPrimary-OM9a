@@ -14,7 +14,8 @@ export function assessThreatLevel(input: string, currentContext: DialogueState['
   const text = input.toLowerCase();
   let threatScore = 0;
 
-  // Life-threatening indicators (high scoring)
+  // CRITICAL EMERGENCY KEYWORDS - Immediate dispatch triggers
+  if (/rip current|rip|riptide/.test(text)) threatScore += 60; // RIP CURRENT = IMMEDIATE EMERGENCY
   if (/dying|drowning|bleeding|unconscious|not breathing|heart attack|stroke/.test(text)) threatScore += 40;
   if (/trapped|stuck|can't move|collapsed/.test(text)) threatScore += 35;
   if (/fire|explosion|smoke|burning/.test(text)) threatScore += 35;
@@ -25,10 +26,10 @@ export function assessThreatLevel(input: string, currentContext: DialogueState['
   if (/trouble|danger|scared|panic/.test(text)) threatScore += 15;
   if (/pain|hurt|injured/.test(text)) threatScore += 15;
 
-  // Specific scenario indicators
-  if (/rip|current|ocean|sea|swimming/.test(text) && /trouble|help|hand/.test(text)) threatScore += 25;
-  if (/cramp|cramping/.test(text) && /water|swimming/.test(text)) threatScore += 20;
-  if (/raised.*hand|waving|gesturing/.test(text) && /water|beach|sea/.test(text)) threatScore += 20;
+  // Water emergency scenarios - higher scoring due to immediate danger
+  if (/waving.*hand|raising.*hand|gesturing/.test(text) && /water|beach|sea|ocean/.test(text)) threatScore += 30;
+  if (/cramp|cramping/.test(text) && /water|swimming/.test(text)) threatScore += 25;
+  if (/moving.*fast.*out|swept.*out|carried.*out/.test(text) && /sea|ocean|current/.test(text)) threatScore += 35;
 
   // Location specificity adds urgency
   if (/beach|camps bay|ocean|sea|street|address/.test(text)) threatScore += 10;
@@ -73,6 +74,26 @@ export function generateIntelligentResponse(state: DialogueState, newInput: stri
         response: generateCrankWarning(),
         newState,
         shouldDispatch: false
+      };
+    }
+  }
+
+  // Special handling for RIP CURRENT - immediate dispatch
+  if (/rip current|rip|riptide/.test(newInput.toLowerCase())) {
+    // Location priority for water emergencies
+    if (!newState.context.location || newState.context.location === 'Unknown') {
+      return {
+        response: "STAND BY - Emergency services dispatched for rip current rescue. Where exactly are you? Which beach or specific location?",
+        newState: { ...newState, stage: 'dispatched' },
+        shouldDispatch: true,
+        dispatchSummary: `RIP CURRENT EMERGENCY - Person in distress, location needed urgently`
+      };
+    } else if (/camps bay|beach/.test(newState.context.location.toLowerCase()) && !/north|south|main|rocks/.test(newState.context.location.toLowerCase())) {
+      return {
+        response: `Emergency services moving to ${newState.context.location}. Which part of ${newState.context.location}? North side, south side, main beach, or near the rocks?`,
+        newState: { ...newState, stage: 'dispatched' },
+        shouldDispatch: true,
+        dispatchSummary: `RIP CURRENT at ${newState.context.location} - Specific location refinement needed`
       };
     }
   }
@@ -122,13 +143,19 @@ function extractLocation(input: string): string {
 }
 
 function generateEscalatingQuestion(context: DialogueState['context']): string {
-  if (context.location && context.personInDanger) {
-    return "This sounds serious. Is the person still in the water? Can you describe their current condition? Emergency services are being prepared for dispatch.";
+  if (!context.location) {
+    return "This sounds serious. Where exactly are you? I need your precise location to send help immediately.";
   }
-  if (context.personInDanger) {
-    return "Where exactly is this happening? Can you give me the specific location? I need to alert emergency services immediately.";
+  if (!context.personInDanger) {
+    return "Is someone in immediate danger? Can you see them now?";
   }
-  return "Is someone in immediate physical danger right now? Where is this occurring? Please be specific - this could be an emergency.";
+  
+  // Location refinement for beach emergencies
+  if (/beach|camps bay/i.test(context.location) && !/north|south|main|rocks/i.test(context.location)) {
+    return "Emergency services are being prepared. Which part of the beach exactly? North side, south side, main beach area, or near the rocks?";
+  }
+  
+  return "This sounds serious. Is the person still in the water? Can you describe their current condition? Emergency services are being prepared for dispatch.";
 }
 
 function generateGatheringQuestion(context: DialogueState['context']): string {

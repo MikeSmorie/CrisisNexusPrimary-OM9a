@@ -46,6 +46,7 @@ export function CallerInput({ onInput, operatorMessage }: { onInput: (text: stri
         if (event.results[event.results.length - 1].isFinal) {
           setTimeout(() => {
             onInput(transcript);
+            setText(''); // Clear input after submission
           }, 500); // Small delay for better UX
         }
       };
@@ -60,6 +61,7 @@ export function CallerInput({ onInput, operatorMessage }: { onInput: (text: stri
         // Ensure voice input is submitted when recording ends
         if (text) {
           onInput(text);
+          setText(''); // Clear input after submission
         }
       };
       
@@ -79,6 +81,7 @@ export function CallerInput({ onInput, operatorMessage }: { onInput: (text: stri
     setRecording(false);
     if (text) {
       onInput(text);
+      setText(''); // Clear input after submission
     }
   };
 
@@ -138,7 +141,10 @@ export function CallerInput({ onInput, operatorMessage }: { onInput: (text: stri
           />
           <button
             className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md"
-            onClick={() => onInput(text)}
+            onClick={() => {
+              onInput(text);
+              setText(''); // Clear input after submission
+            }}
           >
             Submit Message
           </button>
