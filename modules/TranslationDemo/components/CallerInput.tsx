@@ -89,8 +89,8 @@ export function CallerInput({ onInput, operatorMessage }: { onInput: (text: stri
   console.log('📞 Caller received operator message:', operatorMessage);
 
   return (
-    <div className="h-full flex flex-col border-2 border-blue-400 rounded-lg resize overflow-auto min-h-[400px]">
-      <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 backdrop-blur-md shadow-sm p-4 rounded-t-lg border-b border-blue-200 dark:border-blue-700">
+    <div className="h-full flex flex-col border-2 border-blue-400 resize overflow-auto min-h-[400px] relative bg-white dark:bg-gray-800">
+      <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 backdrop-blur-md shadow-sm p-4 border-b border-blue-200 dark:border-blue-700">
         <h2 className="text-lg font-bold text-blue-800 dark:text-blue-200">📞 Victim Caller</h2>
       </div>
       
@@ -212,6 +212,9 @@ export function CallerInput({ onInput, operatorMessage }: { onInput: (text: stri
         </select>
         </div>
       </div>
+      
+      {/* Resize Handle */}
+      <div className="absolute bottom-0 right-0 w-4 h-4 bg-blue-400 cursor-se-resize opacity-50 hover:opacity-100 transition-opacity"></div>
     </div>
   );
 }

@@ -98,16 +98,19 @@ ${responseText}`;
   }, [input]);
 
   return (
-    <div className="h-full flex flex-col border-2 border-indigo-500 rounded-lg resize overflow-auto min-h-[400px]">
-      <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 backdrop-blur-md shadow-sm p-4 rounded-t-lg border-b border-indigo-200 dark:border-indigo-700">
+    <div className="h-full flex flex-col border-2 border-indigo-500 resize overflow-auto min-h-[400px] relative bg-white dark:bg-gray-800">
+      <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 backdrop-blur-md shadow-sm p-4 border-b border-indigo-200 dark:border-indigo-700">
         <h2 className="text-lg font-bold text-indigo-800 dark:text-indigo-200">🤖 AI Translator</h2>
       </div>
       
-      <div className="flex-1 bg-slate-900 rounded-lg p-4 overflow-auto m-4 min-h-[300px]">
+      <div className="flex-1 bg-slate-900 p-4 overflow-auto m-4 min-h-[300px]">
         <pre className="whitespace-pre-wrap text-white text-sm font-mono">
           {log || 'Waiting for caller input...'}
         </pre>
       </div>
+      
+      {/* Resize Handle */}
+      <div className="absolute bottom-0 right-0 w-4 h-4 bg-indigo-500 cursor-se-resize opacity-50 hover:opacity-100 transition-opacity"></div>
     </div>
   );
 }
