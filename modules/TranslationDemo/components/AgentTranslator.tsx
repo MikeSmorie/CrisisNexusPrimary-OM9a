@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
 import { translateToEnglish, getEDTG } from '../utils/translate';
-import { classifyIntent, generateAcknowledgement } from '../../../lib/classifyIntent';
-import { handleIntent } from '../../../lib/intentRouter';
-import { generateIntelligentResponse, type DialogueState } from '../../../lib/emergencyDialogueEngine';
+import { 
+  updateSessionContext, 
+  generateEscalatingResponse, 
+  getSessionContext,
+  cleanupOldSessions 
+} from '../../../lib/contextMemory';
 
 export function AgentTranslator({
   input,
@@ -17,25 +20,29 @@ export function AgentTranslator({
 }) {
   const [log, setLog] = useState('');
   const [dialogueHistory, setDialogueHistory] = useState<Array<{caller: string, operator: string}>>([]);
-  const [dialogueState, setDialogueState] = useState<DialogueState>({
-    stage: 'initial',
-    threatLevel: 0,
-    context: { responses: [] }
-  });
+  const callerId = 'caller-session-1'; // In production, this would be unique per caller
 
   useEffect(() => {
     if (input) {
       const run = async () => {
+        // Clean up old sessions periodically
+        cleanupOldSessions();
+        
         const english = await translateToEnglish(input);
         // CRITICAL: EDTG must be captured ONCE per event and never change
         const edtg = getEDTG();
         
-        // Use intelligent dialogue engine for progressive threat assessment
-        const dialogueResult = generateIntelligentResponse(dialogueState, input);
-        setDialogueState(dialogueResult.newState);
+        // Get current session context
+        const currentContext = getSessionContext(callerId);
+        
+        // Generate intelligent escalating response
+        const escalationResult = generateEscalatingResponse(currentContext, input);
+        
+        // Update session context with new dialogue
+        const updatedContext = updateSessionContext(callerId, input, escalationResult.response);
         
         // Route to responder if dispatch threshold is met
-        if (dialogueResult.shouldDispatch) {
+        if (escalationResult.shouldDispatch) {
           setEnglish(english);
           setEdtg(edtg);
         } else {
@@ -44,13 +51,13 @@ export function AgentTranslator({
         }
 
         // Set operator message for caller display
-        console.log('🧠 Setting operator message:', dialogueResult.response);
-        setOperatorMessage(dialogueResult.response);
+        console.log('🧠 Setting operator message:', escalationResult.response);
+        setOperatorMessage(escalationResult.response);
 
         // Build dialogue history for comprehensive log
         const newDialogueEntry = {
           caller: input,
-          operator: dialogueResult.response
+          operator: escalationResult.response
         };
         
         const updatedHistory = [...dialogueHistory, newDialogueEntry];
@@ -61,25 +68,29 @@ export function AgentTranslator({
           `Caller: ${entry.caller}\nOperator: ${entry.operator}`
         ).join('\n\n');
 
-        // Generate response based on dialogue engine
+        // Generate enhanced response display
+        const detectedKeywords = Array.from(updatedContext.mentionedKeywords);
         let responseText = '';
-        if (dialogueResult.shouldDispatch) {
-          responseText = `🚨 EMERGENCY DISPATCH INITIATED\n📡 ${dialogueResult.dispatchSummary}`;
+        if (escalationResult.shouldDispatch) {
+          responseText = `🚨 EMERGENCY DISPATCH INITIATED\n📡 Responders notified based on threat assessment`;
         } else {
-          responseText = `📊 Threat Assessment: Building context (${dialogueResult.newState.threatLevel}% confidence)\n🔄 Gathering additional information from caller`;
+          responseText = `🔄 Escalation Level: ${escalationResult.escalationLevel.toUpperCase()}\n📊 Continuing intelligent assessment`;
         }
 
         const autoResponse = `
-🧠 [Emergency Dialogue Engine]
+🧠 [AI Agent Log]
 ⏱ EDTG: ${edtg} [LOCKED]
-🎯 Threat Level: ${dialogueResult.newState.threatLevel}% (Stage: ${dialogueResult.newState.stage})
-📍 Context: ${dialogueResult.newState.context.location || 'Unknown'} | Person at risk: ${dialogueResult.newState.context.personInDanger ? 'Yes' : 'Unknown'}
-Decision: ${dialogueResult.shouldDispatch ? '🚨 EMERGENCY DISPATCHED' : '🔄 Gathering Critical Information'}
+🔍 Detected Keywords: [${detectedKeywords.join(', ') || 'None'}]
+🧮 Threat Score: ${updatedContext.threatScore}%
+📈 Escalation Level: ${escalationResult.escalationLevel.toUpperCase()}
+🗣️ Operator Response: "${escalationResult.response}"
+📡 Routed to Responder: ${escalationResult.shouldDispatch ? '✅' : '❌'}
 
 📞 FULL DIALOGUE LOG:
 ${dialogueLog}
 
 ${responseText}`;
+
         setLog(autoResponse);
       };
       run();

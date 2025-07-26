@@ -1,0 +1,71 @@
+// 🔧 PATCH: Smarter AI Operator — Context Memory + Escalation Logic
+// FILES AFFECTED: /api/process-voice.ts, /lib/contextMemory.ts, AITranslator.tsx
+
+//--------------------------------------------------------
+// ✅ STEP 1 — Create Context Memory Singleton (Volatile Memory)
+// /lib/contextMemory.ts
+export const sessionMemory: Record<string, {
+  threatScore: number;
+  mentionedKeywords: Set<string>;
+  lastUpdate: number;
+}> = {};
+
+//--------------------------------------------------------
+// ✅ STEP 2 — Extend Intent Classifier (Already implemented)
+// Enhance to extract keywords like: "shark", "drowning", "trouble", "bleeding", etc.
+// Add a `scoreEmergencyWords(text)` util:
+export function scoreEmergencyWords(text: string): { keywords: string[], score: number } {
+  const map = ["shark", "bleeding", "drowning", "trouble", "injured", "fallen", "attacked"];
+  const lower = text.toLowerCase();
+  const found = map.filter(word => lower.includes(word));
+  return { keywords: found, score: found.length * 20 }; // 20% per trigger word
+}
+
+//--------------------------------------------------------
+// ✅ STEP 3 — Update /api/process-voice.ts
+// In main handler, after transcribing speech:
+import { scoreEmergencyWords } from "@/lib/contextMemory";
+
+const memory = sessionMemory[callerId] ?? { threatScore: 0, mentionedKeywords: new Set(), lastUpdate: Date.now() };
+const { keywords, score } = scoreEmergencyWords(transcribedText);
+
+// Update session memory:
+keywords.forEach(k => memory.mentionedKeywords.add(k));
+memory.threatScore += score;
+memory.lastUpdate = Date.now();
+sessionMemory[callerId] = memory;
+
+// Decision logic:
+let response = "Can you describe what you're seeing? Is someone in danger?";
+let escalate = false;
+
+if (memory.threatScore >= 40) {
+  response = "Understood. This appears to be a developing emergency. Are lifeguards present? What's the exact location?";
+}
+if (memory.threatScore >= 60) {
+  response = "Emergency confirmed. Stay on the line. Dispatching responders now. Where exactly is the swimmer?";
+  escalate = true;
+}
+
+// Output
+return res.json({
+  intent: "escalated_dialogue",
+  aiResponse: response,
+  routeToResponder: escalate,
+  threatScore: memory.threatScore,
+  keywordsDetected: Array.from(memory.mentionedKeywords),
+});
+
+--------------------------------------------------------
+// ✅ STEP 4 — Update AITranslator.tsx Display
+// Show running threatScore, dynamic AI question, and responder routing status:
+
+🧠 [AI Agent Log]
+Detected Keywords: ["shark", "trouble"]
+🧮 Threat Score: 60%
+🗣️ Operator Response: "Emergency confirmed. Stay on the line..."
+📡 Routed to Responder: ✅
+
+--------------------------------------------------------
+
+⚠️ Optional: Add `resetMemory()` call if idle time > 5 min or new callerID.
