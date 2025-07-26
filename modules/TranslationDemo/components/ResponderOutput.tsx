@@ -54,7 +54,7 @@ export function ResponderOutput({ input }: { input: string }) {
   const languageOptions = ["Zulu", "Xhosa", "Afrikaans", "Tswana", "Sotho", "Venda", "Tsonga", "Swati", "Ndebele", "Northern Sotho", "English"];
 
   return (
-    <div className="h-full flex flex-col border-2 border-purple-400 resize overflow-auto min-h-[400px] relative bg-white dark:bg-gray-800">
+    <div className="h-full flex flex-col border-2 border-purple-400 overflow-auto min-h-[400px] relative bg-white dark:bg-gray-800" style={{resize: 'both'}}>
       <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 backdrop-blur-md shadow-sm p-4 border-b border-purple-200 dark:border-purple-700">
         <h2 className="text-lg font-bold text-purple-800 dark:text-purple-200">🧑‍🚒 Responder View</h2>
       </div>
@@ -100,8 +100,7 @@ export function ResponderOutput({ input }: { input: string }) {
         )}
       </div>
       
-      {/* Resize Handle */}
-      <div className="absolute bottom-0 right-0 w-4 h-4 bg-purple-400 cursor-se-resize opacity-50 hover:opacity-100 transition-opacity"></div>
+
     </div>
   );
 }

@@ -89,7 +89,7 @@ export function CallerInput({ onInput, operatorMessage }: { onInput: (text: stri
   console.log('📞 Caller received operator message:', operatorMessage);
 
   return (
-    <div className="h-full flex flex-col border-2 border-blue-400 resize overflow-auto min-h-[400px] relative bg-white dark:bg-gray-800">
+    <div className="h-full flex flex-col border-2 border-blue-400 overflow-auto min-h-[400px] relative bg-white dark:bg-gray-800" style={{resize: 'both'}}>
       <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 backdrop-blur-md shadow-sm p-4 border-b border-blue-200 dark:border-blue-700">
         <h2 className="text-lg font-bold text-blue-800 dark:text-blue-200">📞 Victim Caller</h2>
       </div>
@@ -98,7 +98,7 @@ export function CallerInput({ onInput, operatorMessage }: { onInput: (text: stri
 
       {/* Operator Dialogue Display */}
       {operatorMessage && (
-        <div className="mb-4 bg-blue-900/30 border border-blue-500 rounded-lg p-4">
+        <div className="mb-4 bg-blue-900/30 border border-blue-500 p-4">
           <div className="flex items-start gap-3">
             <span className="text-blue-300 font-bold text-sm whitespace-nowrap">📞 Operator:</span>
             <span className="text-white text-sm leading-relaxed">{operatorMessage}</span>
@@ -108,7 +108,7 @@ export function CallerInput({ onInput, operatorMessage }: { onInput: (text: stri
       
       {/* Debug: Show if operatorMessage exists */}
       {!operatorMessage && (
-        <div className="mb-4 bg-gray-700/50 border border-gray-600 rounded-lg p-3">
+        <div className="mb-4 bg-gray-700/50 border border-gray-600 p-3">
           <div className="text-gray-400 text-xs italic">
             Waiting for operator response...
           </div>
@@ -118,13 +118,13 @@ export function CallerInput({ onInput, operatorMessage }: { onInput: (text: stri
       <div className="mb-4">
         <label className="mr-3 text-sm font-medium text-slate-600 dark:text-slate-400">Mode:</label>
         <button
-          className={`px-3 py-2 rounded-lg mr-2 transition-colors ${mode === 'text' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
+          className={`px-3 py-2 mr-2 transition-colors ${mode === 'text' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
           onClick={() => setMode('text')}
         >
           Text
         </button>
         <button
-          className={`px-3 py-2 rounded-lg transition-colors ${mode === 'voice' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
+          className={`px-3 py-2 transition-colors ${mode === 'voice' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
           onClick={() => setMode('voice')}
         >
           Voice
@@ -135,12 +135,12 @@ export function CallerInput({ onInput, operatorMessage }: { onInput: (text: stri
         <div className="flex-1 flex flex-col">
           <textarea
             placeholder="Type your emergency message..."
-            className="flex-1 p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none placeholder-gray-500 dark:placeholder-gray-400"
+            className="flex-1 p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none placeholder-gray-500 dark:placeholder-gray-400"
             value={text}
             onChange={(e) => setText(e.target.value)}
           />
           <button
-            className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md"
+            className="mt-3 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-md"
             onClick={() => {
               onInput(text);
               setText(''); // Clear input after submission
@@ -213,8 +213,7 @@ export function CallerInput({ onInput, operatorMessage }: { onInput: (text: stri
         </div>
       </div>
       
-      {/* Resize Handle */}
-      <div className="absolute bottom-0 right-0 w-4 h-4 bg-blue-400 cursor-se-resize opacity-50 hover:opacity-100 transition-opacity"></div>
+
     </div>
   );
 }
