@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { translateToEnglish, getEDTG } from '../utils/translate';
 import { classifyIntent, generateAcknowledgement } from '../../../lib/classifyIntent';
 import { handleIntent } from '../../../lib/intentRouter';
+import { generateIntelligentResponse, type DialogueState } from '../../../lib/emergencyDialogueEngine';
 
 export function AgentTranslator({
   input,
@@ -13,6 +14,11 @@ export function AgentTranslator({
   setEdtg: (val: string) => void;
 }) {
   const [log, setLog] = useState('');
+  const [dialogueState, setDialogueState] = useState<DialogueState>({
+    stage: 'initial',
+    threatLevel: 0,
+    context: { responses: [] }
+  });
 
   useEffect(() => {
     if (input) {
@@ -20,53 +26,41 @@ export function AgentTranslator({
         const english = await translateToEnglish(input);
         const edtg = getEDTG();
         
-        // Classify the ORIGINAL input, not the AI translation
-        const result = classifyIntent(input);
+        // Use intelligent dialogue engine for progressive threat assessment
+        const dialogueResult = generateIntelligentResponse(dialogueState, input);
+        setDialogueState(dialogueResult.newState);
         
-        // Use intent router for emergency confirmation logic
-        const intentResponse = handleIntent(result.type.toUpperCase(), result.confidence, input);
-        const routeToResponder = intentResponse.routeToResponder || false;
-        
-        // Only route confirmed emergency content to ResponderOutput
-        if (routeToResponder) {
+        // Route to responder if dispatch threshold is met
+        if (dialogueResult.shouldDispatch) {
           setEnglish(english);
           setEdtg(edtg);
         } else {
-          setEnglish(''); // Clear responder output for non-emergencies
+          setEnglish(''); // Hold for more information
           setEdtg('');
         }
 
-        const intentEmoji = {
-          'emergency': '🚨',
-          'greeting': '👋',
-          'noise': '🔇',
-          'unknown': '❓'
-        };
-
+        // Generate response based on dialogue engine
         let responseText = '';
-        if (intentResponse.intent === 'CONFIRM_EMERGENCY') {
-          responseText = `⚠️ Confirmation Required: "${intentResponse.message}"\n⛔ Awaiting confirmation before routing to responder.`;
-        } else if (routeToResponder) {
-          responseText = '📌 Requesting location, callback, time of incident, injury status, and caller role...\n📡 Routing to appropriate emergency channel...';
+        if (dialogueResult.shouldDispatch) {
+          responseText = `🚨 EMERGENCY DISPATCH INITIATED\n📡 ${dialogueResult.dispatchSummary}\n💬 AI Response: "${dialogueResult.response}"`;
         } else {
-          const acknowledgement = generateAcknowledgement(result.type, result.confidence);
-          responseText = `💬 Caller Acknowledgement: "${acknowledgement}"\n⛔ Held for Clarification - AI needs clearer emergency information before routing.`;
+          responseText = `💬 AI Dialogue: "${dialogueResult.response}"\n📊 Threat Assessment: Building context (${dialogueResult.newState.threatLevel}% confidence)`;
         }
 
         const autoResponse = `
-🧠 [AI Agent Log]
+🧠 [Emergency Dialogue Engine]
 Raw Input: "${input}"
-Classification Source: Original Input (NOT translated text)
 Translated: "${english}"
 ⏱ EDTG: ${edtg}
-Intent: 🧠 ${result.type.toUpperCase()} (${Math.round(result.confidence * 100)}%)
-Decision: ${routeToResponder ? '📡 Routed to Responder' : intentResponse.intent === 'CONFIRM_EMERGENCY' ? '⚠️ Awaiting Confirmation' : '⛔ Held for Clarification'}
+🎯 Threat Level: ${dialogueResult.newState.threatLevel}% (Stage: ${dialogueResult.newState.stage})
+📍 Context: ${dialogueResult.newState.context.location || 'Unknown'} | Person at risk: ${dialogueResult.newState.context.personInDanger ? 'Yes' : 'Unknown'}
+Decision: ${dialogueResult.shouldDispatch ? '🚨 EMERGENCY DISPATCHED' : '🔄 Gathering Critical Information'}
 ${responseText}`;
         setLog(autoResponse);
       };
       run();
     }
-  }, [input]);
+  }, [input, dialogueState]);
 
   return (
     <div className="h-full flex flex-col border-2 border-indigo-500 rounded-2xl">
