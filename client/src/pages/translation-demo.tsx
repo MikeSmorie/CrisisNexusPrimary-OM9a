@@ -14,8 +14,8 @@ export default function TranslationDemoPage() {
         </div>
       </div>
       
-      {/* Full height translation demo */}
-      <div className="h-[calc(100vh-60px)] w-full overflow-auto">
+      {/* Full height translation demo - no overflow constraint */}
+      <div className="h-[calc(100vh-60px)] w-full">
         <TranslationDemo />
       </div>
     </div>

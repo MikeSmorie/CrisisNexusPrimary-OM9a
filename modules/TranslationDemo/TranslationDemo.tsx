@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { CallerInput } from './components/CallerInput';
 import { AgentTranslator } from './components/AgentTranslator';
 import { ResponderOutput } from './components/ResponderOutput';
-import { AnimatedCard } from './components/AnimatedCard';
+
 
 export default function TranslationDemo() {
   const [callerMessage, setCallerMessage] = useState('');
@@ -12,42 +12,26 @@ export default function TranslationDemo() {
 
   return (
     <div className="h-full w-full max-w-none bg-slate-50 dark:bg-slate-900">
-      {/* Responsive grid layout - stacks on mobile, side-by-side on larger screens */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 p-4 h-full w-full">
-        {/* Caller Input - Full width on mobile, 1/3 on desktop */}
-        <div className="w-full min-h-[400px] lg:min-h-full">
-          <AnimatedCard>
-            <CallerInput onInput={setCallerMessage} operatorMessage={operatorMessage} />
-          </AnimatedCard>
+      {/* Flexible layout for resizable windows */}
+      <div className="flex flex-col lg:flex-row gap-4 p-4 h-full w-full">
+        {/* Caller Input - Fully resizable */}
+        <div className="flex-1 min-w-0 min-h-[400px]">
+          <CallerInput onInput={setCallerMessage} operatorMessage={operatorMessage} />
         </div>
 
-        {/* Agent Translator - Full width on mobile, 1/3 on desktop */}
-        <div className="w-full min-h-[400px] lg:min-h-full">
-          <AnimatedCard>
-            <AgentTranslator
-              input={callerMessage}
-              setEnglish={setEnglishTranslation}
-              setEdtg={setEdtgCode}
-              setOperatorMessage={setOperatorMessage}
-            />
-            <div className="mt-4">
-              <h3 className="text-lg font-semibold mb-2 text-slate-800 dark:text-slate-200">📋 Crisis Triage Checklist</h3>
-              <ul className="text-sm list-disc list-inside text-gray-700 dark:text-gray-300 space-y-1">
-                <li>📍 Exact location of the crisis?</li>
-                <li>📞 Callback number?</li>
-                <li>⏰ Time of occurrence?</li>
-                <li>🩺 Injured parties involved?</li>
-                <li>🧍 Caller role (bystander, victim, responder)?</li>
-              </ul>
-            </div>
-          </AnimatedCard>
+        {/* Agent Translator - Fully resizable */}
+        <div className="flex-1 min-w-0 min-h-[400px]">
+          <AgentTranslator
+            input={callerMessage}
+            setEnglish={setEnglishTranslation}
+            setEdtg={setEdtgCode}
+            setOperatorMessage={setOperatorMessage}
+          />
         </div>
 
-        {/* Responder Output - Full width on mobile, 1/3 on desktop */}
-        <div className="w-full min-h-[400px] lg:min-h-full">
-          <AnimatedCard>
-            <ResponderOutput input={englishTranslation} />
-          </AnimatedCard>
+        {/* Responder Output - Fully resizable */}
+        <div className="flex-1 min-w-0 min-h-[400px]">
+          <ResponderOutput input={englishTranslation} edtg={edtgCode} />
         </div>
       </div>
     </div>
