@@ -54,8 +54,8 @@ export function ResponderOutput({ input }: { input: string }) {
   const languageOptions = ["Zulu", "Xhosa", "Afrikaans", "Tswana", "Sotho", "Venda", "Tsonga", "Swati", "Ndebele", "Northern Sotho", "English"];
 
   return (
-    <div className="h-full flex flex-col border-2 border-purple-400 rounded-2xl">
-      <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 backdrop-blur-md shadow-sm p-4 rounded-t-2xl border-b border-purple-200 dark:border-purple-700">
+    <div className="h-full flex flex-col border-2 border-purple-400 rounded-lg resize overflow-auto min-h-[400px]">
+      <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 backdrop-blur-md shadow-sm p-4 rounded-t-lg border-b border-purple-200 dark:border-purple-700">
         <h2 className="text-lg font-bold text-purple-800 dark:text-purple-200">🧑‍🚒 Responder View</h2>
       </div>
       
@@ -82,7 +82,7 @@ export function ResponderOutput({ input }: { input: string }) {
           </div>
         )}
 
-        <div className="bg-slate-900 rounded-lg p-4 overflow-auto max-h-[calc(100vh-200px)] mb-4">
+        <div className="flex-1 bg-slate-900 rounded-lg p-4 overflow-auto mb-4 min-h-[300px]">
           <pre className="whitespace-pre-wrap text-white text-sm font-mono">
             {output || (input ? '⛔ Content held for clarification - requires clearer emergency information' : 'Awaiting emergency dispatch...')}
           </pre>

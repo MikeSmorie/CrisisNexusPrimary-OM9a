@@ -89,8 +89,8 @@ export function CallerInput({ onInput, operatorMessage }: { onInput: (text: stri
   console.log('📞 Caller received operator message:', operatorMessage);
 
   return (
-    <div className="h-full flex flex-col border-2 border-blue-400 rounded-2xl">
-      <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 backdrop-blur-md shadow-sm p-4 rounded-t-2xl border-b border-blue-200 dark:border-blue-700">
+    <div className="h-full flex flex-col border-2 border-blue-400 rounded-lg resize overflow-auto min-h-[400px]">
+      <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 backdrop-blur-md shadow-sm p-4 rounded-t-lg border-b border-blue-200 dark:border-blue-700">
         <h2 className="text-lg font-bold text-blue-800 dark:text-blue-200">📞 Victim Caller</h2>
       </div>
       
