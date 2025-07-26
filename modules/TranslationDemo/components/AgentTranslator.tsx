@@ -16,6 +16,7 @@ export function AgentTranslator({
   setOperatorMessage: (val: string) => void;
 }) {
   const [log, setLog] = useState('');
+  const [dialogueHistory, setDialogueHistory] = useState<Array<{caller: string, operator: string}>>([]);
   const [dialogueState, setDialogueState] = useState<DialogueState>({
     stage: 'initial',
     threatLevel: 0,
@@ -46,6 +47,20 @@ export function AgentTranslator({
         console.log('🧠 Setting operator message:', dialogueResult.response);
         setOperatorMessage(dialogueResult.response);
 
+        // Build dialogue history for comprehensive log
+        const newDialogueEntry = {
+          caller: input,
+          operator: dialogueResult.response
+        };
+        
+        const updatedHistory = [...dialogueHistory, newDialogueEntry];
+        setDialogueHistory(updatedHistory);
+
+        // Build dialogue log display
+        const dialogueLog = updatedHistory.map((entry, idx) => 
+          `Caller: ${entry.caller}\nOperator: ${entry.operator}`
+        ).join('\n\n');
+
         // Generate response based on dialogue engine
         let responseText = '';
         if (dialogueResult.shouldDispatch) {
@@ -56,12 +71,14 @@ export function AgentTranslator({
 
         const autoResponse = `
 🧠 [Emergency Dialogue Engine]
-Raw Input: "${input}"
-Translated: "${english}"
 ⏱ EDTG: ${edtg} [LOCKED]
 🎯 Threat Level: ${dialogueResult.newState.threatLevel}% (Stage: ${dialogueResult.newState.stage})
 📍 Context: ${dialogueResult.newState.context.location || 'Unknown'} | Person at risk: ${dialogueResult.newState.context.personInDanger ? 'Yes' : 'Unknown'}
 Decision: ${dialogueResult.shouldDispatch ? '🚨 EMERGENCY DISPATCHED' : '🔄 Gathering Critical Information'}
+
+📞 FULL DIALOGUE LOG:
+${dialogueLog}
+
 ${responseText}`;
         setLog(autoResponse);
       };
