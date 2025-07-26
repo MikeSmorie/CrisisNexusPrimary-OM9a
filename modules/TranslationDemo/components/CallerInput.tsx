@@ -82,6 +82,9 @@ export function CallerInput({ onInput, operatorMessage }: { onInput: (text: stri
     }
   };
 
+  // Debug: Log operator message
+  console.log('📞 Caller received operator message:', operatorMessage);
+
   return (
     <div className="h-full flex flex-col border-2 border-blue-400 rounded-2xl">
       <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 backdrop-blur-md shadow-sm p-4 rounded-t-2xl border-b border-blue-200 dark:border-blue-700">
@@ -92,10 +95,19 @@ export function CallerInput({ onInput, operatorMessage }: { onInput: (text: stri
 
       {/* Operator Dialogue Display */}
       {operatorMessage && (
-        <div className="mb-4 bg-blue-900/20 border border-blue-600 rounded-lg p-3">
-          <div className="flex items-start gap-2">
-            <span className="text-blue-400 font-semibold text-sm">📞 Operator:</span>
-            <span className="text-blue-100 text-sm">{operatorMessage}</span>
+        <div className="mb-4 bg-blue-900/30 border border-blue-500 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <span className="text-blue-300 font-bold text-sm whitespace-nowrap">📞 Operator:</span>
+            <span className="text-white text-sm leading-relaxed">{operatorMessage}</span>
+          </div>
+        </div>
+      )}
+      
+      {/* Debug: Show if operatorMessage exists */}
+      {!operatorMessage && (
+        <div className="mb-4 bg-gray-700/50 border border-gray-600 rounded-lg p-3">
+          <div className="text-gray-400 text-xs italic">
+            Waiting for operator response...
           </div>
         </div>
       )}

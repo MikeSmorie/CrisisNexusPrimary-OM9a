@@ -65,6 +65,18 @@ export function generateIntelligentResponse(state: DialogueState, newInput: stri
     newState.context.personInDanger = true;
   }
 
+  // Check for potential crank calls after multiple exchanges
+  if (newState.context.responses.length > 2 && maxThreat < 30) {
+    const isPotentialCrank = detectPotentialCrank(newState.context);
+    if (isPotentialCrank) {
+      return {
+        response: generateCrankWarning(),
+        newState,
+        shouldDispatch: false
+      };
+    }
+  }
+
   // Determine response strategy based on threat level
   if (maxThreat >= 70) {
     // High threat - immediate dispatch with intelligent summary

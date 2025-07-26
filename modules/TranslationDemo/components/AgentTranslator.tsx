@@ -42,6 +42,7 @@ export function AgentTranslator({
         }
 
         // Set operator message for caller display
+        console.log('🧠 Setting operator message:', dialogueResult.response);
         setOperatorMessage(dialogueResult.response);
 
         // Generate response based on dialogue engine
@@ -65,7 +66,7 @@ ${responseText}`;
       };
       run();
     }
-  }, [input, dialogueState]);
+  }, [input]);
 
   return (
     <div className="h-full flex flex-col border-2 border-indigo-500 rounded-2xl">
