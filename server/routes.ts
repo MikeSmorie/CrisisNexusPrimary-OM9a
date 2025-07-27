@@ -35,6 +35,7 @@ import disasterAIRoutes from "./routes/disaster-ai";
 import disasterModules from "./routes/disaster-modules";
 import aiIncidentRouter from "./routes/ai-incident";
 import analyzeThreatRouter from "./routes/analyze-threat";
+import translationRouter from "./routes/translation";
 import { db } from "../db";
 import { disasterUsers } from "../db/schema";
 import { eq, and, or, desc, asc, sql } from "drizzle-orm";
@@ -221,6 +222,15 @@ export function registerRoutes(app: Express) {
    * GET /api/ai-router-test/test-utilities - Test all utility functions
    */
   app.use("/api/ai-router-test", aiRouterTestRouter);
+
+  /**
+   * TRANSLATION ROUTES
+   * Auth: None (public access for emergency translation)
+   * Role: Public access for emergency response
+   * POST /api/translate-to-english - Translate any language to English
+   * POST /api/translate-from-english - Translate English to target language
+   */
+  app.use("/api", translationRouter);
 
   /**
    * MODULE REFACTORING TESTS
