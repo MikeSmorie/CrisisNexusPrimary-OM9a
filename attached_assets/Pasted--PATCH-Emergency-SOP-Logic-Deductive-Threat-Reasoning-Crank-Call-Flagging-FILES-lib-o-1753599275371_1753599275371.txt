@@ -1,0 +1,74 @@
+// 🔧 PATCH: Emergency SOP Logic — Deductive Threat Reasoning + Crank Call Flagging
+// FILES: /lib/operatorSOP.ts, /api/process-voice.ts, AITranslator.tsx
+
+//------------------------------------------------------------
+// ✅ STEP 1 — Add Deductive Questioning Tree (lib/operatorSOP.ts)
+export function getFollowUpQuestions(context: {
+  hasThreat: boolean;
+  hasInjury: boolean;
+  locationKnown: boolean;
+  callerWorried: boolean;
+}): string[] {
+  const questions: string[] = [];
+
+  if (!context.locationKnown) questions.push("Where exactly is this happening?");
+  if (context.hasThreat && !context.hasInjury) questions.push("Do you see anyone in danger or signaling for help?");
+  if (context.hasInjury) questions.push("Is there visible bleeding or unconsciousness?");
+  if (context.callerWorried && !context.hasThreat) questions.push("Can you describe why you’re concerned?");
+
+  return questions.length > 0 ? questions : ["I’m still listening — please tell me more about the situation."];
+}
+
+//------------------------------------------------------------
+// ✅ STEP 2 — Add Crank Call Pattern Detection (lib/crankDetector.ts)
+export function detectCrankCall(text: string): boolean {
+  const crankSignals = [
+    "unicorn", "alien", "fart", "zebra doing karate", "I’m joking", "LOL", "nothing wrong", "I made it up"
+  ];
+  const t = text.toLowerCase();
+  return crankSignals.some(sig => t.includes(sig));
+}
+
+//------------------------------------------------------------
+// ✅ STEP 3 — Enhance /api/process-voice.ts Logic
+import { getFollowUpQuestions } from "@/lib/operatorSOP";
+import { detectCrankCall } from "@/lib/crankDetector";
+
+const crankDetected = detectCrankCall(transcribedText);
+if (crankDetected) {
+  return res.json({
+    routeToResponder: false,
+    aiResponse: "⚠️ False reporting is a criminal offense. Your voice and device have been logged.",
+    flagCrank: true,
+    escalateToAdmin: true,
+  });
+}
+
+const context = {
+  hasThreat: detectThreatContext(transcribedText).length > 0,
+  hasInjury: /bitten|blood|unconscious|injured|collapsed/.test(transcribedText.toLowerCase()),
+  locationKnown: /at|near|beach|street|mall|corner|intersection/.test(transcribedText.toLowerCase()),
+  callerWorried: /trouble|help|think|worried|in danger|can you/.test(transcribedText.toLowerCase()),
+};
+
+const questions = getFollowUpQuestions(context);
+const escalate = context.hasThreat || context.hasInjury || context.callerWorried;
+
+return res.json({
+  aiResponse: questions[0],
+  routeToResponder: escalate,
+  responderContext: {
+    locationKnown: context.locationKnown,
+    threatConfirmed: context.hasThreat,
+    injury: context.hasInjury,
+    lastText: transcribedText,
+  }
+});
+
+//------------------------------------------------------------
+// ✅ STEP 4 — Update AITranslator.tsx
+Display:
+- ❓ Deductive Question
+- ⚠️ Crank Warning (if triggered)
+- 📡 Responder Routing: YES/NO
+- 🧠 Context Tags (Threat, Injury, Location Known)
