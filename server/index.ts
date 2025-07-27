@@ -66,14 +66,24 @@ app.use((req, res, next) => {
   next();
 });
 
-// Health check endpoint for deployment (NOT on root path)
+// Root endpoint for health checks (Cloud Run requirement)
+app.get("/", (req, res) => {
+  res.status(200).json({ 
+    status: "healthy",
+    service: "CrisisNexus",
+    ready: true
+  });
+});
+
+// Dedicated health check endpoint (lightweight)
 app.get("/health", (req, res) => {
   res.status(200).json({ 
     status: "healthy",
     service: "CrisisNexus Emergency Management System",
-    uptime: process.uptime(),
+    uptime: Math.floor(process.uptime()),
     timestamp: new Date().toISOString(),
-    version: "1.0.0"
+    version: "1.0.0",
+    ready: true
   });
 });
 
@@ -100,15 +110,20 @@ app.get("/api/module/test", async (req, res) => {
       process.exit(1);
     }
 
-    // Test database connection before starting server
-    try {
-      const { db } = await import("../db");
-      const { disasterUsers } = await import("../db/schema");
-      await db.select().from(disasterUsers).limit(1);
-      console.log("Database connection verified");
-    } catch (error) {
-      console.log("Database connection established (fallback)");
-    }
+    // Verify database connection (non-blocking for faster startup)
+    const dbVerification = async () => {
+      try {
+        const { db } = await import("../db");
+        const { disasterUsers } = await import("../db/schema");
+        await db.select().from(disasterUsers).limit(1);
+        console.log("Database connection verified");
+      } catch (error) {
+        console.log("Database connection will be established on first request");
+      }
+    };
+    
+    // Start database verification in background
+    dbVerification();
 
     // Register all API routes and create HTTP server
     const server = registerRoutes(app);
@@ -130,11 +145,14 @@ app.get("/api/module/test", async (req, res) => {
       serveStatic(app); // Production: Static file serving
     }
 
-    // Start server on port 5000 (Cloud Run compatible)
-    const PORT = process.env.PORT || 5000;
-    server.listen(PORT, "0.0.0.0", () => {
+    // Cloud Run compatible server configuration
+    const PORT = parseInt(process.env.PORT || '5000', 10);
+    const HOST = '0.0.0.0'; // Bind to all interfaces for Cloud Run
+    
+    server.listen(PORT, HOST, () => {
       log(`CrisisNexus Emergency Management System serving on port ${PORT}`);
-      log(`Health check available at http://0.0.0.0:${PORT}/health`);
+      log(`Health check available at http://${HOST}:${PORT}/health`);
+      log(`Root health check at http://${HOST}:${PORT}/`);
     });
 
   } catch (error) {
