@@ -66,16 +66,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Root endpoint for health checks (Cloud Run requirement)
-app.get("/", (req, res) => {
-  res.status(200).json({ 
-    status: "healthy",
-    service: "CrisisNexus",
-    ready: true
-  });
-});
-
-// Dedicated health check endpoint (lightweight)
+// Dedicated health check endpoint for Cloud Run (lightweight)
 app.get("/health", (req, res) => {
   res.status(200).json({ 
     status: "healthy",

@@ -67,6 +67,20 @@ const errorHandler = async (err: any, req: any, res: any, next: any) => {
 };
 
 export function registerRoutes(app: Express) {
+  // Root health check for Cloud Run health checks only
+  app.get("/", (req, res, next) => {
+    // For Cloud Run health checks, return simple JSON
+    if (req.headers['user-agent']?.includes('GoogleHC') || req.query.healthcheck) {
+      return res.status(200).json({ 
+        status: "healthy",
+        service: "CrisisNexus",
+        ready: true
+      });
+    }
+    // Otherwise continue to next middleware (Vite will handle frontend)
+    next();
+  });
+
   // Basic CORS setup
   app.use(cors({
     origin: process.env.NODE_ENV === 'production' ? false : '*',
