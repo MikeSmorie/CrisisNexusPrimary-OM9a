@@ -77,14 +77,26 @@ export function AgentTranslator({
           responseText = `🔄 Escalation Level: ${escalationResult.escalationLevel.toUpperCase()}\n📊 Continuing intelligent assessment`;
         }
 
+        // Enhanced display with SOP analysis
+        const crankStatus = escalationResult.crankDetected ? '⚠️ CRANK DETECTED' : '✅ Legitimate Call';
+        const adminEscalation = escalationResult.escalateToAdmin ? '🚨 ADMIN NOTIFIED' : '';
+        
+        const contextTags = [];
+        if (detectedKeywords.includes('shark') || detectedKeywords.includes('attack')) contextTags.push('🦈 SHARK THREAT');
+        if (detectedKeywords.includes('bleeding') || detectedKeywords.includes('injured')) contextTags.push('🩸 INJURY');
+        if (detectedKeywords.includes('stuck') || detectedKeywords.includes('trapped')) contextTags.push('🚧 ENTRAPMENT');
+        if (detectedKeywords.includes('drowning') || detectedKeywords.includes('water')) contextTags.push('🌊 WATER EMERGENCY');
+
         const autoResponse = `
-🧠 [AI Agent Log]
+🧠 [Enhanced AI Emergency SOP Analysis]
 ⏱ EDTG: ${edtg} [LOCKED]
-🔍 Detected Keywords: [${detectedKeywords.join(', ') || 'None'}]
+🔍 Context Tags: [${contextTags.join(', ') || 'General Emergency'}]
 🧮 Threat Score: ${updatedContext.threatScore}%
-📈 Escalation Level: ${escalationResult.escalationLevel.toUpperCase()}
-🗣️ Operator Response: "${escalationResult.response}"
-📡 Routed to Responder: ${escalationResult.shouldDispatch ? '✅' : '❌'}
+📈 Escalation: ${escalationResult.escalationLevel.toUpperCase()}
+${crankStatus} ${adminEscalation}
+
+❓ Deductive Question: "${escalationResult.response}"
+📡 Responder Routing: ${escalationResult.shouldDispatch ? 'YES - DISPATCHING' : 'NO - GATHERING INFO'}
 
 📞 FULL DIALOGUE LOG:
 ${dialogueLog}

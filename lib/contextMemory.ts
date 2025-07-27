@@ -129,72 +129,64 @@ export function updateSessionContext(
   return context;
 }
 
-// Enhanced 911 SOP-compliant response generation
+import { assessEmergencyContext, generateOperatorResponse } from './operatorSOP';
+import { detectCrankCall, shouldEscalateToAdmin, logCrankCall } from './crankDetector';
+
+// Enhanced 911 SOP-compliant response generation with crank detection
 export function generateEscalatingResponse(context: SessionContext, latestInput: string): {
   response: string;
   shouldDispatch: boolean;
   escalationLevel: 'initial' | 'gathering' | 'escalating' | 'dispatched';
   dispatchSummary?: string;
+  crankDetected?: boolean;
+  escalateToAdmin?: boolean;
 } {
-  const { threatScore, mentionedKeywords, criticalInfo } = context;
-  const lowerInput = latestInput.toLowerCase();
+  const conversationHistory = context.conversationHistory.map(h => h.caller);
   
-  // Extract critical information from current input
+  // Step 1: Check for crank call
+  const crankAnalysis = detectCrankCall(latestInput, conversationHistory);
+  if (crankAnalysis.isCrank) {
+    logCrankCall(context.callerId, latestInput, crankAnalysis.indicators);
+    
+    return {
+      response: crankAnalysis.warningMessage || "This appears to be a false report. Emergency services are for genuine emergencies only.",
+      shouldDispatch: false,
+      escalationLevel: 'initial',
+      crankDetected: true,
+      escalateToAdmin: shouldEscalateToAdmin(crankAnalysis)
+    };
+  }
+  
+  // Step 2: Assess emergency context using deductive reasoning
+  const emergencyContext = assessEmergencyContext(latestInput, conversationHistory);
+  
+  // Step 3: Update critical info extraction
   updateCriticalInfo(context, latestInput);
   
-  // Emergency dispatch threshold (60%+) - Full 911 protocol
-  if (threatScore >= 60) {
-    const missingCritical = getMissingCriticalInfo(context);
-    
-    if (missingCritical.length > 0) {
-      return {
-        response: `EMERGENCY CONFIRMED. Dispatching now. Critical: I need the exact ${missingCritical.join(' and ')} immediately. Stay on the line.`,
-        shouldDispatch: true,
-        escalationLevel: 'dispatched',
-        dispatchSummary: generateDispatchSummary(context)
-      };
-    }
-    
-    return {
-      response: "EMERGENCY UNITS DISPATCHED. Keep the line open. Can you tell me what immediate actions you're taking? Are there any hazards responders should know about?",
-      shouldDispatch: true,
-      escalationLevel: 'dispatched',
-      dispatchSummary: generateDispatchSummary(context)
-    };
+  // Step 4: Generate response using enhanced SOP logic
+  const sopResponse = generateOperatorResponse(emergencyContext, latestInput);
+  
+  // Step 5: Create dispatch summary if needed
+  let dispatchSummary: string | undefined;
+  if (sopResponse.shouldDispatch) {
+    dispatchSummary = generateDispatchSummary(context);
   }
   
-  // High urgency - escalating (40-59%) - Follow 911 triage
-  if (threatScore >= 40) {
-    const missingInfo = getMissingCriticalInfo(context);
-    if (missingInfo.includes('location')) {
-      return {
-        response: "This is an emergency situation. I need your EXACT LOCATION immediately - what beach, what section, nearest landmark?",
-        shouldDispatch: false,
-        escalationLevel: 'escalating'
-      };
-    }
-    
-    return {
-      response: `Emergency developing. How many people are involved? What is their current condition? Are you safe to stay and provide updates?`,
-      shouldDispatch: false,
-      escalationLevel: 'escalating'
-    };
-  }
+  // Map SOP escalation levels to our system
+  const escalationMap: Record<string, 'initial' | 'gathering' | 'escalating' | 'dispatched'> = {
+    'INITIAL': 'initial',
+    'GATHERING': 'gathering', 
+    'ESCALATING': 'escalating',
+    'DISPATCHED': 'dispatched'
+  };
   
-  // Medium urgency - gathering information (20-39%)
-  if (threatScore >= 20) {
-    return {
-      response: "I'm coordinating a response. Tell me exactly what you're seeing right now - are they conscious, moving, responding to you?",
-      shouldDispatch: false,
-      escalationLevel: 'gathering'
-    };
-  }
-  
-  // Initial contact - standard 911 opening
   return {
-    response: "911 Emergency - What is your exact location and what is the emergency?",
-    shouldDispatch: false,
-    escalationLevel: 'initial'
+    response: sopResponse.response,
+    shouldDispatch: sopResponse.shouldDispatch,
+    escalationLevel: escalationMap[sopResponse.escalationLevel] || 'gathering',
+    dispatchSummary,
+    crankDetected: false,
+    escalateToAdmin: false
   };
 }
 
