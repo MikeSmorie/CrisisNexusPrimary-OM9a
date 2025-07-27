@@ -66,7 +66,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Dedicated health check endpoint for Cloud Run (lightweight)
+// Health check endpoints for Cloud Run deployment
 app.get("/health", (req, res) => {
   res.status(200).json({ 
     status: "healthy",
@@ -74,6 +74,15 @@ app.get("/health", (req, res) => {
     uptime: Math.floor(process.uptime()),
     timestamp: new Date().toISOString(),
     version: "1.0.0",
+    ready: true
+  });
+});
+
+// Alternative health check endpoint
+app.get("/healthz", (req, res) => {
+  res.status(200).json({ 
+    status: "healthy",
+    service: "CrisisNexus",
     ready: true
   });
 });
