@@ -39,29 +39,32 @@ export function AgentTranslator({
         // Generate intelligent escalating response
         const escalationResult = generateEscalatingResponse(currentContext, input);
         
-        // Apply contextual questioning for smart threat-aware interrogation
-        const contextualQuestions = getContextualQuestions({
-          history: currentContext.conversationHistory.map(h => h.caller),
-          threatWords: Array.from(currentContext.activeThreats || []),
-          missingPeople: /missing|gone|disappeared/.test(input.toLowerCase()),
-          bloodSeen: /blood/.test(input.toLowerCase()),
-          reducedHeadcount: /only (one|two|three)/.test(input.toLowerCase())
-        });
+        // Apply contextual questioning ONLY if NOT a crank call
+        let finalResponse = escalationResult.response;
         
-        // Use contextual question if available and not dispatching
-        const finalResponse = !escalationResult.shouldDispatch && contextualQuestions.length > 0 
-          ? contextualQuestions[0] 
-          : escalationResult.response;
+        if (!escalationResult.crankDetected && !escalationResult.shouldDispatch) {
+          const contextualQuestions = getContextualQuestions({
+            history: currentContext.conversationHistory.map(h => h.caller),
+            threatWords: Array.from(currentContext.activeThreats || []),
+            missingPeople: /missing|gone|disappeared/.test(input.toLowerCase()),
+            bloodSeen: /blood/.test(input.toLowerCase()),
+            reducedHeadcount: /only (one|two|three)/.test(input.toLowerCase())
+          });
+          
+          if (contextualQuestions.length > 0) {
+            finalResponse = contextualQuestions[0];
+          }
+        }
         
         // Update session context with new dialogue
         const updatedContext = updateSessionContext(callerId, input, finalResponse);
         
-        // Route to responder if dispatch threshold is met
-        if (escalationResult.shouldDispatch && escalationResult.dispatchSummary) {
+        // Route to responder ONLY if dispatch threshold is met AND NOT a crank call
+        if (escalationResult.shouldDispatch && escalationResult.dispatchSummary && !escalationResult.crankDetected) {
           setEnglish(escalationResult.dispatchSummary); // Send full dispatch summary to responder
           setEdtg(edtg);
         } else {
-          setEnglish(''); // Hold for more information
+          setEnglish(''); // Hold for more information OR block crank dispatch
           setEdtg('');
         }
 
@@ -102,7 +105,7 @@ export function AgentTranslator({
         }
 
         // Enhanced display with SOP analysis
-        const crankStatus = escalationResult.crankDetected ? '⚠️ CRANK DETECTED' : '✅ Legitimate Call';
+        const crankStatus = escalationResult.crankDetected ? '⚠️ CRANK DETECTED - DISPATCH BLOCKED' : '✅ Legitimate Call';
         const adminEscalation = escalationResult.escalateToAdmin ? '🚨 ADMIN NOTIFIED' : '';
         
         const contextTags = [];

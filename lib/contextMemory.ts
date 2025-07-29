@@ -181,7 +181,7 @@ export function generateEscalatingResponse(context: SessionContext, latestInput:
     
     return {
       response: crankAnalysis.warningMessage || "This appears to be a false report. Emergency services are for genuine emergencies only.",
-      shouldDispatch: false,
+      shouldDispatch: false, // CRITICAL: Block all dispatch for crank calls
       escalationLevel: 'initial',
       crankDetected: true,
       escalateToAdmin: shouldEscalateToAdmin(crankAnalysis)
