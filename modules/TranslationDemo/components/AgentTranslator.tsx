@@ -72,12 +72,13 @@ export function AgentTranslator({
         console.log('🧠 Setting operator message:', finalResponse);
         setOperatorMessage(finalResponse);
         
-        // Handle severe crank call escalation
+        // Handle severe escalation scenarios
         if (escalationResult.escalateToAdmin) {
-          console.warn('🚨 ADMIN ESCALATION: Severe crank call detected', {
+          console.warn('🚨 ADMIN ESCALATION: Critical situation detected', {
             callerId,
             input,
-            escalationLevel: updatedContext.escalationLevel
+            escalationLevel: updatedContext.escalationLevel,
+            crankDetected: escalationResult.crankDetected
           });
         }
 
@@ -104,9 +105,10 @@ export function AgentTranslator({
           responseText = `🔄 Escalation Level: ${escalationResult.escalationLevel.toUpperCase()}\n📊 Continuing intelligent assessment`;
         }
 
-        // Enhanced display with SOP analysis
-        const crankStatus = escalationResult.crankDetected ? '⚠️ CRANK DETECTED - DISPATCH BLOCKED' : '✅ Legitimate Call';
+        // Enhanced display with intelligent escalation analysis
+        const crankStatus = escalationResult.crankDetected ? '⚠️ FALSE REPORT DETECTED - DISPATCH BLOCKED' : '✅ Legitimate Emergency Call';
         const adminEscalation = escalationResult.escalateToAdmin ? '🚨 ADMIN NOTIFIED' : '';
+        const escalationStatus = escalationResult.escalationLevel ? `📊 Stage: ${escalationResult.escalationLevel.toUpperCase()}` : '';
         
         const contextTags = [];
         if (detectedKeywords.includes('shark') || detectedKeywords.includes('attack')) contextTags.push('🦈 SHARK THREAT');

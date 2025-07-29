@@ -1,0 +1,97 @@
+// 🔧 PATCH: Intelligent Escalation Engine — Reacts to Retraction, Escalation, Contradiction
+// FILES: /api/process-voice.ts, /lib/escalationEngine.ts, AITranslator.tsx, ResponderView.tsx
+
+//------------------------------------------------------------
+// ✅ STEP 1 — Add Escalation Memory State (/lib/escalationEngine.ts)
+
+type EscalationState = "none" | "pending" | "active" | "retracted" | "false_report";
+
+export const escalationMemory: Record<string, {
+  level: EscalationState;
+  lastText: string;
+  confirmedThreats: Set<string>;
+  retractionFlag: boolean;
+  retractionConfirmed: boolean;
+}> = {};
+
+//------------------------------------------------------------
+// ✅ STEP 2 — In /api/process-voice.ts — Main Decision Handler
+
+const session = escalationMemory[callerId] ?? {
+  level: "none",
+  lastText: "",
+  confirmedThreats: new Set(),
+  retractionFlag: false,
+  retractionConfirmed: false,
+};
+
+const text = transcribedText.toLowerCase();
+
+const isThreat = /shark|blood|gun|fire|injured|missing/.test(text);
+const isRetraction = /just kidding|not really|i made it up|wasn’t serious|false alarm/.test(text);
+const isSarcastic = /don’t you think it's funny|lol|haha/.test(text);
+
+if (isRetraction || isSarcastic) {
+  if (session.level === "active") {
+    session.retractionFlag = true;
+    session.level = "retracted";
+  }
+  if (session.retractionFlag && (isRetraction || isSarcastic)) {
+    session.retractionConfirmed = true;
+    session.level = "false_report";
+  }
+} else if (isThreat) {
+  session.confirmedThreats.add(text);
+  if (session.level === "retracted") {
+    session.level = "pending"; // re-escalating
+  } else if (session.level === "none") {
+    session.level = "pending";
+  } else {
+    session.level = "active";
+  }
+}
+
+escalationMemory[callerId] = session;
+
+//------------------------------------------------------------
+// ✅ STEP 3 — Generate Responses Based on Escalation State
+
+let aiResponse = "";
+let responderNotice = "";
+let routeToResponder = false;
+let incidentCode = "";
+
+switch (session.level) {
+  case "pending":
+    aiResponse = "Emergency confirmed. Stay on the line. Please describe what you're seeing now.";
+    responderNotice = "Threat confirmed. Awaiting detail.";
+    routeToResponder = true;
+    break;
+  case "active":
+    aiResponse = "Emergency confirmed. Units are being dispatched. How many people are involved?";
+    responderNotice = "Full dispatch active.";
+    routeToResponder = true;
+    break;
+  case "retracted":
+    aiResponse = "Warning: Your statements contradict earlier threat. Please clarify immediately.";
+    responderNotice = "⚠️ Caller retracted prior threat. Pause full deployment.";
+    routeToResponder = true;
+    break;
+  case "false_report":
+    aiResponse = "🚨 You are now flagged for false emergency reporting. This is a criminal offense. Logged.";
+    responderNotice = "❌ Emergency log cancelled. Caller flagged for false report. Admin review required.";
+    routeToResponder = false;
+    incidentCode = "FALSE_EMERGENCY";
+    break;
+  default:
+    aiResponse = "Please describe the emergency in detail.";
+    routeToResponder = false;
+}
+
+return res.json({
+  aiResponse,
+  routeToResponder,
+  escalationLevel: session.level,
+  responderNotice,
+  incidentCode: incidentCode || null
+});

@@ -1,6 +1,10 @@
 // 🔧 Context Memory Singleton for Emergency Dialogue Sessions
 // Maintains volatile memory of caller interactions for intelligent escalation
 
+import { assessEmergencyContext, generateOperatorResponse } from './operatorSOP';
+import { detectCrankCall, shouldEscalateToAdmin, logCrankCall } from './crankDetector';
+import { processEscalation } from './escalationEngine';
+
 export interface SessionContext {
   threatScore: number;
   mentionedKeywords: Set<string>;
@@ -148,9 +152,6 @@ export function updateSessionContext(
   return context;
 }
 
-import { assessEmergencyContext, generateOperatorResponse } from './operatorSOP';
-import { detectCrankCall, shouldEscalateToAdmin, logCrankCall } from './crankDetector';
-
 // Enhanced 911 SOP-compliant response generation with crank detection
 export function generateEscalatingResponse(context: SessionContext, latestInput: string): {
   response: string;
@@ -162,11 +163,38 @@ export function generateEscalatingResponse(context: SessionContext, latestInput:
 } {
   const conversationHistory = context.conversationHistory.map(h => h.caller);
   
-  // Step 1: Check for crank call with enhanced escalation logic
-  const crankAnalysis = detectCrankCall(latestInput, conversationHistory);
-  const isHighEscalation = (context.escalationLevel || 0) >= 2;
+  // Step 1: Use intelligent escalation engine for enhanced retraction/contradiction handling
+  const escalationResult = processEscalation(context.callerId, latestInput);
   
-  if (crankAnalysis.isCrank && isHighEscalation) {
+  // Handle false reports detected by escalation engine
+  if (escalationResult.shouldBlock) {
+    logCrankCall(context.callerId, latestInput, ['Escalation engine detected false report']);
+    
+    return {
+      response: escalationResult.aiResponse,
+      shouldDispatch: false,
+      escalationLevel: 'initial',
+      crankDetected: true,
+      escalateToAdmin: true,
+      dispatchSummary: undefined
+    };
+  }
+  
+  // Handle contradiction/retraction states
+  if (escalationResult.escalationLevel === 'retracted') {
+    return {
+      response: escalationResult.aiResponse,
+      shouldDispatch: false, // Pause dispatch for contradictions
+      escalationLevel: 'gathering',
+      crankDetected: false,
+      escalateToAdmin: false,
+      dispatchSummary: undefined
+    };
+  }
+  
+  // Check for traditional crank patterns as backup
+  const crankAnalysis = detectCrankCall(latestInput, conversationHistory);
+  if (crankAnalysis.isCrank && crankAnalysis.confidence >= 80) {
     logCrankCall(context.callerId, latestInput, crankAnalysis.indicators);
     
     return {
@@ -176,46 +204,48 @@ export function generateEscalatingResponse(context: SessionContext, latestInput:
       crankDetected: true,
       escalateToAdmin: true
     };
-  } else if (crankAnalysis.isCrank) {
-    logCrankCall(context.callerId, latestInput, crankAnalysis.indicators);
+  }
+  
+  // Step 2: Process legitimate emergency using escalation engine results
+  if (escalationResult.routeToResponder) {
+    // Update critical info extraction
+    updateCriticalInfo(context, latestInput);
+    
+    // Create dispatch summary for active emergencies
+    let dispatchSummary: string | undefined;
+    if (escalationResult.escalationLevel === 'active') {
+      dispatchSummary = generateDispatchSummary(context);
+    }
+    
+    // Map escalation states to our system
+    const escalationMap: Record<string, 'initial' | 'gathering' | 'escalating' | 'dispatched'> = {
+      'none': 'initial',
+      'pending': 'gathering',
+      'active': 'dispatched',
+      'retracted': 'escalating',
+      'false_report': 'initial'
+    };
     
     return {
-      response: crankAnalysis.warningMessage || "This appears to be a false report. Emergency services are for genuine emergencies only.",
-      shouldDispatch: false, // CRITICAL: Block all dispatch for crank calls
-      escalationLevel: 'initial',
-      crankDetected: true,
-      escalateToAdmin: shouldEscalateToAdmin(crankAnalysis)
+      response: escalationResult.aiResponse,
+      shouldDispatch: escalationResult.escalationLevel === 'active',
+      escalationLevel: escalationMap[escalationResult.escalationLevel] || 'gathering',
+      dispatchSummary,
+      crankDetected: false,
+      escalateToAdmin: false
     };
   }
   
-  // Step 2: Assess emergency context using deductive reasoning
+  // Step 3: Fallback to traditional SOP for initial assessment
   const emergencyContext = assessEmergencyContext(latestInput, conversationHistory);
-  
-  // Step 3: Update critical info extraction
   updateCriticalInfo(context, latestInput);
-  
-  // Step 4: Generate response using enhanced SOP logic
   const sopResponse = generateOperatorResponse(emergencyContext, latestInput);
   
-  // Step 5: Create dispatch summary if needed
-  let dispatchSummary: string | undefined;
-  if (sopResponse.shouldDispatch) {
-    dispatchSummary = generateDispatchSummary(context);
-  }
-  
-  // Map SOP escalation levels to our system
-  const escalationMap: Record<string, 'initial' | 'gathering' | 'escalating' | 'dispatched'> = {
-    'INITIAL': 'initial',
-    'GATHERING': 'gathering', 
-    'ESCALATING': 'escalating',
-    'DISPATCHED': 'dispatched'
-  };
-  
   return {
-    response: sopResponse.response,
-    shouldDispatch: sopResponse.shouldDispatch,
-    escalationLevel: escalationMap[sopResponse.escalationLevel] || 'gathering',
-    dispatchSummary,
+    response: escalationResult.aiResponse || sopResponse.response,
+    shouldDispatch: false, // Initial assessment, no dispatch yet
+    escalationLevel: 'initial',
+    dispatchSummary: undefined,
     crankDetected: false,
     escalateToAdmin: false
   };

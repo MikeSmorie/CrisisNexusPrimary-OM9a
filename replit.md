@@ -134,6 +134,17 @@ DisasterMng-1-OM9 is a comprehensive emergency management and disaster response 
 
 ```
 Changelog:
+- July 29, 2025. Intelligent Escalation Engine & Advanced Crank Detection Complete
+  - Implemented sophisticated escalation state machine: none → pending → active → retracted → false_report
+  - Enhanced retraction detection: handles "just kidding", contradictions, and sarcastic responses
+  - Contradiction handling: system now pauses dispatch when callers retract earlier threats
+  - Multi-stage false report detection: traditional crank patterns + intelligent escalation analysis
+  - State-aware responses: different messages based on escalation level and retraction status
+  - Admin escalation for confirmed false reports with criminal offense warnings
+  - Contextual questioning intelligence that skips for detected crank calls
+  - Improved dispatch blocking: emergency resources protected from false alarms
+  - Professional 911 SOP compliance with threat-aware interrogation protocols
+
 - July 26, 2025. Emergency Dialogue System & EDTG Timestamp Fix Complete
   - Fixed CRITICAL EDTG issue: Enhanced Date-Time Group now locks to exact event timestamp instead of running clock
   - EDTG timestamps are immutable once created - essential for forensic logging and emergency audit trails
