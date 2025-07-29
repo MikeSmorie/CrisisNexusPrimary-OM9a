@@ -107,10 +107,25 @@ export function AgentTranslator({
 
         // Enhanced display with intelligent escalation analysis
         let crankStatus = '✅ Legitimate Emergency Call';
+        
         if (escalationResult.crankDetected) {
           crankStatus = '⚠️ FALSE REPORT DETECTED - DISPATCH BLOCKED';
-        } else if (escalationResult.escalationLevel === 'reactivated_case') {
-          crankStatus = '🔄 CASE REACTIVATED - UNDER REVIEW';
+        } else if (escalationResult.escalationLevel === 'reactivated' || escalationResult.escalationLevel === 'gathering') {
+          // Check responder notice for recovery indicators
+          if (escalationResult.responderNotice?.includes('RECOVERED FROM MISFLAG')) {
+            crankStatus = '🧠 Recovered From Misflag - DISPATCH RESUMED';
+          } else if (escalationResult.responderNotice?.includes('CASE REACTIVATED')) {
+            crankStatus = '🔄 CASE REACTIVATED - UNDER REVIEW';
+          }
+        }
+        
+        // Check for false report states via response content
+        if (escalationResult.response?.includes('flagged for false emergency reporting')) {
+          if (escalationResult.response?.includes('recovery attempts')) {
+            crankStatus = '⚠️ FALSE FLAG (recovery window active)';
+          } else {
+            crankStatus = '❌ FALSE FLAG (confirmed)';
+          }
         }
         
         const adminEscalation = escalationResult.escalateToAdmin ? '🚨 ADMIN NOTIFIED' : '';
@@ -121,6 +136,11 @@ export function AgentTranslator({
         if (detectedKeywords.includes('bleeding') || detectedKeywords.includes('injured')) contextTags.push('🩸 INJURY');
         if (detectedKeywords.includes('stuck') || detectedKeywords.includes('trapped')) contextTags.push('🚧 ENTRAPMENT');
         if (detectedKeywords.includes('drowning') || detectedKeywords.includes('water')) contextTags.push('🌊 WATER EMERGENCY');
+        
+        // Add recovery indicator if case was recovered from false flag
+        if (crankStatus.includes('Recovered From Misflag')) {
+          contextTags.push('🧠 Recovered From Misflag');
+        }
 
         const autoResponse = `
 🧠 [Enhanced AI Emergency SOP Analysis]

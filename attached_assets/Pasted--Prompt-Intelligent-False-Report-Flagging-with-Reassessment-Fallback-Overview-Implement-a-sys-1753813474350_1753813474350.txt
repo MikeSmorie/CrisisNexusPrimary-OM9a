@@ -1,0 +1,60 @@
+# Prompt: Intelligent False Report Flagging with Reassessment Fallback
+
+## Overview:
+Implement a system in the Emergency Module that:
+1. Detects and flags potential prank or false emergency reports.
+2. Issues a formal legal warning and logs device info.
+3. **But** also allows for intelligent reassessment if the user:
+   - Appears sincere in retracting the prank.
+   - Indicates they made a mistake (e.g., "wrong tab", "ongoing", "accident").
+   - Restates the emergency clearly.
+
+## Required Behavior:
+
+### 1. When prank is detected:
+- Display this warning:
+  ```text
+  🚨 You are now flagged for false emergency reporting. This is a criminal offense punishable by law. Your call details and device information have been logged for investigation.
+  ```
+- Escalation is paused.
+- Mark status: `flagged_for_false_reporting = true`.
+
+### 2. Fallback Recovery Logic:
+If within the next 3 caller messages any of the following patterns are detected:
+  - “sorry… meant to send that elsewhere”
+  - “this emergency is ongoing”
+  - “I made a mistake”
+  - “please help”
+  - “I was wrong / misclicked”
+  - Message includes a *repeat of the original emergency description*
+
+THEN:
+- Unflag the call: `flagged_for_false_reporting = false`
+- Re-evaluate context tags and threat level
+- IF danger is still valid:
+  - Re-initiate dispatch logic.
+  - Log:
+    ```text
+    ✅ Emergency re-evaluation complete. Dispatch resuming. Caller reinstated after clarification.
+    ```
+
+### 3. System Tagging:
+- Add a contextual badge: `🧠 Recovered From Misflag`
+- Add audit trail entry with timestamps and rationale for reinstatement.
+
+## AI Translator / Operator Message Examples:
+- After reinstatement:
+  ```text
+  We have reassessed your report based on your clarification. Emergency dispatch has resumed. Stay on the line and provide updates.
+  ```
+
+- If prank is confirmed without recovery:
+  ```text
+  Your actions have been logged and forwarded to authorities. Misuse of emergency services is a serious offense.
+  ```
+
+## Additional Notes:
+- Retain all original messages in full dialogue log with flags.
+- Status tags must reflect: `FALSE FLAG (recovered)` or `FALSE FLAG (confirmed)`.
+
+# Execute this update across Emergency Module logic immediately.

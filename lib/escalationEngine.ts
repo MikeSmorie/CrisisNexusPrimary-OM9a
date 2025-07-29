@@ -12,6 +12,11 @@ export interface EscalationSession {
   conversationTurns: number;
   initialThreatTime?: number;
   reactivated: boolean;
+  flaggedForFalseReporting: boolean;
+  recoveryAttempts: number;
+  originalEmergencyDescription?: string;
+  flaggedMessages: string[];
+  recoveryWindowActive: boolean;
 }
 
 export const escalationMemory: Record<string, EscalationSession> = {};
@@ -34,7 +39,11 @@ export function processEscalation(callerId: string, transcribedText: string): Es
     retractionFlag: false,
     retractionConfirmed: false,
     conversationTurns: 0,
-    reactivated: false
+    reactivated: false,
+    flaggedForFalseReporting: false,
+    recoveryAttempts: 0,
+    flaggedMessages: [],
+    recoveryWindowActive: false
   };
 
   const text = transcribedText.toLowerCase();
@@ -52,17 +61,39 @@ export function processEscalation(callerId: string, transcribedText: string): Es
   
   // Apology or correction detection for reactivation
   const isApologyOrCorrection = /sorry|mistake|meant to|this is real|still ongoing|continuing|actually happening|i was wrong/.test(text);
+  
+  // Enhanced recovery patterns for false report reassessment
+  const isRecoveryPattern = /sorry.*meant to send that elsewhere|this emergency is ongoing|i made a mistake|please help|i was wrong|misclicked|wrong tab|accident/.test(text);
+  
+  // Check if message contains repeat of original emergency description
+  const containsOriginalEmergency = session.originalEmergencyDescription && 
+    text.includes(session.originalEmergencyDescription.toLowerCase());
 
-  // STEP 1: Check for reactivation of false report cases
-  if (session.level === "false_report" && isApologyOrCorrection && isThreat) {
-    session.level = "reactivated_case";
-    session.reactivated = true;
-    session.retractionConfirmed = false;
-    session.retractionFlag = false;
+  // STEP 1: Enhanced Recovery Logic for False Report Reassessment
+  if (session.level === "false_report" && session.recoveryAttempts < 3) {
+    session.recoveryAttempts++;
     
-    // Extract new threat words for reactivated case
-    const threatWords = text.match(/shark|blood|gun|fire|injured|missing|attack|drowning|emergency|help|trapped|accident|screaming/g) || [];
-    threatWords.forEach(threat => session.confirmedThreats.add(threat));
+    // Check for recovery patterns within 3-message window
+    if (isRecoveryPattern || containsOriginalEmergency || (isApologyOrCorrection && isThreat)) {
+      // Unflag and reassess
+      session.flaggedForFalseReporting = false;
+      session.level = "reactivated_case";
+      session.reactivated = true;
+      session.retractionConfirmed = false;
+      session.retractionFlag = false;
+      session.recoveryWindowActive = false;
+      
+      // Store original emergency context if first threat detected
+      if (!session.originalEmergencyDescription && isThreat) {
+        session.originalEmergencyDescription = transcribedText;
+      }
+      
+      // Extract threat words for reactivated case
+      const threatWords = text.match(/shark|blood|gun|fire|injured|missing|attack|drowning|emergency|help|trapped|accident|screaming/g) || [];
+      threatWords.forEach(threat => session.confirmedThreats.add(threat));
+      
+      console.log(`✅ Emergency re-evaluation complete. Dispatch resuming. Caller reinstated after clarification.`);
+    }
   }
   // STEP 2: Process retractions and sarcasm (only if not reactivated)
   else if (isRetraction || isSarcastic) {
@@ -73,6 +104,14 @@ export function processEscalation(callerId: string, transcribedText: string): Es
     if (session.retractionFlag && (isRetraction || isSarcastic)) {
       session.retractionConfirmed = true;
       session.level = "false_report";
+      session.flaggedForFalseReporting = true;
+      session.recoveryWindowActive = true;
+      session.flaggedMessages.push(transcribedText);
+      
+      // Store original emergency context for potential recovery
+      if (!session.originalEmergencyDescription && session.confirmedThreats.size > 0) {
+        session.originalEmergencyDescription = session.lastText;
+      }
     }
   } 
   // STEP 3: Process threat escalation
@@ -128,18 +167,30 @@ function generateEscalationResponse(session: EscalationSession): EscalationResul
       break;
 
     case "reactivated_case":
-      aiResponse = "⚠️ Emergency session reactivated based on updated information. Please reconfirm: Where is the incident happening now? Describe the current situation.";
-      responderNotice = `🔄 CASE REACTIVATED: Caller provided correction after false report flag (${threatList}). Proceeding with caution - verify legitimacy.`;
+      if (session.flaggedForFalseReporting === false && session.reactivated) {
+        aiResponse = "We have reassessed your report based on your clarification. Emergency dispatch has resumed. Stay on the line and provide updates on the current situation.";
+        responderNotice = `🧠 RECOVERED FROM MISFLAG: Caller provided valid correction (${threatList}). Emergency re-evaluation complete - dispatch resuming.`;
+      } else {
+        aiResponse = "⚠️ Emergency session reactivated based on updated information. Please reconfirm: Where is the incident happening now? Describe the current situation.";
+        responderNotice = `🔄 CASE REACTIVATED: Caller provided correction after false report flag (${threatList}). Proceeding with caution - verify legitimacy.`;
+      }
       routeToResponder = true;
       incidentCode = "REACTIVATED_CASE_UNDER_REVIEW";
       shouldBlock = false;
       break;
 
     case "false_report":
-      aiResponse = "🚨 You are flagged for false emergency reporting. This is a criminal offense punishable by law. Your call details and device information have been logged for investigation.";
-      responderNotice = `❌ EMERGENCY LOG CANCELLED: Caller confirmed false report (${threatList}). Admin review required. NO DISPATCH.`;
+      if (session.recoveryAttempts >= 3) {
+        aiResponse = "Your actions have been logged and forwarded to authorities. Misuse of emergency services is a serious offense.";
+        responderNotice = `❌ FALSE FLAG (confirmed): Multiple recovery attempts failed (${threatList}). Admin review required. NO DISPATCH.`;
+        incidentCode = "FALSE_EMERGENCY_CONFIRMED";
+      } else {
+        aiResponse = "🚨 You are now flagged for false emergency reporting. This is a criminal offense punishable by law. Your call details and device information have been logged for investigation.";
+        responderNotice = `⚠️ FALSE FLAG (recovery window active): Caller flagged for false report (${threatList}). ${3 - session.recoveryAttempts} recovery attempts remaining.`;
+        incidentCode = "FALSE_EMERGENCY";
+      }
+      
       routeToResponder = false;
-      incidentCode = "FALSE_EMERGENCY";
       shouldBlock = true;
       break;
 

@@ -196,13 +196,17 @@ export function generateEscalatingResponse(context: SessionContext, latestInput:
   if (escalationResult.escalationLevel === 'reactivated_case') {
     updateCriticalInfo(context, latestInput);
     
+    // Check if this is a successful recovery from false flag
+    const isRecoveredFromMisflag = escalationResult.incidentCode === "REACTIVATED_CASE_UNDER_REVIEW" && 
+                                  escalationResult.responderNotice?.includes('RECOVERED FROM MISFLAG');
+    
     return {
       response: escalationResult.aiResponse,
-      shouldDispatch: false, // Require verification before dispatch
-      escalationLevel: 'gathering',
+      shouldDispatch: isRecoveredFromMisflag, // Allow dispatch for successful recoveries
+      escalationLevel: isRecoveredFromMisflag ? 'dispatched' : 'gathering',
       crankDetected: false,
       escalateToAdmin: false,
-      dispatchSummary: undefined
+      dispatchSummary: isRecoveredFromMisflag ? generateDispatchSummary(context) : undefined
     };
   }
   
