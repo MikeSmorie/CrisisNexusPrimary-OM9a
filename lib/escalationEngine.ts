@@ -1,7 +1,7 @@
 // 🔧 Intelligent Escalation Engine — Reacts to Retraction, Escalation, Contradiction
 // Enhanced version of the emergency escalation system with state management
 
-type EscalationState = "none" | "pending" | "active" | "retracted" | "false_report";
+type EscalationState = "none" | "pending" | "active" | "retracted" | "false_report" | "reactivated_case";
 
 export interface EscalationSession {
   level: EscalationState;
@@ -11,6 +11,7 @@ export interface EscalationSession {
   retractionConfirmed: boolean;
   conversationTurns: number;
   initialThreatTime?: number;
+  reactivated: boolean;
 }
 
 export const escalationMemory: Record<string, EscalationSession> = {};
@@ -32,7 +33,8 @@ export function processEscalation(callerId: string, transcribedText: string): Es
     confirmedThreats: new Set(),
     retractionFlag: false,
     retractionConfirmed: false,
-    conversationTurns: 0
+    conversationTurns: 0,
+    reactivated: false
   };
 
   const text = transcribedText.toLowerCase();
@@ -40,16 +42,30 @@ export function processEscalation(callerId: string, transcribedText: string): Es
   session.conversationTurns++;
 
   // Enhanced threat detection
-  const isThreat = /shark|blood|gun|fire|injured|missing|attack|drowning|emergency|help|trapped|accident/.test(text);
+  const isThreat = /shark|blood|gun|fire|injured|missing|attack|drowning|emergency|help|trapped|accident|screaming/.test(text);
   
   // Enhanced retraction detection
   const isRetraction = /just kidding|not really|i made it up|wasn't serious|false alarm|joking|kidding|made up|fake|lie/.test(text);
   
   // Sarcastic or dismissive responses
   const isSarcastic = /don't you think it's funny|lol|haha|funny|hilarious|joke|prank/.test(text);
+  
+  // Apology or correction detection for reactivation
+  const isApologyOrCorrection = /sorry|mistake|meant to|this is real|still ongoing|continuing|actually happening|i was wrong/.test(text);
 
-  // Process retractions and sarcasm
-  if (isRetraction || isSarcastic) {
+  // STEP 1: Check for reactivation of false report cases
+  if (session.level === "false_report" && isApologyOrCorrection && isThreat) {
+    session.level = "reactivated_case";
+    session.reactivated = true;
+    session.retractionConfirmed = false;
+    session.retractionFlag = false;
+    
+    // Extract new threat words for reactivated case
+    const threatWords = text.match(/shark|blood|gun|fire|injured|missing|attack|drowning|emergency|help|trapped|accident|screaming/g) || [];
+    threatWords.forEach(threat => session.confirmedThreats.add(threat));
+  }
+  // STEP 2: Process retractions and sarcasm (only if not reactivated)
+  else if (isRetraction || isSarcastic) {
     if (session.level === "active" || session.level === "pending") {
       session.retractionFlag = true;
       session.level = "retracted";
@@ -59,7 +75,7 @@ export function processEscalation(callerId: string, transcribedText: string): Es
       session.level = "false_report";
     }
   } 
-  // Process threat escalation
+  // STEP 3: Process threat escalation
   else if (isThreat) {
     // Extract specific threat words
     const threatWords = text.match(/shark|blood|gun|fire|injured|missing|attack|drowning|emergency|help|trapped|accident/g) || [];
@@ -111,8 +127,16 @@ function generateEscalationResponse(session: EscalationSession): EscalationResul
       routeToResponder = true; // Still route but with warning
       break;
 
+    case "reactivated_case":
+      aiResponse = "⚠️ Emergency session reactivated based on updated information. Please reconfirm: Where is the incident happening now? Describe the current situation.";
+      responderNotice = `🔄 CASE REACTIVATED: Caller provided correction after false report flag (${threatList}). Proceeding with caution - verify legitimacy.`;
+      routeToResponder = true;
+      incidentCode = "REACTIVATED_CASE_UNDER_REVIEW";
+      shouldBlock = false;
+      break;
+
     case "false_report":
-      aiResponse = "🚨 You are now flagged for false emergency reporting. This is a criminal offense punishable by law. Your call details and device information have been logged for investigation.";
+      aiResponse = "🚨 You are flagged for false emergency reporting. This is a criminal offense punishable by law. Your call details and device information have been logged for investigation.";
       responderNotice = `❌ EMERGENCY LOG CANCELLED: Caller confirmed false report (${threatList}). Admin review required. NO DISPATCH.`;
       routeToResponder = false;
       incidentCode = "FALSE_EMERGENCY";

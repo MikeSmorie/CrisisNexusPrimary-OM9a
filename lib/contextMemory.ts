@@ -192,6 +192,20 @@ export function generateEscalatingResponse(context: SessionContext, latestInput:
     };
   }
   
+  // Handle reactivated cases with special caution
+  if (escalationResult.escalationLevel === 'reactivated_case') {
+    updateCriticalInfo(context, latestInput);
+    
+    return {
+      response: escalationResult.aiResponse,
+      shouldDispatch: false, // Require verification before dispatch
+      escalationLevel: 'gathering',
+      crankDetected: false,
+      escalateToAdmin: false,
+      dispatchSummary: undefined
+    };
+  }
+  
   // Check for traditional crank patterns as backup
   const crankAnalysis = detectCrankCall(latestInput, conversationHistory);
   if (crankAnalysis.isCrank && crankAnalysis.confidence >= 80) {
@@ -223,7 +237,8 @@ export function generateEscalatingResponse(context: SessionContext, latestInput:
       'pending': 'gathering',
       'active': 'dispatched',
       'retracted': 'escalating',
-      'false_report': 'initial'
+      'false_report': 'initial',
+      'reactivated_case': 'gathering'
     };
     
     return {

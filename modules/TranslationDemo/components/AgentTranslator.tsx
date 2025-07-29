@@ -106,7 +106,13 @@ export function AgentTranslator({
         }
 
         // Enhanced display with intelligent escalation analysis
-        const crankStatus = escalationResult.crankDetected ? '⚠️ FALSE REPORT DETECTED - DISPATCH BLOCKED' : '✅ Legitimate Emergency Call';
+        let crankStatus = '✅ Legitimate Emergency Call';
+        if (escalationResult.crankDetected) {
+          crankStatus = '⚠️ FALSE REPORT DETECTED - DISPATCH BLOCKED';
+        } else if (escalationResult.escalationLevel === 'reactivated_case') {
+          crankStatus = '🔄 CASE REACTIVATED - UNDER REVIEW';
+        }
+        
         const adminEscalation = escalationResult.escalateToAdmin ? '🚨 ADMIN NOTIFIED' : '';
         const escalationStatus = escalationResult.escalationLevel ? `📊 Stage: ${escalationResult.escalationLevel.toUpperCase()}` : '';
         
