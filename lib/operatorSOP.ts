@@ -41,6 +41,28 @@ export function getFollowUpQuestions(context: EmergencyContext): string[] {
   return questions;
 }
 
+// 🔧 PATCH: Smart Threat-Aware Interrogation
+export function getContextualQuestions(context: {
+  history: string[];
+  threatWords: string[];
+  missingPeople: boolean;
+  bloodSeen: boolean;
+  reducedHeadcount: boolean;
+}): string[] {
+  const q: string[] = [];
+
+  if (context.bloodSeen && !context.missingPeople)
+    q.push("You said there's blood in the water — is someone visibly bleeding?");
+  if (context.reducedHeadcount)
+    q.push("You said one swimmer is missing — can you see where they went under?");
+  if (context.threatWords.includes("shark"))
+    q.push("Is the shark still visible? Is it circling or moving away?");
+  if (!q.length)
+    q.push("Please describe what you're seeing now. Is there still panic?");
+
+  return q;
+}
+
 export function assessEmergencyContext(text: string, conversationHistory: string[]): EmergencyContext {
   const lower = text.toLowerCase();
   const fullConversation = conversationHistory.join(' ').toLowerCase();

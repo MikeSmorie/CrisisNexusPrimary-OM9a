@@ -6,6 +6,7 @@ import {
   getSessionContext,
   cleanupOldSessions 
 } from '../../../lib/contextMemory';
+import { getContextualQuestions } from '../../../lib/operatorSOP';
 
 export function AgentTranslator({
   input,
@@ -38,8 +39,22 @@ export function AgentTranslator({
         // Generate intelligent escalating response
         const escalationResult = generateEscalatingResponse(currentContext, input);
         
+        // Apply contextual questioning for smart threat-aware interrogation
+        const contextualQuestions = getContextualQuestions({
+          history: currentContext.conversationHistory.map(h => h.caller),
+          threatWords: Array.from(currentContext.activeThreats || []),
+          missingPeople: /missing|gone|disappeared/.test(input.toLowerCase()),
+          bloodSeen: /blood/.test(input.toLowerCase()),
+          reducedHeadcount: /only (one|two|three)/.test(input.toLowerCase())
+        });
+        
+        // Use contextual question if available and not dispatching
+        const finalResponse = !escalationResult.shouldDispatch && contextualQuestions.length > 0 
+          ? contextualQuestions[0] 
+          : escalationResult.response;
+        
         // Update session context with new dialogue
-        const updatedContext = updateSessionContext(callerId, input, escalationResult.response);
+        const updatedContext = updateSessionContext(callerId, input, finalResponse);
         
         // Route to responder if dispatch threshold is met
         if (escalationResult.shouldDispatch && escalationResult.dispatchSummary) {
@@ -51,13 +66,22 @@ export function AgentTranslator({
         }
 
         // Set operator message for caller display
-        console.log('🧠 Setting operator message:', escalationResult.response);
-        setOperatorMessage(escalationResult.response);
+        console.log('🧠 Setting operator message:', finalResponse);
+        setOperatorMessage(finalResponse);
+        
+        // Handle severe crank call escalation
+        if (escalationResult.escalateToAdmin) {
+          console.warn('🚨 ADMIN ESCALATION: Severe crank call detected', {
+            callerId,
+            input,
+            escalationLevel: updatedContext.escalationLevel
+          });
+        }
 
         // Build dialogue history for comprehensive log
         const newDialogueEntry = {
           caller: input,
-          operator: escalationResult.response
+          operator: finalResponse
         };
         
         const updatedHistory = [...dialogueHistory, newDialogueEntry];

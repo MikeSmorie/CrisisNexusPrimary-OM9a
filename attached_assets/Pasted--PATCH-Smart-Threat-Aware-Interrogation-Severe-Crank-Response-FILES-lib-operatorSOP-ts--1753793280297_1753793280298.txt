@@ -1,0 +1,65 @@
+// 🔧 PATCH: Smart Threat-Aware Interrogation + Severe Crank Response
+// FILES: /lib/operatorSOP.ts, /api/process-voice.ts, AITranslator.tsx, AdminAlerts.tsx
+
+//------------------------------------------------------------
+// ✅ STEP 1 — Expand Follow-Up Intelligence (lib/operatorSOP.ts)
+
+export function getContextualQuestions(context: {
+  history: string[];
+  threatWords: string[];
+  missingPeople: boolean;
+  bloodSeen: boolean;
+  reducedHeadcount: boolean;
+}): string[] {
+  const q: string[] = [];
+
+  if (context.bloodSeen && !context.missingPeople)
+    q.push("You said there’s blood in the water — is someone visibly bleeding?");
+  if (context.reducedHeadcount)
+    q.push("You said one swimmer is missing — can you see where they went under?");
+  if (context.threatWords.includes("shark"))
+    q.push("Is the shark still visible? Is it circling or moving away?");
+  if (!q.length)
+    q.push("Please describe what you're seeing now. Is there still panic?");
+
+  return q;
+}
+
+//------------------------------------------------------------
+// ✅ STEP 2 — Add Enhanced Crank Detection Severity (process-voice.ts)
+
+const isCrank = detectCrankCall(transcribedText);
+const isHighEscalation = (memory[callerId]?.escalationLevel || 0) >= 2;
+
+if (isCrank && isHighEscalation) {
+  return res.json({
+    routeToResponder: false,
+    aiResponse: "🚨 This is a criminal act. False reports endanger lives. Your identity and device fingerprint have been logged. Authorities will be notified.",
+    flagCrank: true,
+    escalateToAdmin: true,
+    incidentCode: "FALSE_EMERGENCY"
+  });
+}
+
+//------------------------------------------------------------
+// ✅ STEP 3 — Apply Contextual Questioning (back in process-voice.ts)
+import { getContextualQuestions } from "@/lib/operatorSOP";
+
+const questions = getContextualQuestions({
+  history: memory[callerId].history,
+  threatWords: Array.from(memory[callerId].activeThreats),
+  bloodSeen: /blood/.test(transcribedText.toLowerCase()),
+  missingPeople: /missing|gone|disappeared/.test(transcribedText.toLowerCase()),
+  reducedHeadcount: /only (one|two|three)/.test(transcribedText.toLowerCase())
+});
+
+return res.json({
+  aiResponse: questions[0],
+  routeToResponder: escalate,
+  threatProfile: {
+    threatWords: Array.from(memory[callerId].activeThreats),
+    escalationLevel: memory[callerId].escalationLevel,
+    missingDetected: context.missingPeople
+  }
+});
+

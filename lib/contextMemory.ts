@@ -6,6 +6,8 @@ export interface SessionContext {
   mentionedKeywords: Set<string>;
   lastUpdate: number;
   callerId: string;
+  escalationLevel: number; // Added for smart interrogation
+  activeThreats: Set<string>; // Added for contextual questions
   conversationHistory: Array<{
     caller: string;
     operator: string;
@@ -98,6 +100,8 @@ export function getSessionContext(callerId: string): SessionContext {
       mentionedKeywords: new Set(),
       lastUpdate: Date.now(),
       callerId,
+      escalationLevel: 0,
+      activeThreats: new Set(),
       conversationHistory: [],
       criticalInfo: {}
     };
@@ -118,6 +122,21 @@ export function updateSessionContext(
   keywords.forEach(k => context.mentionedKeywords.add(k));
   context.threatScore = Math.min(context.threatScore + score, 100);
   context.lastUpdate = Date.now();
+  
+  // Update escalation level based on conversation length and threat score
+  context.escalationLevel = Math.min(
+    Math.floor(context.conversationHistory.length / 2) + 
+    Math.floor(context.threatScore / 30), 
+    5
+  );
+  
+  // Track active threats for contextual questioning
+  const threatWords = ['shark', 'drowning', 'bleeding', 'attack', 'trapped', 'fire', 'accident'];
+  threatWords.forEach(threat => {
+    if (callerInput.toLowerCase().includes(threat)) {
+      context.activeThreats.add(threat);
+    }
+  });
   
   // Add to conversation history
   context.conversationHistory.push({
@@ -143,9 +162,21 @@ export function generateEscalatingResponse(context: SessionContext, latestInput:
 } {
   const conversationHistory = context.conversationHistory.map(h => h.caller);
   
-  // Step 1: Check for crank call
+  // Step 1: Check for crank call with enhanced escalation logic
   const crankAnalysis = detectCrankCall(latestInput, conversationHistory);
-  if (crankAnalysis.isCrank) {
+  const isHighEscalation = (context.escalationLevel || 0) >= 2;
+  
+  if (crankAnalysis.isCrank && isHighEscalation) {
+    logCrankCall(context.callerId, latestInput, crankAnalysis.indicators);
+    
+    return {
+      response: "🚨 This is a criminal act. False reports endanger lives. Your identity and device fingerprint have been logged. Authorities will be notified.",
+      shouldDispatch: false,
+      escalationLevel: 'initial',
+      crankDetected: true,
+      escalateToAdmin: true
+    };
+  } else if (crankAnalysis.isCrank) {
     logCrankCall(context.callerId, latestInput, crankAnalysis.indicators);
     
     return {

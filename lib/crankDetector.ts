@@ -5,6 +5,8 @@ export interface CrankAnalysis {
   confidence: number;
   indicators: string[];
   warningMessage?: string;
+  escalateToAdmin?: boolean;
+  incidentCode?: string;
 }
 
 export function detectCrankCall(text: string, conversationHistory: string[] = []): CrankAnalysis {
@@ -83,11 +85,23 @@ export function detectCrankCall(text: string, conversationHistory: string[] = []
     warningMessage = "⚠️ CRANK CALL DETECTED: False emergency reporting is a criminal offense. This call and your device information have been logged for investigation.";
   }
   
+  // Enhanced crank response based on escalation level
+  let escalateToAdmin = false;
+  let incidentCode: string | undefined;
+  
+  if (isCrank && confidence >= 80) {
+    warningMessage = "🚨 This is a criminal act. False reports endanger lives. Your identity and device fingerprint have been logged. Authorities will be notified.";
+    escalateToAdmin = true;
+    incidentCode = "FALSE_EMERGENCY";
+  }
+  
   return {
     isCrank,
     confidence,
     indicators,
-    warningMessage
+    warningMessage,
+    escalateToAdmin,
+    incidentCode
   };
 }
 
