@@ -49,13 +49,32 @@ export function getContextualQuestions(context: {
   bloodSeen: boolean;
   reducedHeadcount: boolean;
 }): string[] {
-  const q: string[] = [];
+  const fullHistory = context.history.join(' ').toLowerCase();
+  
+  // CRITICAL: Shark attack scenario - immediate dispatch
+  if (context.threatWords.includes("shark") && (context.bloodSeen || context.missingPeople || context.reducedHeadcount)) {
+    return ["CONFIRMED SHARK ATTACK - DISPATCHING COAST GUARD AND EMERGENCY MEDICAL. Stay on the line. Are there any other people in immediate danger?"];
+  }
+  
+  // CRITICAL: Missing swimmer with blood in water
+  if (context.missingPeople && context.bloodSeen) {
+    return ["EMERGENCY CONFIRMED. Units are being dispatched. Stay on the line. How many people are involved? Are they conscious and responding?"];
+  }
+  
+  // CRITICAL: Multiple danger indicators
+  if ((context.missingPeople && fullHistory.includes("panic")) || 
+      (context.bloodSeen && fullHistory.includes("fin")) ||
+      (context.reducedHeadcount && context.threatWords.length > 0)) {
+    return ["EMERGENCY CONFIRMED. Units are being dispatched. Stay on the line. How many people are involved? Are they conscious and responding?"];
+  }
 
+  // Standard follow-up questions for less critical scenarios
+  const q: string[] = [];
   if (context.bloodSeen && !context.missingPeople)
     q.push("You said there's blood in the water — is someone visibly bleeding?");
-  if (context.reducedHeadcount)
+  if (context.reducedHeadcount && !context.bloodSeen)
     q.push("You said one swimmer is missing — can you see where they went under?");
-  if (context.threatWords.includes("shark"))
+  if (context.threatWords.includes("shark") && !context.bloodSeen)
     q.push("Is the shark still visible? Is it circling or moving away?");
   if (!q.length)
     q.push("Please describe what you're seeing now. Is there still panic?");

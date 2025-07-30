@@ -50,8 +50,16 @@ export function processEscalation(callerId: string, transcribedText: string): Es
   session.lastText = transcribedText;
   session.conversationTurns++;
 
-  // Enhanced threat detection
+  // Enhanced threat detection with immediate dispatch triggers
   const isThreat = /shark|blood|gun|fire|injured|missing|attack|drowning|emergency|help|trapped|accident|screaming/.test(text);
+  
+  // CRITICAL THREATS requiring immediate dispatch
+  const isCriticalThreat = /shark.*blood|missing.*swimmer|disappeared.*water|fin.*circling|attack.*water|blood.*water.*fin/.test(text) ||
+    (text.includes("shark") && (text.includes("blood") || text.includes("missing") || text.includes("disappeared"))) ||
+    (text.includes("swimmers") && text.includes("panicking") && text.includes("fin")) ||
+    (text.includes("blood in the water") || text.includes("swimmer") && text.includes("disappeared")) ||
+    (text.includes("fin") && text.includes("circling")) ||
+    (session.conversationTurns > 1 && text.includes("shark") && session.lastText.includes("panic"));
   
   // Enhanced retraction detection
   const isRetraction = /just kidding|not really|i made it up|wasn't serious|false alarm|joking|kidding|made up|fake|lie/.test(text);
@@ -114,19 +122,24 @@ export function processEscalation(callerId: string, transcribedText: string): Es
       }
     }
   } 
-  // STEP 3: Process threat escalation
+  // STEP 3: Process threat escalation with immediate critical threat handling
   else if (isThreat) {
     // Extract specific threat words
     const threatWords = text.match(/shark|blood|gun|fire|injured|missing|attack|drowning|emergency|help|trapped|accident/g) || [];
     threatWords.forEach(threat => session.confirmedThreats.add(threat));
     
-    if (session.level === "retracted") {
+    // IMMEDIATE DISPATCH for critical threats
+    if (isCriticalThreat) {
+      session.level = "active";
+      session.initialThreatTime = Date.now();
+      console.log(`🚨 CRITICAL THREAT DETECTED: Immediate dispatch triggered for ${threatWords.join(', ')}`);
+    } else if (session.level === "retracted") {
       // Re-escalating after retraction - suspicious
       session.level = "pending";
     } else if (session.level === "none") {
       session.level = "pending";
       session.initialThreatTime = Date.now();
-    } else if (session.level === "pending" && session.conversationTurns >= 2) {
+    } else if (session.level === "pending" && session.conversationTurns >= 1) {
       session.level = "active";
     }
   }

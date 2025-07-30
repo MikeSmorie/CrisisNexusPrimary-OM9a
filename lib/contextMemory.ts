@@ -38,16 +38,25 @@ export const sessionMemory: Record<string, SessionContext> = {};
 // Emergency keyword scoring system
 export function scoreEmergencyWords(text: string): { keywords: string[], score: number } {
   const emergencyMap = {
-    // Critical danger words (40% each)
-    "shark": 40,
-    "drowning": 40, 
-    "bleeding": 40,
-    "attack": 40,
-    "attacked": 40,
+    // CRITICAL DISPATCH TRIGGERS - Immediate 80%+ score
+    "shark": 80,        // Shark = immediate critical threat
+    "shark attack": 90,
+    "blood in water": 85,
+    "missing swimmer": 85,
+    "disappeared": 70,  // Person disappeared = critical
+    "fin circling": 90,
+    
+    // Critical danger words (60% each)
+    "drowning": 60, 
+    "bleeding": 50,
+    "attack": 50,
+    "attacked": 50,
     "stuck": 50,        // CRITICAL: stuck under car = immediate dispatch
     "trapped": 45,
     "crushed": 50,
     "pinned": 45,
+    "panicking": 40,    // Multiple people panicking = serious
+    "swimmers": 30,     // Combined with other words increases score
     
     // High urgency words (30% each)
     "trouble": 30,
