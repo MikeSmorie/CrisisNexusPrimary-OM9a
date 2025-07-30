@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { db } from "../../db";
-import { disasterUsers, disasterIncidents, disasterResources, disasterAlerts, disasterActivityLogs, disasterCommunications } from "../../db/disaster-schema";
+import { users } from "../../db/schema";
+import { disasterIncidents, disasterResources, disasterAlerts, disasterActivityLogs, disasterCommunications } from "../../db/disaster-schema";
 import { eq, desc, and } from "drizzle-orm";
 import { createIncident, checkEscalationTriggers } from "../lib/escalationEngine";
 
@@ -9,13 +10,10 @@ const router = Router();
 // Get all active incidents
 router.get("/incidents", async (req, res) => {
   try {
-    const incidents = await db.query.disasterIncidents.findMany({
-      orderBy: [desc(disasterIncidents.createdAt)],
-      with: {
-        reporter: true,
-        commander: true
-      }
-    });
+    const incidents = await db
+      .select()
+      .from(disasterIncidents)
+      .orderBy(desc(disasterIncidents.createdAt));
     res.json(incidents);
   } catch (error) {
     console.error("Error fetching incidents:", error);
@@ -26,12 +24,10 @@ router.get("/incidents", async (req, res) => {
 // Get active alerts
 router.get("/alerts", async (req, res) => {
   try {
-    const alerts = await db.query.disasterAlerts.findMany({
-      orderBy: [desc(disasterAlerts.createdAt)],
-      with: {
-        issuer: true
-      }
-    });
+    const alerts = await db
+      .select()
+      .from(disasterAlerts)
+      .orderBy(desc(disasterAlerts.createdAt));
     res.json(alerts);
   } catch (error) {
     console.error("Error fetching alerts:", error);
@@ -42,13 +38,10 @@ router.get("/alerts", async (req, res) => {
 // Get available resources
 router.get("/resources", async (req, res) => {
   try {
-    const resources = await db.query.disasterResources.findMany({
-      orderBy: [desc(disasterResources.updatedAt)],
-      with: {
-        operator: true,
-        incident: true
-      }
-    });
+    const resources = await db
+      .select()
+      .from(disasterResources)
+      .orderBy(desc(disasterResources.updatedAt));
     res.json(resources);
   } catch (error) {
     console.error("Error fetching resources:", error);
