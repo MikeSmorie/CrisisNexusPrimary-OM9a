@@ -3,7 +3,7 @@ import { IVerifyOptions, Strategy as LocalStrategy } from "passport-local";
 import { type Express } from "express";
 import session from "express-session";
 import createMemoryStore from "memorystore";
-import { disasterUsers, type SelectDisasterUser } from "../db/schema";
+import { users, type SelectUser } from "../db/schema";
 import { z } from "zod";
 import { db } from "../db";
 import { eq } from "drizzle-orm";
@@ -26,7 +26,7 @@ const MemoryStore = createMemoryStore(session);
 
 declare global {
   namespace Express {
-    interface User extends SelectDisasterUser { }
+    interface User extends SelectUser { }
   }
 }
 
@@ -58,8 +58,8 @@ export function setupAuth(app: Express) {
         console.log(`[DEBUG] Login attempt: { username: '${username}', skipEmailVerification: '${process.env.NODE_ENV}' }`);
         const [user] = await db
           .select()
-          .from(disasterUsers)
-          .where(eq(disasterUsers.username, username))
+          .from(users)
+          .where(eq(users.username, username))
           .limit(1);
 
         if (!user) {
@@ -74,13 +74,13 @@ export function setupAuth(app: Express) {
         const replitSandbox = process.env.REPLIT_DOMAINS || process.env.REPL_DOMAIN;
         const isSandboxEnvironment = isDevelopment || !!replitSandbox;
         
-        if (!user.isVerified && !isSandboxEnvironment) {
+        if (!user.is_verified && !isSandboxEnvironment) {
           console.log(`[DEBUG] User not verified: ${username}, isDev: ${isDevelopment}, sandbox: ${!!replitSandbox}`);
           return done(null, false, { message: "Please verify your emergency credentials before accessing the system." });
         }
 
         // Log sandbox bypass for transparency
-        if (!user.isVerified && isSandboxEnvironment) {
+        if (!user.is_verified && isSandboxEnvironment) {
           console.log(`[SANDBOX BYPASS] Emergency credential verification bypassed for user: ${username} in development environment`);
         }
 
@@ -91,9 +91,9 @@ export function setupAuth(app: Express) {
         }
 
         await db
-          .update(disasterUsers)
-          .set({ lastLogin: new Date() })
-          .where(eq(disasterUsers.id, user.id));
+          .update(users)
+          .set({ last_login: new Date() })
+          .where(eq(users.id, user.id));
 
         return done(null, user);
       } catch (err) {
