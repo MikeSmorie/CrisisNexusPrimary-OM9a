@@ -4,6 +4,7 @@
 import { assessEmergencyContext, generateOperatorResponse } from './operatorSOP';
 import { detectCrankCall, shouldEscalateToAdmin, logCrankCall } from './crankDetector';
 import { processEscalation } from './escalationEngine';
+import { assessThreatSeverity, generateOperatorResponse as generateProfessionalResponse } from './threatAssessment';
 
 export interface SessionContext {
   threatScore: number;
@@ -161,7 +162,7 @@ export function updateSessionContext(
   return context;
 }
 
-// Enhanced 911 SOP-compliant response generation with crank detection
+// Enhanced 911 SOP-compliant response generation with professional threat assessment
 export function generateEscalatingResponse(context: SessionContext, latestInput: string): {
   response: string;
   shouldDispatch: boolean;
@@ -169,10 +170,14 @@ export function generateEscalatingResponse(context: SessionContext, latestInput:
   dispatchSummary?: string;
   crankDetected?: boolean;
   escalateToAdmin?: boolean;
+  threatAssessment?: any;
 } {
   const conversationHistory = context.conversationHistory.map(h => h.caller);
   
-  // Step 1: Use intelligent escalation engine for enhanced retraction/contradiction handling
+  // Step 1: Professional threat assessment using real 911 protocols
+  const threatAssessment = assessThreatSeverity(latestInput, conversationHistory);
+  
+  // Step 2: Use intelligent escalation engine for enhanced retraction/contradiction handling
   const escalationResult = processEscalation(context.callerId, latestInput);
   
   // Handle false reports detected by escalation engine
@@ -233,8 +238,22 @@ export function generateEscalatingResponse(context: SessionContext, latestInput:
     };
   }
   
-  // Step 2: Process legitimate emergency using escalation engine results
-  if (escalationResult.routeToResponder) {
+  // Step 2: Process legitimate emergency using professional threat assessment + escalation engine
+  const shouldDispatch = threatAssessment.immediateDispatch || 
+                        threatAssessment.severityScore >= 4 ||
+                        escalationResult.routeToResponder;
+  
+  // Use professional threat assessment response if severity warrants it
+  let response: string;
+  if (threatAssessment.severityScore >= 6) {
+    response = generateProfessionalResponse(threatAssessment, latestInput);
+  } else if (escalationResult.routeToResponder) {
+    response = escalationResult.aiResponse;
+  } else {
+    response = generateProfessionalResponse(threatAssessment, latestInput);
+  }
+  
+  if (shouldDispatch) {
     // Update critical info extraction
     updateCriticalInfo(context, latestInput);
     
@@ -255,12 +274,13 @@ export function generateEscalatingResponse(context: SessionContext, latestInput:
     };
     
     return {
-      response: escalationResult.aiResponse,
-      shouldDispatch: escalationResult.escalationLevel === 'active',
-      escalationLevel: escalationMap[escalationResult.escalationLevel] || 'gathering',
-      dispatchSummary,
+      response,
+      shouldDispatch: true,
+      escalationLevel: 'dispatched',
+      dispatchSummary: generateDispatchSummary(context, threatAssessment),
       crankDetected: false,
-      escalateToAdmin: false
+      escalateToAdmin: shouldEscalateToAdmin(context.threatScore, false),
+      threatAssessment
     };
   }
   
@@ -270,12 +290,13 @@ export function generateEscalatingResponse(context: SessionContext, latestInput:
   const sopResponse = generateOperatorResponse(emergencyContext, latestInput);
   
   return {
-    response: escalationResult.aiResponse || sopResponse.response,
+    response: response,
     shouldDispatch: false, // Initial assessment, no dispatch yet
     escalationLevel: 'initial',
     dispatchSummary: undefined,
     crankDetected: false,
-    escalateToAdmin: false
+    escalateToAdmin: false,
+    threatAssessment
   };
 }
 
@@ -343,21 +364,33 @@ function getMissingCriticalInfo(context: SessionContext): string[] {
   return missing;
 }
 
-// Generate comprehensive dispatch summary following 911 standards
-function generateDispatchSummary(context: SessionContext): string {
+// Generate comprehensive dispatch summary following 911 standards with professional threat assessment
+function generateDispatchSummary(context: SessionContext, threatAssessment?: any): string {
   const info = context.criticalInfo;
   const keywords = Array.from(context.mentionedKeywords).join(', ');
+  
+  // Use professional threat assessment if available
+  let threatLevel = `${context.threatScore}% - ${context.threatScore >= 80 ? 'CRITICAL' : context.threatScore >= 60 ? 'HIGH' : 'ELEVATED'}`;
+  let responseUnits = info.responderNeeded || 'Multi-unit response';
+  
+  if (threatAssessment) {
+    threatLevel = `${Math.round(threatAssessment.severityScore * 10)}% - ${threatAssessment.category}`;
+    if (threatAssessment.requiredUnits.length > 0) {
+      responseUnits = threatAssessment.requiredUnits.join(' + ');
+    }
+  }
   
   return `EMERGENCY DISPATCH SUMMARY:
 📍 LOCATION: ${info.location || 'Unknown - CRITICAL'}
 🚨 INCIDENT TYPE: ${info.incidentType || 'Emergency situation'}
 👥 VICTIMS: ${info.numberOfVictims || 'Unknown number'}
 🩺 CONDITION: ${info.currentCondition || 'Assessment needed'}
-🚒 RESPONSE UNITS: ${info.responderNeeded || 'Multi-unit response'}
+🚒 RESPONSE UNITS: ${responseUnits}
 ⚠️ HAZARDS: ${info.hazards?.join(', ') || 'Standard precautions'}
 📞 CALLER: ${info.callerRelation || 'Unknown relation'}
 🔍 KEYWORDS: ${keywords}
-⭐ THREAT LEVEL: ${context.threatScore}% - ${context.threatScore >= 80 ? 'CRITICAL' : context.threatScore >= 60 ? 'HIGH' : 'ELEVATED'}
+⭐ THREAT LEVEL: ${threatLevel}
+${threatAssessment?.reasoning ? '\n🧠 ASSESSMENT: ' + threatAssessment.reasoning.join('; ') : ''}
 
 ONGOING COMMUNICATION: Caller remains on line for updates.`;
 }

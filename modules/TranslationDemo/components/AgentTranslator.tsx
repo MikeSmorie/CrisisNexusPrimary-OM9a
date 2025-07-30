@@ -137,21 +137,41 @@ export function AgentTranslator({
         if (detectedKeywords.includes('stuck') || detectedKeywords.includes('trapped')) contextTags.push('🚧 ENTRAPMENT');
         if (detectedKeywords.includes('drowning') || detectedKeywords.includes('water')) contextTags.push('🌊 WATER EMERGENCY');
         
+        // Add professional threat assessment tags
+        if (escalationResult.threatAssessment) {
+          const ta = escalationResult.threatAssessment;
+          if (ta.category === 'CATASTROPHIC') contextTags.push('🚨 CATASTROPHIC');
+          if (ta.category === 'CRITICAL') contextTags.push('⚠️ CRITICAL');
+          if (ta.immediateDispatch) contextTags.push('⚡ IMMEDIATE DISPATCH');
+        }
+        
         // Add recovery indicator if case was recovered from false flag
         if (crankStatus.includes('Recovered From Misflag')) {
           contextTags.push('🧠 Recovered From Misflag');
         }
 
+        // Professional threat assessment display
+        let threatDisplay = `🧮 Threat Score: ${updatedContext.threatScore}%`;
+        if (escalationResult.threatAssessment) {
+          const ta = escalationResult.threatAssessment;
+          threatDisplay = `🧮 Professional Assessment: ${ta.severityScore}/10 (${ta.category})`;
+          if (ta.reasoning.length > 0) {
+            threatDisplay += `\n🔍 Analysis: ${ta.reasoning[0]}`;
+          }
+        }
+
         const autoResponse = `
-🧠 [Enhanced AI Emergency SOP Analysis]
+🧠 [Professional Emergency Assessment - Real 911 Protocols]
 ⏱ EDTG: ${edtg} [LOCKED]
 🔍 Context Tags: [${contextTags.join(', ') || 'General Emergency'}]
-🧮 Threat Score: ${updatedContext.threatScore}%
+${threatDisplay}
 📈 Escalation: ${escalationResult.escalationLevel.toUpperCase()}
 ${crankStatus} ${adminEscalation}
 
-❓ Deductive Question: "${escalationResult.response}"
-📡 Responder Routing: ${escalationResult.shouldDispatch ? 'YES - DISPATCHING' : 'NO - GATHERING INFO'}
+❓ Professional Response: "${escalationResult.response}"
+📡 Dispatch Decision: ${escalationResult.shouldDispatch ? 
+  `YES - ${escalationResult.threatAssessment?.dispatchLevel || 'EMERGENCY'} RESPONSE` : 
+  'NO - CONTINUING ASSESSMENT'}
 
 📞 FULL DIALOGUE LOG:
 ${dialogueLog}
