@@ -111,8 +111,8 @@ export function setupAuth(app: Express) {
     try {
       const [user] = await db
         .select()
-        .from(disasterUsers)
-        .where(eq(disasterUsers.id, id))
+        .from(users)
+        .where(eq(users.id, id))
         .limit(1);
       done(null, user);
     } catch (err) {
@@ -149,8 +149,8 @@ export function setupAuth(app: Express) {
               try {
                 const [foundUser] = await db
                   .select()
-                  .from(disasterUsers)
-                  .where(eq(disasterUsers.username, username))
+                  .from(users)
+                  .where(eq(users.username, username))
                   .limit(1);
                 
                 if (foundUser) {
@@ -228,8 +228,8 @@ export function setupAuth(app: Express) {
       // Check if username or email already exists
       const existingUser = await db
         .select()
-        .from(disasterUsers)
-        .where(eq(disasterUsers.username, username))
+        .from(users)
+        .where(eq(users.username, username))
         .limit(1);
       
       if (existingUser.length > 0) {
@@ -240,8 +240,8 @@ export function setupAuth(app: Express) {
 
       const existingEmailUser = await db
         .select()
-        .from(disasterUsers)
-        .where(eq(disasterUsers.email, email || ""))
+        .from(users)
+        .where(eq(users.email, email || ""))
         .limit(1);
 
       if (existingEmailUser.length > 0) {
@@ -257,22 +257,19 @@ export function setupAuth(app: Express) {
       const now = new Date();
       
       const [newUser] = await db
-        .insert(disasterUsers)
+        .insert(users)
         .values({
           username,
           email: email || "",
           password: password,
           role: "responder",
-          lastLogin: now,
-          subscriptionPlan: "emergency",
-          department: "General Response",
-          certificationLevel: "Basic",
-          locationZone: "Unassigned",
-          twoFactorEnabled: true,
+          last_login: now,
+          subscription_plan: "emergency",
+          two_factor_enabled: true,
           status: "active", 
-          tokens: 1000,
-          createdAt: now,
-          isVerified: shouldSkipVerification ? true : false,
+          token_balance: 1000,
+          created_at: now,
+          is_verified: shouldSkipVerification ? true : false,
           verificationToken: shouldSkipVerification ? null : verificationToken,
           tokenVersion: 0
         })
@@ -330,10 +327,10 @@ export function setupAuth(app: Express) {
         username: req.user.username,
         email: req.user.email,
         role: req.user.role,
-        tokens: req.user.tokens,
-        subscriptionPlan: req.user.subscriptionPlan,
-        trialActive: req.user.trialActive,
-        trialExpiresAt: req.user.trialExpiresAt,
+        tokens: req.user.token_balance,
+        subscriptionPlan: req.user.subscription_plan,
+        trialActive: req.user.trial_active,
+        trialExpiresAt: req.user.trial_expires_at,
       });
     } else {
       res.status(401).json({ message: "Not logged in" });
