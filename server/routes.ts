@@ -87,26 +87,8 @@ export function registerRoutes(app: Express) {
     limit: '50mb'
   }));
 
-  // Health check middleware for deployment compatibility - handles automated health checks at root
-  app.use("/", (req, res, next) => {
-    // Only intercept GET requests to root path
-    if (req.method === 'GET' && req.path === '/') {
-      const userAgent = req.get('User-Agent') || '';
-      
-      // Detect deployment health checks by user agent patterns
-      if (userAgent.includes('curl') || userAgent.includes('GoogleHC') || userAgent.includes('kube-probe') || userAgent.includes('healthcheck')) {
-        return res.status(200).json({ 
-          status: "healthy",
-          service: "CrisisNexus Emergency Management System",
-          timestamp: new Date().toISOString(),
-          version: "1.0.0"
-        });
-      }
-    }
-    
-    // Let all other requests continue to the frontend app
-    next();
-  });
+  // Health check middleware - only for automated deployment health checks via specific endpoints
+  // Root path "/" is handled by frontend app in production
 
   // Setup auth
   setupAuth(app);

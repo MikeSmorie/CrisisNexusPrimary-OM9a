@@ -97,20 +97,7 @@ app.get("/healthz", (req, res) => {
   }
 });
 
-// Root health check endpoint
-app.get("/", (req, res) => {
-  try {
-    res.status(200).json({ 
-      status: "CrisisNexus Emergency Management System",
-      version: "1.0.0",
-      ready: true,
-      health: "/health"
-    });
-  } catch (error) {
-    console.error("Root endpoint error:", error);
-    res.status(500).json({ status: "error" });
-  }
-});
+// Root endpoint removed - handled by frontend routing in production
 
 // Test endpoint for module manager
 app.get("/api/module/test", async (req, res) => {
