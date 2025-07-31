@@ -41,7 +41,8 @@ export function setupAuth(app: Express) {
     }),
   };
 
-  if (app.get("env") === "production") {
+  // Production settings - only enable secure cookies for actual HTTPS deployment
+  if (app.get("env") === "production" && !process.env.REPLIT_DOMAINS) {
     app.set("trust proxy", 1);
     sessionSettings.cookie = {
       secure: true,
