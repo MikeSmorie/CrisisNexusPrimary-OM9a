@@ -68,13 +68,18 @@ const errorHandler = async (err: any, req: any, res: any, next: any) => {
 };
 
 export function registerRoutes(app: Express) {
-
-
-  // Basic CORS setup
-  app.use(cors({
-    origin: process.env.NODE_ENV === 'production' ? false : '*',
-    credentials: true
-  }));
+  try {
+    console.log("Setting up CORS...");
+    
+    // Basic CORS setup - Allow Replit domains in production  
+    app.use(cors({
+      origin: process.env.NODE_ENV === 'production' 
+        ? ['https://disaster-mng-1-om-9-michaelsthewrit.replit.app', 'https://replit.com']
+        : '*',
+      credentials: true
+    }));
+    
+    console.log("CORS setup complete");
 
   // Form data parser
   app.use(express.urlencoded({ 
@@ -1115,8 +1120,14 @@ export function registerRoutes(app: Express) {
     }
   });
 
-  // Error handler must be last
-  app.use(errorHandler);
+    // Error handler must be last
+    app.use(errorHandler);
 
-  return createServer(app);
+    console.log("All routes registered successfully");
+    return createServer(app);
+    
+  } catch (error) {
+    console.error("Error registering routes:", error);
+    throw error;
+  }
 }

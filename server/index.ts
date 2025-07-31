@@ -66,25 +66,50 @@ app.use((req, res, next) => {
   next();
 });
 
-// Health check endpoints for Cloud Run deployment
+// Health check endpoints for Cloud Run deployment  
 app.get("/health", (req, res) => {
-  res.status(200).json({ 
-    status: "healthy",
-    service: "CrisisNexus Emergency Management System",
-    uptime: Math.floor(process.uptime()),
-    timestamp: new Date().toISOString(),
-    version: "1.0.0",
-    ready: true
-  });
+  try {
+    res.status(200).json({ 
+      status: "healthy",
+      service: "CrisisNexus Emergency Management System",
+      uptime: Math.floor(process.uptime()),
+      timestamp: new Date().toISOString(),
+      version: "1.0.0",
+      ready: true
+    });
+  } catch (error) {
+    console.error("Health check error:", error);
+    res.status(500).json({ status: "error", message: "Health check failed" });
+  }
 });
 
 // Alternative health check endpoint
 app.get("/healthz", (req, res) => {
-  res.status(200).json({ 
-    status: "healthy",
-    service: "CrisisNexus",
-    ready: true
-  });
+  try {
+    res.status(200).json({ 
+      status: "healthy",
+      service: "CrisisNexus",
+      ready: true
+    });
+  } catch (error) {
+    console.error("Healthz error:", error);
+    res.status(500).json({ status: "error" });
+  }
+});
+
+// Root health check endpoint
+app.get("/", (req, res) => {
+  try {
+    res.status(200).json({ 
+      status: "CrisisNexus Emergency Management System",
+      version: "1.0.0",
+      ready: true,
+      health: "/health"
+    });
+  } catch (error) {
+    console.error("Root endpoint error:", error);
+    res.status(500).json({ status: "error" });
+  }
 });
 
 // Test endpoint for module manager
@@ -126,7 +151,9 @@ app.get("/api/module/test", async (req, res) => {
     dbVerification();
 
     // Register all API routes and create HTTP server
+    console.log("Registering routes...");
     const server = registerRoutes(app);
+    console.log("Routes registered successfully");
 
     // Global error handling middleware
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
